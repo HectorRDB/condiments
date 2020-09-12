@@ -1,0 +1,36 @@
+Package: DT
+Type: Package
+Title: Differential Topology
+Version: 0.1.0
+Date: 2020-09-17
+Authors@R: c(person("Koen", "Van den Berge", role = c("aut"),
+                     email = "koen.vandenberge@ugent.be"),
+              person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
+                     email = "hector.rouxdebezieux@berkeley.edu",
+		     comment = c(ORCID = "0000-0002-1489-8339")),
+		person("Kelly","Street", role = "ctb"))
+Description: Need to update
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: false
+URL: https://hectorrdb.github.io/DT/index.html
+Depends: R (>= 3.6)
+VignetteBuilder: knitr
+biocViews:
+    Clustering,
+    DifferentialExpression,
+    GeneExpression,
+    RNASeq,
+    Sequencing,
+    Software,
+    SingleCell,
+    Transcriptomics,
+    MultipleComparison,
+    Visualization
+BugReports: https://github.com/statOmics/tradeSeq/issues
+Imports: 
+    mgcv,
+    RANN,
+    EMT,
+    stats
+RoxygenNote: 7.1.1
