@@ -32,5 +32,8 @@ Imports:
     mgcv,
     RANN,
     EMT,
-    stats
+    stats,
+    ggplot2
 RoxygenNote: 7.1.1
+Suggests: 
+    knitr
