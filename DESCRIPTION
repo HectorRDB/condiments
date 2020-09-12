@@ -36,4 +36,7 @@ Imports:
     ggplot2
 RoxygenNote: 7.1.1
 Suggests: 
-    knitr
+    knitr,
+    testthat,
+    rmarkdown,
+    covr

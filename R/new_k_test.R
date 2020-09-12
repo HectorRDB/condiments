@@ -28,7 +28,7 @@ ks_test <-  function (x, y, thresh = .05) {
     return(max(stat, 0))
   })
   STATISTIC <- max(unlist(dist))
-  PVAL <- min(1, 2 * exp(- 2 * w * STATISTIC^2))
+  PVAL <- 1 - pkstwo(sqrt(w) * STATISTIC)
 
   PVAL <- min(1, max(0, PVAL))
   METHOD <- paste0("Two-sample Kolmogorov-Smirnov test with threshold ", thresh)
