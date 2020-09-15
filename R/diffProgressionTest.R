@@ -14,6 +14,7 @@
   B <- unique(cl)[2]
   pst <- slingshot::slingPseudotime(sds, na.rm = TRUE)
   w <- slingshot::slingCurveWeights(sds)
+  w <- sweep(w, 1, FUN = "/", STATS = apply(w, 1, sum))
   lineages_test <- lapply(seq_len(ncol(pst)), function(l){
     w_l <- w[, l]
     pst_l <- pst[, l]
@@ -22,8 +23,18 @@
                       thresh = thresh)
     return(c("Pval" = test_l$p.value, "Statistic" = test_l$statistic))
   }) %>%
-    dplyr::bind_rows(.id = "Lineage")
-  if(global) {}
+    dplyr::bind_rows(.id = "Lineage") %>%
+    dplyr::mutate(Lineage = as.character(Lineage))
+  glob_test <- .Stouffer(pvals = lineages_test$Pval,
+                         weights = colSums(w))
+  glob_test <- data.frame("Pval" = glob_test$Pval,
+                          "Statistic" = glob_test$Statistic,
+                          "Lineage" = "All")
+  if (global == TRUE & lineages == FALSE) return(glob_test)
+  if (global == FALSE & lineages == TRUE) return(lineages_test)
+  if (global == TRUE & lineages == TRUE) {
+    return(dplyr::bind_rows(glob_test, lineages_test))
+  }
 }
 
 
@@ -40,7 +51,7 @@
 #' @param global If TRUE, test for all lineages simultaneously.
 #' @param lineages If TRUE, test for all lineages independently.
 #' @import slingshot
-#' @importFrom dplyr n_distinct bind_rows
+#' @importFrom dplyr n_distinct bind_rows mutate
 #' @importFrom magrittr %>%
 #' @examples
 #' sd <- create_differential_topology(n_cells = 200, shift = 0,
