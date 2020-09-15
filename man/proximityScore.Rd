@@ -6,13 +6,6 @@
 \usage{
 proximity_score(Object, ...)
 }
-\arguments{
-\item{k}{The number of neighbours to consider when computing the score.
-Default to 10.}
-
-\item{smooth}{The smoothing parameter. Default to k. Lower values mean that
-we smooth more.}
-}
 \description{
 Proximity Score
 }

@@ -34,7 +34,8 @@ Imports:
     EMT,
     stats,
     SingleCellExperiment,
-    SummarizedExperiment
+    SummarizedExperiment,
+    slingshot
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,
