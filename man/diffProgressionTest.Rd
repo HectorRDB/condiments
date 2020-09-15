@@ -10,7 +10,7 @@ diffProgressionTest(sds, ...)
 
 \S4method{diffProgressionTest}{SlingshotDataSet}(
   sds,
-  cd,
+  conditions,
   global = TRUE,
   lineages = FALSE,
   method = "KS",
@@ -19,7 +19,7 @@ diffProgressionTest(sds, ...)
 
 \S4method{diffProgressionTest}{SingleCellExperiment}(
   sds,
-  cd,
+  conditions,
   global = TRUE,
   lineages = FALSE,
   method = "KS",
@@ -30,8 +30,8 @@ diffProgressionTest(sds, ...)
 \item{sds}{The final object after running slingshot. Can be either a
 \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{cd}{Either the vector of conditions, or a character indicating which
-column of the metadata contains this vector.}
+\item{conditions}{Either the vector of conditions, or a character indicating
+which column of the metadata contains this vector.}
 
 \item{global}{If TRUE, test for all lineages simultaneously.}
 
@@ -45,4 +45,13 @@ for a permutation. See details. Default to KS.}
 \description{
 Test whether or not the pseudotime distribution are identical
 within lineages between conditions
+}
+\examples{
+data('slingshotExample')
+rd <- slingshotExample$rd
+cl <- slingshotExample$cl
+condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+condition[110:139] <- 'A'
+sds <- slingshot(rd, cl)
+diffProgressionTest(sds, condition)
 }

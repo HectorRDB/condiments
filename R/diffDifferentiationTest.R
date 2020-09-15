@@ -1,5 +1,9 @@
 .diffDifferentiationTest <- function(sds, conditions, global = TRUE,
                                      lineages = FALSE, method = "Permutation") {
+  pairs <- utils::combn(length)
+  for (cond in unique(conditions)) {
+
+  }
 }
 
 
@@ -16,9 +20,17 @@
 #' @param pairwise If TRUE, test for all pairs independently.
 #' @param method For now, only "Permutation" is accepted.
 #' @import slingshot
-#' @importFrom dplyr n_distinct bind_rows mutate
+#' @importFrom utils combn
 #' @importFrom magrittr %>%
 #' @export
+#' @examples
+#' data('slingshotExample')
+#' rd <- slingshotExample$rd
+#' cl <- slingshotExample$cl
+#' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+#' condition[110:139] <- 'A'
+#' sds <- slingshot(rd, cl)
+#' diffDifferentiationTest(sds, condition)
 #' @rdname diffDifferentiationTest
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),

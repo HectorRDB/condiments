@@ -3,36 +3,35 @@
 %   R/diffTopoTest.R
 \name{diffTopoTest}
 \alias{diffTopoTest}
-\alias{diffProgressionTest,SingleCellExperiment-method}
+\alias{diffDifferentiationTest,SingleCellExperiment-method}
 \alias{diffTopoTest,SlingshotDataSet-method}
 \alias{diffTopoTest,SingleCellExperiment-method}
 \title{Differential Topology Test}
 \usage{
 diffTopoTest(sds, ...)
 
-\S4method{diffProgressionTest}{SingleCellExperiment}(
+\S4method{diffDifferentiationTest}{SingleCellExperiment}(
   sds,
-  cd,
+  conditions,
   global = TRUE,
   lineages = FALSE,
-  method = "KS",
-  thresh = 0.05
+  method = "Permutation"
 )
 
-\S4method{diffTopoTest}{SlingshotDataSet}(sds, cd, rep = 200, thresh = 0.05)
+\S4method{diffTopoTest}{SlingshotDataSet}(sds, conditions, rep = 200, thresh = 0.05)
 
-\S4method{diffTopoTest}{SingleCellExperiment}(sds, cd = cd, rep = 200, thresh = 0.05)
+\S4method{diffTopoTest}{SingleCellExperiment}(sds, conditions = conditions, rep = 200, thresh = 0.05)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
 \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{cd}{Either the vector of conditions, or a character indicating which
+\item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector.}
 
-\item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
-
 \item{rep}{How many permutations to run. Default to 200.}
+
+\item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
 }
 \description{
 Test whether or not slingshot should be fitted independently

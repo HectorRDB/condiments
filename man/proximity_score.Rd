@@ -5,15 +5,15 @@
 \alias{proximity_score,SingleCellExperiment-method}
 \title{Proximity Score}
 \usage{
-\S4method{proximity_score}{matrix}(Object, cd, k = 10, smooth = 10)
+\S4method{proximity_score}{matrix}(Object, conditions, k = 10, smooth = 10)
 
-\S4method{proximity_score}{SingleCellExperiment}(Object, dimred = 1, cd, k = 10, smooth = 10)
+\S4method{proximity_score}{SingleCellExperiment}(Object, dimred = 1, conditions, k = 10, smooth = 10)
 }
 \arguments{
 \item{Object}{A \code{\link{SingleCellExperiment}} object or a matrix
 representing the reduced dimension matrix of the cells.}
 
-\item{cd}{Either the vector of conditions, or a character indicating which
+\item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector}
 
 \item{k}{The number of neighbors to consider when computing the score.
@@ -32,7 +32,7 @@ same condition of not
 \examples{
 sd <- create_differential_topology(n_cells = 200, shift = 0,
                                    unbalance_level = 1)
-scores <- proximity_score(sd$rd, sd$cd, k = 4)
+scores <- proximity_score(sd$rd, sd$conditions, k = 4)
 cols <- as.numeric(cut(scores$scaled_scores, 8))
 plot(sd$rd[, "Dim1"], sd$rd[, "Dim2"], xlab = "Dim1", ylab = "Dim2",
  pch = 16, col = RColorBrewer::brewer.pal(8, "Blues")[cols])

@@ -36,7 +36,8 @@ Imports:
     SingleCellExperiment,
     SummarizedExperiment,
     slingshot,
-    spatstat
+    spatstat,
+    utils
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

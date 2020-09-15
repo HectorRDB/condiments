@@ -9,26 +9,22 @@ diffDifferentiationTest(sds, ...)
 
 \S4method{diffDifferentiationTest}{SlingshotDataSet}(
   sds,
-  cd,
+  conditions,
   global = TRUE,
   lineages = FALSE,
-  method = "KS",
-  thresh = 0.05
+  method = "Permutation"
 )
 }
 \arguments{
 \item{sds}{The final object after running slingshot. Can be either a
 \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{cd}{Either the vector of conditions, or a character indicating which
+\item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector}
 
 \item{global}{If TRUE, test for all pairs simultaneously.}
 
-\item{method}{Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
-for a permutation. See details. Default to KS.}
-
-\item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
+\item{method}{For now, only "Permutation" is accepted.}
 
 \item{pairwise}{If TRUE, test for all pairs independently.}
 }

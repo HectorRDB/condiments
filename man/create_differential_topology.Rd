@@ -28,7 +28,7 @@ A list with three components
   \code{n_cells} by \code{2} matrix
   \item \code{lineages}: A vector of length \code{n_cells}. Either 1 or 2
   depending of lineage assignment for each cell.
-  \item \code{cd}: A vector of length \code{n_cells}. Either A or B
+  \item \code{conditions}: A vector of length \code{n_cells}. Either A or B
   depending of condition assignment for each cell.
 }
 }

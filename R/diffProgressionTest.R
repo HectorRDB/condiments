@@ -2,9 +2,8 @@
                                  method = "KS", thresh = 0.05) {
   A <- unique(conditions)[1]
   B <- unique(conditions)[2]
-  pst <- slingshot::slingPseudotime(sds, na.rm = TRUE)
-  w <- slingshot::slingCurveWeights(sds)
-  w <- sweep(w, 1, FUN = "/", STATS = apply(w, 1, sum))
+  pst <- slingshot::slingPseudotime(sds, na = TRUE)
+  w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
   lineages_test <- lapply(seq_len(ncol(pst)), function(l){
     w_l <- w[, l]
     pst_l <- pst[, l]
@@ -61,6 +60,14 @@
 #' @import slingshot
 #' @importFrom dplyr n_distinct bind_rows mutate
 #' @importFrom magrittr %>%
+#' @examples
+#' data('slingshotExample')
+#' rd <- slingshotExample$rd
+#' cl <- slingshotExample$cl
+#' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+#' condition[110:139] <- 'A'
+#' sds <- slingshot(rd, cl)
+#' diffProgressionTest(sds, condition)
 #' @export
 #' @rdname diffProgressionTest
 setMethod(f = "diffProgressionTest",
