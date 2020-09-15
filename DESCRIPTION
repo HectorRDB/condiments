@@ -35,7 +35,8 @@ Imports:
     stats,
     SingleCellExperiment,
     SummarizedExperiment,
-    slingshot
+    slingshot,
+    spatstat
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

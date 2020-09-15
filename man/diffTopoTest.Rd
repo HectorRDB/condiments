@@ -23,7 +23,7 @@ diffProgressionTest(sds, ...)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
-\code\link{{slingshotDataset}} or a \code\link{{SingleCellExperiment}} object.}
+\code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
 
 \item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
 

@@ -4,7 +4,7 @@
 \alias{ks_test}
 \title{New KS Test}
 \usage{
-ks_test(x, y, thresh = 0.05)
+ks_test(x, y, thresh = 0.05, w_x = rep(1, length(x)), w_y = rep(1, length(y)))
 }
 \arguments{
 \item{x}{Vector of values sampled from the first distribution}
@@ -12,6 +12,10 @@ ks_test(x, y, thresh = 0.05)
 \item{y}{Vector of values sampled from the second distribution}
 
 \item{thresh}{The threshold needed to clear between the two cumulative distributions}
+
+\item{w_x}{The observation weights for x}
+
+\item{w_y}{The observation weights for y}
 }
 \description{
 Kolmogorov-Smirnov Two-Sample Test, with threshold for differences
