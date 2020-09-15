@@ -32,3 +32,12 @@ column of the metadata contains this vector}
 Test whether or not the cell repartition between lineages is
 independent of the conditions
 }
+\examples{
+data('slingshotExample')
+rd <- slingshotExample$rd
+cl <- slingshotExample$cl
+condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+condition[110:139] <- 'A'
+sds <- slingshot(rd, cl)
+diffDifferentiationTest(sds, condition)
+}
