@@ -28,6 +28,17 @@ ks_test <-  function (x, y, thresh = .05) {
     return(max(stat, 0))
   })
   STATISTIC <- max(unlist(dist))
+  pkstwo <- function(x, tol = 1e-06) {
+    if (is.numeric(x))
+      x <- as.double(x)
+    else stop("argument 'x' must be numeric")
+    p <- rep(0, length(x))
+    p[is.na(x)] <- NA
+    IND <- which(!is.na(x) & (x > 0))
+    if (length(IND))
+      p[IND] <- .Call(stats:::C_pKS2, p = x[IND], tol)
+    p
+  }
   PVAL <- 1 - pkstwo(sqrt(w) * STATISTIC)
 
   PVAL <- min(1, max(0, PVAL))

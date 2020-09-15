@@ -33,7 +33,8 @@ Imports:
     RANN,
     EMT,
     stats,
-    ggplot2
+    SingleCellExperiment,
+    SummarizedExperiment
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

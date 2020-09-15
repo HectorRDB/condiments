@@ -33,31 +33,12 @@
   return(res)
 }
 
-#' Proximity score
-#'
-#' @description Compute a proximity score to show whether nearby cells have the
-#' same condition of not
-#'
-#' @param rd The reduced dimension matrix of the cells
-#' @param cl the vector of conditions
-#' @param k The number of neighbours to consider when computing the score.
-#'  Default to 10.
-#' @param smooth The smoothing parameter. Default to k. Lower values mean that
-#' we smooth more.
-#' @import RANN EMT
-#' @importFrom mgcv gam
-#' @examples
-#' sd <- create_differential_topology(n_cells = 200, shift = 0,
-#'                                    unbalance_level = .8)
-#' scores <- proximity_score(sd$rd, sd$cl, 4)
-#' ggplot(data.frame(sd$rd, scores = scores$scaled_scores),
-#'        aes(x = Dim1, y = Dim2, col = scores)) +
-#'   geom_point() +
-#'   theme_classic()
-#' @export
-proximity_score <- function(rd, cl, k = 10, smooth = k) {
+.proximity_score <- function(rd, cl, k = 10, smooth = k) {
   # Code inspired from the monocle3 package
   # https://github.com/cole-trapnell-lab/monocle3/blob/9becd94f60930c2a9b51770e3818c194dd8201eb/R/cluster_cells.R#L194
+  if (length(cl) != nrow(rd)) {
+    stop("The conditions and reduced dimensions do not contain the same cells")
+  }
 
   props <- as.vector(table(cl) / length(cl))
   groups <- unique(cl)
@@ -92,3 +73,66 @@ proximity_score <- function(rd, cl, k = 10, smooth = k) {
 
   return(list("scores" = scores, "scaled_scores" = scaled_scores))
 }
+
+
+#' Proximity Score
+#'
+#' @description Compute a proximity score to show whether nearby cells have the
+#' same condition of not
+#'
+#' @param Object A \code{\link{SingleCellExperiment}} object or a matrix
+#' representing the reduced dimension matrix of the cells.
+#' @param dimred A string or integer scalar indicating the reduced dimension
+#' result in \code{reducedDims(sce)} to plot. Default to 1.
+#' @param cl Either the vector of conditions, or a character indicating which
+#' column of the metadata contains this vector
+#' @param k The number of neighbors to consider when computing the score.
+#'  Default to 10.
+#' @param smooth The smoothing parameter. Default to k. Lower values mean that
+#' we smooth more.
+#' @import RANN EMT
+#' @importFrom mgcv gam
+#' @examples
+#' sd <- create_differential_topology(n_cells = 200, shift = 0,
+#'                                    unbalance_level = 1)
+#' scores <- proximity_score(sd$rd, sd$cl, k = 4)
+#' cols <- as.numeric(cut(scores$scaled_scores, 8))
+#' plot(sd$rd[, "Dim1"], sd$rd[, "Dim2"], xlab = "Dim1", ylab = "Dim2",
+#'  pch = 16, col = RColorBrewer::brewer.pal(8, "Blues")[cols])
+#' @export
+#' @rdname proximity_score
+setMethod(f = "proximity_score",
+          signature = c(Object = "matrix"),
+          definition = function(Object, cl, k = 10, smooth = 10){
+            scores <-
+              .proximity_score(rd = Object, cl = cl, k = k, smooth = smooth)
+            return(scores)
+          }
+)
+
+
+#' @export
+#' @rdname proximity_score
+#' @importFrom SummarizedExperiment colData
+#' @import SingleCellExperiment
+setMethod(f = "proximity_score",
+          signature = c(Object = "SingleCellExperiment"),
+          definition = function(Object, dimred = 1, cl, k = 10, smooth = 10){
+            if (ncol(Object) == 1) stop("The dataset only has one cell")
+            if (length(cl == 1)) {
+              if (cl %in% colnames(SummarizedExperiment::colData(Object))) {
+                conditions <- SummarizedExperiment::colData(Object)[, cl]
+              } else {
+                stop("cl is not a column of colData(Object)")
+              }
+            }
+            if (length(SingleCellExperiment::reducedDims(Object)) == 0) {
+              stop("Add a reduced dimension method to Object")
+            } else {
+              rd <- SingleCellExperiment::reducedDims(Object)[[dimred]]
+            }
+            Object$scores <-
+              .proximity_score(rd = rd, cl = cl, k = k, smooth = smooth)
+            return(Object)
+          }
+)
