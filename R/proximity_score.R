@@ -33,16 +33,16 @@
   return(res)
 }
 
-.proximity_score <- function(rd, cd, k = 10, smooth = k) {
+.proximity_score <- function(rd, conditions, k = 10, smooth = k) {
   # Code inspired from the monocle3 package
   # https://github.com/cole-trapnell-lab/monocle3/blob/9becd94f60930c2a9b51770e3818c194dd8201eb/R/cluster_cells.R#L194
-  if (length(cd) != nrow(rd)) {
+  if (length(conditions) != nrow(rd)) {
     stop("The conditions and reduced dimensions do not contain the same cells")
   }
 
-  props <- as.vector(table(cd) / length(cd))
-  groups <- unique(cd)
-  if (length(groups) == 1) stop("cd should have at least 2 classes")
+  props <- as.vector(table(conditions) / length(conditions))
+  groups <- unique(conditions)
+  if (length(groups) == 1) stop("conditions should have at least 2 classes")
 
   # Get the graph
   # We need to add 1 because by default, nn2 counts each cell as its own
@@ -53,7 +53,7 @@
   distMatrix <- tmp[[2]][, -1]
   distMatrix <- 1 / distMatrix
   distMatrix <- distMatrix / rowSums(distMatrix)
-  cdMatrix <- matrix(factor(cd)[neighborMatrix], ncol = k + 1)
+  cdMatrix <- matrix(factor(conditions)[neighborMatrix], ncol = k + 1)
   simMatrix <- cdMatrix == cdMatrix[, 1]
   # Remove each cell from being it's own neighbour
   simMatrix <- simMatrix[, -1]
@@ -84,7 +84,7 @@
 #' representing the reduced dimension matrix of the cells.
 #' @param dimred A string or integer scalar indicating the reduced dimension
 #' result in \code{reducedDims(sce)} to plot. Default to 1.
-#' @param cd Either the vector of conditions, or a character indicating which
+#' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector
 #' @param k The number of neighbors to consider when computing the score.
 #'  Default to 10.
@@ -95,7 +95,7 @@
 #' @examples
 #' sd <- create_differential_topology(n_cells = 200, shift = 0,
 #'                                    unbalance_level = 1)
-#' scores <- proximity_score(sd$rd, sd$cd, k = 4)
+#' scores <- proximity_score(sd$rd, sd$conditions, k = 4)
 #' cols <- as.numeric(cut(scores$scaled_scores, 8))
 #' plot(sd$rd[, "Dim1"], sd$rd[, "Dim2"], xlab = "Dim1", ylab = "Dim2",
 #'  pch = 16, col = RColorBrewer::brewer.pal(8, "Blues")[cols])
@@ -103,9 +103,10 @@
 #' @rdname proximity_score
 setMethod(f = "proximity_score",
           signature = c(Object = "matrix"),
-          definition = function(Object, cd, k = 10, smooth = 10){
-            scores <-
-              .proximity_score(rd = Object, cd = cd, k = k, smooth = smooth)
+          definition = function(Object, conditions, k = 10, smooth = 10){
+            scores <- .proximity_score(rd = Object,
+                                       conditions = conditions,
+                                       k = k, smooth = smooth)
             return(scores)
           }
 )
@@ -117,13 +118,16 @@ setMethod(f = "proximity_score",
 #' @import SingleCellExperiment
 setMethod(f = "proximity_score",
           signature = c(Object = "SingleCellExperiment"),
-          definition = function(Object, dimred = 1, cd, k = 10, smooth = 10){
+          definition = function(Object,
+                                dimred = 1,
+                                conditions, k = 10,
+                                smooth = 10){
             if (ncol(Object) == 1) stop("The dataset only has one cell")
-            if (length(cd == 1)) {
-              if (cd %in% colnames(SummarizedExperiment::colData(Object))) {
-                conditions <- SummarizedExperiment::colData(Object)[, cd]
+            if (length(conditions == 1)) {
+              if (conditions %in% colnames(SummarizedExperiment::colData(Object))) {
+                conditions <- SummarizedExperiment::colData(Object)[, conditions]
               } else {
-                stop("cd is not a column of colData(Object)")
+                stop("conditions is not a column of colData(Object)")
               }
             }
             if (length(SingleCellExperiment::reducedDims(Object)) == 0) {
@@ -131,8 +135,9 @@ setMethod(f = "proximity_score",
             } else {
               rd <- SingleCellExperiment::reducedDims(Object)[[dimred]]
             }
-            Object$scores <-
-              .proximity_score(rd = rd, cd = cd, k = k, smooth = smooth)
+            Object$scores <- .proximity_score(rd = rd,
+                                              conditions = conditions,
+                                              k = k, smooth = smooth)
             return(Object)
           }
 )
