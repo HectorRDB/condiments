@@ -5,7 +5,7 @@
   }) %>%
     unlist()
   Z <- sum(Zs * weights) / sqrt(sum(weights^2))
-  return(c("Pval" = pnorm(Z), "Statistic" = Z))
+  return(list("Pval" = pnorm(Z), "Statistic" = Z))
 }
 
 # Toy examples ----
