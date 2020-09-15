@@ -99,11 +99,11 @@ setMethod(f = "diffProgressionTest",
                 stop("conditions is not a column of colData(sds)")
               }
             }
-            return(diffTopoTest(slingshot::SlingshotDataSet(sds),
-                                conditions = conditions,
-                                global = global,
-                                lineages = lineages,
-                                method = method,
-                                thresh = thresh))
+            return(diffProgressionTest(slingshot::SlingshotDataSet(sds),
+                                       conditions = conditions,
+                                       global = global,
+                                       lineages = lineages,
+                                       method = method,
+                                       thresh = thresh))
           }
 )

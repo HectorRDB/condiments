@@ -1,1 +1,2 @@
-test_check("DT")
+library(DifTopo)
+test_check("DifTopo")

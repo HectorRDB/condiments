@@ -1,6 +1,5 @@
 .diffDifferentiationTest <- function(sds, conditions, global = TRUE,
-                                     lineages = FALSE, method = "KS",
-                                     thresh = 0.05) {
+                                     lineages = FALSE, method = "Permutation") {
 }
 
 
@@ -15,9 +14,7 @@
 #' column of the metadata contains this vector
 #' @param global If TRUE, test for all pairs simultaneously.
 #' @param pairwise If TRUE, test for all pairs independently.
-#' @param method Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
-#' for a permutation. See details. Default to KS.
-#' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
+#' @param method For now, only "Permutation" is accepted.
 #' @import slingshot
 #' @importFrom dplyr n_distinct bind_rows mutate
 #' @importFrom magrittr %>%
@@ -26,10 +23,7 @@
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
-                                method = "KS", thresh = .05){
-            if (n_distinct(conditions) != 2) {
-              stop("For now, this test only works with two conditions")
-            }
+                                method = "Permutation"){
             res <- .diffProgressionTest(sds = sds,
                                         conditions = conditions,
                                         global = global,
@@ -45,10 +39,10 @@ setMethod(f = "diffDifferentiationTest",
 #' @rdname diffTopoTest
 #' @import SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
-setMethod(f = "diffProgressionTest",
+setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions,  global = TRUE,
-                                lineages = FALSE, method = "KS", thresh = .05){
+                                lineages = FALSE, method = "Permutation"){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -59,11 +53,10 @@ setMethod(f = "diffProgressionTest",
                 stop("conditions is not a column of colData(sds)")
               }
             }
-            return(diffTopoTest(slingshot::SlingshotDataSet(sds),
-                                conditions = conditions,
-                                global = global,
-                                lineages = lineages,
-                                method = method,
-                                thresh = thresh))
+            return(diffDifferentiationTest(slingshot::SlingshotDataSet(sds),
+                                           conditions = conditions,
+                                           global = global,
+                                           lineages = lineages,
+                                           method = method))
           }
 )
