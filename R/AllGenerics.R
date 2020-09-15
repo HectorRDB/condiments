@@ -22,12 +22,24 @@ setGeneric(
 )
 
 #' @export
-#' @name diffTopoTest
-#' @title Differential Topology Test
+#' @name diffProgressionTest
+#' @title Differential Progression Test
 setGeneric(
   name = "diffProgressionTest",
   signature = "sds",
   def = function(sds, ...) {
     standardGeneric("diffProgressionTest")
+  }
+)
+
+
+#' @export
+#' @name diffDifferentiationTest
+#' @title Differential Differentiation Test
+setGeneric(
+  name = "diffDifferentiationTest",
+  signature = "sds",
+  def = function(sds, ...) {
+    standardGeneric("diffDifferentiationTest")
   }
 )

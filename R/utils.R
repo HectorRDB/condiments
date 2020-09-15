@@ -1,3 +1,14 @@
+# Stats ----
+.Stouffer <- function(pvals, weights) {
+  Zs <- lapply(pvals, function(pval) {
+    return(qnorm(pval / 2, lower.tail = FALSE))
+  }) %>%
+    unlist()
+  Z <- sum(Zs * weights) / sqrt(sum(weights^2))
+  return(c("Pval" = pnorm(Z), "Statistic" = Z))
+}
+
+# Toy examples ----
 .create_fork <- function(n_cells, noise) {
   rd <- matrix(0, ncol = 2, nrow = n_cells)
   common <- round(n_cells / 3)
@@ -26,7 +37,7 @@
 #'   \code{n_cells} by \code{2} matrix
 #'   \item \code{lineages}: A vector of length \code{n_cells}. Either 1 or 2
 #'   depending of lineage assignment for each cell.
-#'   \item \code{cl}: A vector of length \code{n_cells}. Either A or B
+#'   \item \code{cd}: A vector of length \code{n_cells}. Either A or B
 #'   depending of condition assignment for each cell.
 #' }
 #' @examples
@@ -49,14 +60,14 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   }
   sd <- list(rd = rbind(sd_1$rd, sd_2$rd),
              lineages = c(sd_1$lineages, sd_2$lineages),
-             cl = rep(c("A", "B"), each = round(n_cells / 2)))
+             cd = rep(c("A", "B"), each = round(n_cells / 2)))
 
   # Unbalance lineage 2 toward the first condition
   lineage_2 <- sd$lineages == -1 & sd$rd[, 1] > -10
-  sd$cl[lineage_2] <- "B"
+  sd$cd[lineage_2] <- "B"
   change <- sample(which(lineage_2),
                    size = round(sum(lineage_2) * unbalance_level))
-  sd$cl[change] <- "A"
+  sd$cd[change] <- "A"
 
   return(sd)
 }

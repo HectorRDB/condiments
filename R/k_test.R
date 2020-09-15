@@ -1,6 +1,7 @@
 #' New KS Test
 #'
-#' @description Kolmogorov-Smirnov Two-Sample Test, with threshold for differences
+#' @description Weight Kolmogorov-Smirnov Two-Sample Test,
+#' with threshold for differences
 #'
 #' @param x Vector of values sampled from the first distribution
 #' @param y Vector of values sampled from the second distribution
@@ -26,7 +27,7 @@ ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
   n.x <- length(x)
   n.x <- as.double(n.x)
   if (n.x < 1L)  stop("not enough 'x' data")
-  w_x <- w_x[!is.na(x)]
+  w_y <- w_y[!is.na(y)]
   y <- y[!is.na(y)]
   y <- y[w_y > 0]
   w_y <- w_y[w_y > 0]

@@ -18,7 +18,8 @@ ks_test(x, y, thresh = 0.05, w_x = rep(1, length(x)), w_y = rep(1, length(y)))
 \item{w_y}{The observation weights for y}
 }
 \description{
-Kolmogorov-Smirnov Two-Sample Test, with threshold for differences
+Weight Kolmogorov-Smirnov Two-Sample Test,
+with threshold for differences
 }
 \examples{
  x <- runif(100)

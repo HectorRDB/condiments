@@ -1,5 +1,5 @@
-.diffProgressionTest <- function(sds, cd, global = TRUE, lineages = FALSE,
-                                 method = "KS", thresh = 0.05) {
+.diffDifferentiationTest <- function(sds, cd, global = TRUE, lineages = FALSE,
+                                     method = "KS", thresh = 0.05) {
   A <- unique(cd)[1]
   B <- unique(cd)[2]
   pst <- slingshot::slingPseudotime(sds, na.rm = TRUE)
@@ -42,17 +42,17 @@
 }
 
 
-#' Differential Progression Test
+#' Differential Differentiation Test
 #'
-#' @description Test whether or not the pseudotime distribution are identical
-#' within lineages between conditions
+#' @description Test whether or not the cell repartition between lineages is
+#' independent of the conditions
 #'
 #' @param sds The final object after running slingshot. Can be either a
 #' \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.
 #' @param cd Either the vector of conditions, or a character indicating which
-#' column of the metadata contains this vector.
-#' @param global If TRUE, test for all lineages simultaneously.
-#' @param lineages If TRUE, test for all lineages independently.
+#' column of the metadata contains this vector
+#' @param global If TRUE, test for all pairs simultaneously.
+#' @param pairwise If TRUE, test for all pairs independently.
 #' @param method Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
 #' for a permutation. See details. Default to KS.
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
@@ -60,8 +60,8 @@
 #' @importFrom dplyr n_distinct bind_rows mutate
 #' @importFrom magrittr %>%
 #' @export
-#' @rdname diffProgressionTest
-setMethod(f = "diffProgressionTest",
+#' @rdname diffDifferentiationTest
+setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, cd, global = TRUE, lineages = FALSE,
                                 method = "KS", thresh = .05){
@@ -80,7 +80,7 @@ setMethod(f = "diffProgressionTest",
 
 
 #' @export
-#' @rdname diffProgressionTest
+#' @rdname diffTopoTest
 #' @import SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffProgressionTest",
