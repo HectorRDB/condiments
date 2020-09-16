@@ -18,7 +18,7 @@ create_differential_topology(
 
 \item{shift}{How much should the top lineage shift in condition B.}
 
-\item{unbalance_levelHow}{much should the bottom lineage be unbalanced toward
+\item{unbalance_level}{How much should the bottom lineage be unbalanced toward
 condition A.}
 }
 \value{

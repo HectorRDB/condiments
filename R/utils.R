@@ -29,7 +29,7 @@
 #' @param n_cells The number of cells in the dataset.
 #' @param noise Amount of noise. Between 0 and 1.
 #' @param shift How much should the top lineage shift in condition B.
-#' @param unbalance_levelHow much should the bottom lineage be unbalanced toward
+#' @param unbalance_level How much should the bottom lineage be unbalanced toward
 #' condition A.
 #' @return A list with three components
 #'  \itemize{

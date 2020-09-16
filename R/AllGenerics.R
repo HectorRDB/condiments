@@ -1,6 +1,7 @@
 #' @export
-#' @name proximityScore
+#' @name proximity_score
 #' @title Proximity Score
+#' @param ... parameters including:
 setGeneric(
   name = "proximity_score",
   signature = "Object",
@@ -13,6 +14,7 @@ setGeneric(
 #' @export
 #' @name diffTopoTest
 #' @title Differential Topology Test
+#' @param ... parameters including:
 setGeneric(
   name = "diffTopoTest",
   signature = "sds",
@@ -24,6 +26,7 @@ setGeneric(
 #' @export
 #' @name diffProgressionTest
 #' @title Differential Progression Test
+#' @param ... parameters including:
 setGeneric(
   name = "diffProgressionTest",
   signature = "sds",
@@ -36,6 +39,7 @@ setGeneric(
 #' @export
 #' @name diffDifferentiationTest
 #' @title Differential Differentiation Test
+#' @param ... parameters including:
 setGeneric(
   name = "diffDifferentiationTest",
   signature = "sds",

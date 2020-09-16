@@ -44,19 +44,19 @@
 #' for different conditions or not.
 #'
 #' @param sds A slingshot object already run on the full dataset. Can be either a
-#' \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.
+#' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector.
 #' @param rep How many permutations to run. Default to 200.
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
 #' @import slingshot
 #' @examples
-#' data('slingshotExample')
+#' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
 #' cl <- slingshotExample$cl
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
-#' sds <- getLineages(rd, cl)
+#' sds <- slingshot::getLineages(rd, cl)
 #' diffTopoTest(sds, condition, rep = 20)
 #' @export
 #' @rdname diffTopoTest

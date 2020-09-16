@@ -3,6 +3,7 @@
 \name{diffDifferentiationTest}
 \alias{diffDifferentiationTest}
 \alias{diffDifferentiationTest,SlingshotDataSet-method}
+\alias{diffDifferentiationTest,SingleCellExperiment-method}
 \title{Differential Differentiation Test}
 \usage{
 diffDifferentiationTest(sds, ...)
@@ -11,33 +12,43 @@ diffDifferentiationTest(sds, ...)
   sds,
   conditions,
   global = TRUE,
-  lineages = FALSE,
+  pairwise = FALSE,
+  method = "Permutation"
+)
+
+\S4method{diffDifferentiationTest}{SingleCellExperiment}(
+  sds,
+  conditions,
+  global = TRUE,
+  pairwise = FALSE,
   method = "Permutation"
 )
 }
 \arguments{
 \item{sds}{The final object after running slingshot. Can be either a
-\code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
+\code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
+
+\item{...}{parameters including:}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector}
 
 \item{global}{If TRUE, test for all pairs simultaneously.}
 
-\item{method}{For now, only "Permutation" is accepted.}
-
 \item{pairwise}{If TRUE, test for all pairs independently.}
+
+\item{method}{For now, only "Permutation" is accepted.}
 }
 \description{
 Test whether or not the cell repartition between lineages is
 independent of the conditions
 }
 \examples{
-data('slingshotExample')
+data('slingshotExample', package = "slingshot")
 rd <- slingshotExample$rd
 cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
-sds <- slingshot(rd, cl)
+sds <- slingshot::slingshot(rd, cl)
 diffDifferentiationTest(sds, condition)
 }

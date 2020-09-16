@@ -9,7 +9,7 @@ Authors@R: c(person("Koen", "Van den Berge", role = c("aut"),
                      email = "hector.rouxdebezieux@berkeley.edu",
 		     comment = c(ORCID = "0000-0002-1489-8339")),
 		person("Kelly","Street", role = "ctb"))
-Description: Need to update
+Description: Need to update.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
@@ -37,7 +37,10 @@ Imports:
     SummarizedExperiment,
     slingshot,
     spatstat,
-    utils
+    utils,
+    magrittr,
+    dplyr,
+    RColorBrewer
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

@@ -49,7 +49,7 @@
 #' within lineages between conditions
 #'
 #' @param sds The final object after running slingshot. Can be either a
-#' \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.
+#' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating
 #' which column of the metadata contains this vector.
 #' @param global If TRUE, test for all lineages simultaneously.
@@ -62,7 +62,6 @@
 #' Default to \code{1e4}.
 #' @import slingshot
 #' @importFrom dplyr n_distinct bind_rows mutate
-#' @importFrom magrittr %>%
 #' @details
 #' For every lineage, we compare the pseudotimes of the cells from either
 #' conditions, using the lineage weights as observations weights.
@@ -90,12 +89,12 @@
 #'   \code{"All"}.
 #' }
 #' @examples
-#' data('slingshotExample')
+#' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
 #' cl <- slingshotExample$cl
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
-#' sds <- slingshot(rd, cl)
+#' sds <- slingshot::slingshot(rd, cl)
 #' diffProgressionTest(sds, condition)
 #' @export
 #' @rdname diffProgressionTest

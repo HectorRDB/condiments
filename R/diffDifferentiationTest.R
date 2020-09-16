@@ -6,6 +6,7 @@
 
     return()
   })
+  return()
 }
 
 
@@ -15,7 +16,7 @@
 #' independent of the conditions
 #'
 #' @param sds The final object after running slingshot. Can be either a
-#' \code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.
+#' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector
 #' @param global If TRUE, test for all pairs simultaneously.
@@ -23,20 +24,19 @@
 #' @param method For now, only "Permutation" is accepted.
 #' @import slingshot
 #' @importFrom utils combn
-#' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' data('slingshotExample')
+#' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
 #' cl <- slingshotExample$cl
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
-#' sds <- slingshot(rd, cl)
+#' sds <- slingshot::slingshot(rd, cl)
 #' diffDifferentiationTest(sds, condition)
 #' @rdname diffDifferentiationTest
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, global = TRUE, lineages = FALSE,
+          definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
                                 method = "Permutation"){
             res <- .diffProgressionTest(sds = sds,
                                         conditions = conditions,
@@ -50,13 +50,13 @@ setMethod(f = "diffDifferentiationTest",
 
 
 #' @export
-#' @rdname diffTopoTest
+#' @rdname diffDifferentiationTest
 #' @import SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions,  global = TRUE,
-                                lineages = FALSE, method = "Permutation"){
+                                pairwise = FALSE, method = "Permutation"){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }

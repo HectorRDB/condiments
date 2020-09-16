@@ -30,7 +30,9 @@ diffProgressionTest(sds, ...)
 }
 \arguments{
 \item{sds}{The final object after running slingshot. Can be either a
-\code{\link{slingshotDataset}} or a \code{\link{SingleCellExperiment}} object.}
+\code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
+
+\item{...}{parameters including:}
 
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}
@@ -77,12 +79,12 @@ Lineage-levels p-values are combined using Stouffer's Z-score method, using
 the sum of cellweights per lineage to weight each p-value.
 }
 \examples{
-data('slingshotExample')
+data('slingshotExample', package = "slingshot")
 rd <- slingshotExample$rd
 cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
-sds <- slingshot(rd, cl)
+sds <- slingshot::slingshot(rd, cl)
 diffProgressionTest(sds, condition)
 }
 \references{
