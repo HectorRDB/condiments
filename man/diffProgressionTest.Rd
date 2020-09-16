@@ -14,7 +14,8 @@ diffProgressionTest(sds, ...)
   global = TRUE,
   lineages = FALSE,
   method = "KS",
-  thresh = 0.05
+  thresh = 0.05,
+  rep = 10000
 )
 
 \S4method{diffProgressionTest}{SingleCellExperiment}(
@@ -23,7 +24,8 @@ diffProgressionTest(sds, ...)
   global = TRUE,
   lineages = FALSE,
   method = "KS",
-  thresh = 0.05
+  thresh = 0.05,
+  rep = 10000
 )
 }
 \arguments{
@@ -40,11 +42,39 @@ which column of the metadata contains this vector.}
 \item{method}{Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
 for a permutation. See details. Default to KS.}
 
-\item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
+\item{thresh}{The threshold for the KS test. See \code{\link{ks_test}}.
+Ignored if \code{method = "Permutation"}. Default to .05.}
+
+\item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
+Default to \code{1e4}.}
+}
+\value{
+A data frame with 3 columns:
+\itemize{
+\item \emph{Pval} the pvalue for the test at the global or lineage level
+\item \emph{Statistic} for individual lineages, either the modified KS statistic
+if \code{method = "KS"}, or the weighted difference of means, if
+\code{method = "Permutation"}. For the global test, the combined Z-score.
+\item \emph{Lineage} for individual lineages, the lineage number. For global,
+\code{"All"}.
+}
 }
 \description{
 Test whether or not the pseudotime distribution are identical
 within lineages between conditions
+}
+\details{
+For every lineage, we compare the pseudotimes of the cells from either
+conditions, using the lineage weights as observations weights.
+\itemize{
+\item If \code{method = "KS"}, this uses the updated KS test,
+see \code{\link{ks_test}} for details.
+\item If \code{method = "Permutation"}, the difference of weighted mean
+pseudotime between condition is computed, and a p-value is found by
+permuting the condition labels.
+}
+Lineage-levels p-values are combined using Stouffer's Z-score method, using
+the sum of cellweights per lineage to weight each p-value.
 }
 \examples{
 data('slingshotExample')
@@ -54,4 +84,10 @@ condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 sds <- slingshot(rd, cl)
 diffProgressionTest(sds, condition)
+}
+\references{
+Stouffer, S.A.; Suchman, E.A.; DeVinney, L.C.; Star, S.A.;
+Williams, R.M. Jr. (1949).
+\emph{The American Soldier, Vol.1: Adjustment during Army Life.}
+Princeton University Press, Princeton.
 }

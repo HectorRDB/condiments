@@ -1,7 +1,6 @@
 #' New KS Test
 #'
-#' @description Weight Kolmogorov-Smirnov Two-Sample Test,
-#' with threshold for differences
+#' @description Weighted Kolmogorov-Smirnov Two-Sample Test with threshold
 #'
 #' @param x Vector of values sampled from the first distribution
 #' @param y Vector of values sampled from the second distribution
@@ -12,7 +11,38 @@
 #' @examples
 #'  x <- runif(100)
 #'  y <- runif(100, min = .001, max = .001)
-#'  .ks.test(x, y, thresh = .001)
+#'  ks_test(x, y, thresh = .001)
+#' @details
+#' The usual Kolmogorov-Smirnov test for two vectors **X** and **Y**, of size m
+#' and n rely on the empirical cdfs \eqn{E_x} and \eqn{E_y} and the test statistic
+#'  \deqn{D = sup_{t\in (X, Y)} |E_x(x) - E_y(x))}.
+#' This modified Kolmogorov-Smirnov test relies on two modifications.
+#' \itemize{
+#'   \item Using observation weights for both vectors **X** and **Y**: Those
+#' weights are used in two places, while modifying the usual KS test. First, the
+#' empirical cdfs are updates to account for the weights. Secondly, the effective
+#' sample sizes are also modified. This is inspired from
+#' \url{https://stackoverflow.com/a/55664242/13768995}, using Monahan (2011).
+#'
+#'   \item Testing against a threshold: the test statistic is thresholded such
+#'   that \eqn{D = max(D - thresh, 0)}. Since \eqn{0\le D\le 1}, the value of
+#'   the threshold is also between 0 and 1, representing an effect size for the
+#'   difference.
+#' }
+#' @md
+#' @references
+#' Monahan, J. (2011). _Numerical Methods of Statistics_ (2nd ed.,
+#' Cambridge Series in Statistical and Probabilistic Mathematics). Cambridge:
+#'  Cambridge University Press. doi:10.1017/CBO9780511977176
+#' @return
+#' A list with class \code{"htest"} containing the following components:
+#' \itemize{
+#'   \item *statistic* the value of the test statistic.
+#'   \item *p.value* the p-value of the test.
+#'   \item *alternative* a character string describing the alternative hypothesis.
+#'   \item *method* a character string indicating what type of test was performed.
+#'   \item *data.name* a character string giving the name(s) of the data.
+#' }
 #' @export
 ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
                       w_y = rep(1, length(y))) {
