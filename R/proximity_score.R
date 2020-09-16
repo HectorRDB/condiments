@@ -90,7 +90,7 @@
 #'  Default to 10.
 #' @param smooth The smoothing parameter. Default to k. Lower values mean that
 #' we smooth more.
-#' @import RANN EMT
+#' @import RANN
 #' @importFrom mgcv gam
 #' @return Either a list with the \code{scaled_scores} and the \code{scores} for
 #'  each cell, if input is a matrix, or the \code{\link{SingleCellExperiment}}

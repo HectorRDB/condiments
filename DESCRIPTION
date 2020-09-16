@@ -31,7 +31,6 @@ BugReports: https://github.com/statOmics/tradeSeq/issues
 Imports: 
     mgcv,
     RANN,
-    EMT,
     stats,
     SingleCellExperiment,
     SummarizedExperiment,
