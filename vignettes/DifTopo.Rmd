@@ -36,7 +36,7 @@ Ideas from 1.3 could be adapted to be able to tell them apart.
 
 This is what was covered in the new slingshot vignette by Kelly and Koen. We have for example this type of topology:
 
-```{r}
+```{r,eval = FALSE}
 sd <- create_differential_topology(n_cells = 200, shift = 0,
                                    unbalance_level = .8)
 ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
@@ -52,8 +52,8 @@ In that case, we can use pseudotime distribution to see if pseudotime in one of 
 
 For example, we can have a situation where the intermediate state is different between condition A and B for one lineage. Or it could be the end states.
 
-```{r}
-sd <- sd <- create_differential_topology(n_cells = 300, shift = 10,
+```{r,eval = FALSE}
+sd <- create_differential_topology(n_cells = 300, shift = 10,
                                    unbalance_level = .5, noise = .1)
 ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
   geom_point() +
@@ -68,7 +68,7 @@ Since most TI methods (at least for the good ones) do not rely on a statistical 
 
 This is actually more common, or at least I have seen a real biology example. For example, in one condition, cells cannot differentiate through one lineage. This is basically the edge case of 1.1.
 
-```{r}
+```{r,eval = FALSE}
 sd <- create_differential_topology(n_cells = 200, shift = 0,
                                    unbalance_level = 1)
 ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
@@ -80,7 +80,7 @@ ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
 
 In that case, though, the second lineage is unchanged. But we can easily imagine a situation where one lineage changes and the other disappears, an edge case of a) and b):
 
-```{r}
+```{r,eval = FALSE}
 sd <- create_differential_topology(n_cells = 300, shift = 10,
                                    unbalance_level = 1, noise = .1)
 ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +

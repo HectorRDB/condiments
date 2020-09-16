@@ -1,5 +1,5 @@
 .diffDifferentiationTest <- function(sds, conditions, global = TRUE,
-                                     lineages = FALSE, method = "Permutation") {
+                                     pairwise = FALSE, method = "Permutation") {
   pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
   df <- apply(pairs, 1, function(pair) {
     ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
@@ -38,12 +38,11 @@ setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
                                 method = "Permutation"){
-            res <- .diffProgressionTest(sds = sds,
-                                        conditions = conditions,
-                                        global = global,
-                                        lineages = lineages,
-                                        method = method,
-                                        thresh = thresh)
+            res <- .diffDifferentiationTest(sds = sds,
+                                            conditions = conditions,
+                                            global = global,
+                                            pairwise = pairwise,
+                                            method = method)
             return(res)
           }
 )
@@ -70,7 +69,7 @@ setMethod(f = "diffDifferentiationTest",
             return(diffDifferentiationTest(slingshot::SlingshotDataSet(sds),
                                            conditions = conditions,
                                            global = global,
-                                           lineages = lineages,
+                                           pairwise = pairwise,
                                            method = method))
           }
 )

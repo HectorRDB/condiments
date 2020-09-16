@@ -79,6 +79,8 @@ ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
     p[is.na(x)] <- NA
     IND <- which(!is.na(x) & (x > 0))
     if (length(IND))
+      # If ever need source code, here it is
+      # https://github.com/cran/distr/blob/48282955480c31bea1c8cf519d0c865708934a6c/src/ks.c
       p[IND] <- .Call(stats:::C_pKS2, p = x[IND], tol)
     p
   }
