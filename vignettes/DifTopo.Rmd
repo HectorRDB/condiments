@@ -20,13 +20,13 @@ opts_chunk$set(
 )
 ```
 
-This is a very rought draft to help clarify the various questions of Differential Topology and Different Gene expression between different topologies. There are two big questions with this condition + lineage analysis.
+This is a very rough draft to help clarify the various questions of Differential Topology and Different Gene expression between different topologies. There are two big questions with this condition + lineage analysis.
 
 # Differential Topology
 
 
 ```{r}
-library(DT)
+library(DifTopo)
 set.seed(2071)
 ```
 There are 3 subtypes. Not sure yet how to tell them apart other than visual inspection? 
