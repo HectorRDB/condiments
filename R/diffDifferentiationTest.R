@@ -1,9 +1,11 @@
 .diffDifferentiationTest <- function(sds, conditions, global = TRUE,
                                      lineages = FALSE, method = "Permutation") {
-  pairs <- utils::combn(length)
-  for (cond in unique(conditions)) {
+  pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
+  df <- apply(pairs, 1, function(pair) {
+    ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
 
-  }
+    return()
+  })
 }
 
 
