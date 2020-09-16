@@ -92,6 +92,9 @@
 #' we smooth more.
 #' @import RANN EMT
 #' @importFrom mgcv gam
+#' @return Either a list with the \code{scaled_scores} and the \code{scores} for
+#'  each cell, if input is a matrix, or the \code{\link{singleCellExperiment}}
+#'  object, wit this list in the \code{\link{colData}}.
 #' @examples
 #' sd <- create_differential_topology(n_cells = 200, shift = 0,
 #'                                    unbalance_level = 1)

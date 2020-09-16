@@ -25,6 +25,11 @@ we smooth more.}
 \item{dimred}{A string or integer scalar indicating the reduced dimension
 result in \code{reducedDims(sce)} to plot. Default to 1.}
 }
+\value{
+Either a list with the \code{scaled_scores} and the \code{scores} for
+ each cell, if input is a matrix, or the \code{\link{singleCellExperiment}}
+ object, wit this list in the \code{\link{colData}}.
+}
 \description{
 Compute a proximity score to show whether nearby cells have the
 same condition of not
