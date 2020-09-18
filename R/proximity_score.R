@@ -62,10 +62,10 @@
   scores <- rowMeans(simMatrix)
 
   # Get the smoothed scores
-  scaled_scores <- .multinomial.test(cdMatrix, groups, props)
-  scaled_scores <- unlist(scaled_scores)
-  names(scaled_scores) <- rownames(rd)
-  formula <- paste0("scaled_scores ~ s(",
+  scores <- .multinomial.test(cdMatrix, groups, props)
+  scores <- unlist(scores)
+  names(scores) <- rownames(rd)
+  formula <- paste0("scores ~ s(",
                     paste0("rd[, ", seq_len(ncol(rd)), "], ", collapse = ""),
                     "k = smooth)")
   mm <- mgcv::gam(as.formula(formula))

@@ -1,5 +1,5 @@
 ---
-title: "Revive the MTME"
+title: "DifTopo"
 author: "Hector Roux de Bézieux"
 date: '`r format(Sys.time(), "%d %B , %Y")`'
 output: 
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{The tradeSeq workflow}
+  %\VignetteIndexEntry{Using DifTopo}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,81 +20,91 @@ opts_chunk$set(
 )
 ```
 
-This is a very rough draft to help clarify the various questions of Differential Topology and Different Gene expression between different topologies. There are two big questions with this condition + lineage analysis.
+# Initial pre-processing
 
-# Differential Topology
+We will use a synthetic dataset to illustrate the functionalities of the _DifTopo_ package. We start directly with a dataset where the following steps are assumed to have been run:
 
++ Obtaining count matrices for each setting (i.e. each condition).
++ Integration and normalization between the conditions.
++ Reduced Dimension Estimations
++ (Clustering)
 
 ```{r}
 library(DifTopo)
+library(slingshot)
+library(RColorBrewer)
+library(viridis)
 set.seed(2071)
-```
-There are 3 subtypes. Not sure yet how to tell them apart other than visual inspection? 
-Ideas from 1.3 could be adapted to be able to tell them apart.
-
-## Same trajectory
-
-This is what was covered in the new slingshot vignette by Kelly and Koen. We have for example this type of topology:
-
-```{r,eval = FALSE}
-sd <- create_differential_topology(n_cells = 200, shift = 0,
-                                   unbalance_level = .8)
-ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
-  geom_point() +
-  theme_classic() +
-  labs(col = "Condition") +
-  scale_color_brewer(type = "qual", palette = "Dark2")
+data('slingshotExample')
+rd <- slingshotExample$rd
+cl <- slingshotExample$cl
+condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+condition[110:139] <- 'A'
+ls()
 ```
 
-In that case, we can use pseudotime distribution to see if pseudotime in one of some or all lineages is associated with condition, as is done in the vignette. We need to decide which test works best but there are plenty of options here.
+As such, we start with a matrix `rd` of the cells in the reduced dimension space. In addition, we have a vector conditions `conditions` and a vector a cluster labels `cl`. 
 
-## Same topology, different trajectories
+For a more complete example, please see our [Bioconductor Workshop](https://kstreet13.github.io/bioc2020trajectories/articles/workshopTrajectories.html) on ‘Trajectory inference across conditions: differential expression and differential progression’.
 
-For example, we can have a situation where the intermediate state is different between condition A and B for one lineage. Or it could be the end states.
+# Differential Topology
+## Exploratory analysis
 
-```{r,eval = FALSE}
-sd <- create_differential_topology(n_cells = 300, shift = 10,
-                                   unbalance_level = .5, noise = .1)
-ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
-  geom_point() +
-  theme_classic() +
-  labs(col = "Condition") +
-  scale_color_brewer(type = "qual", palette = "Dark2")
+We can first plot the cells on the reduced dimensions
+
+```{r}
+plot(rd, asp = 1, pch = 16, col = brewer.pal(3,'Set1')[condition], las=1)
+legend('topleft','(x,y)',legend = c('A','B'), title = 'Condition', pch=16, col = brewer.pal(3,'Set1')[1:2])
+```
+We can then compute the __proximity score__ of each cell using the *proximity_score* function.
+
+```{r}
+scores <- proximity_score(Object = rd, conditions = condition)
 ```
 
-Since most TI methods (at least for the good ones) do not rely on a statistical framework but are purely computational, it's hard to imagine something based on likelihood ratio test for one topology versus two topologies. In that case, we can maybe do a permutation test to see if the conditions are useful info for assigning trajectories. However, as shown in the simulation study of the *tradeSeq* paper, fully unsupervised trajectory inference is far from obvious. Furthermore, a tricky point would be to identify the lineages when we permute: how do we know 1 is 1? We can probably use the cells themselves since in examples like above at least, it is unlikely that the cells would change lineages. Then, their is the question of the metric to use. My current idea would be mean distance to the curve but looking forward to ideas.
+There are two types of scores. The raw score is computed on each cell and looks at the condition distribution of its neighbors compared the the overall distribution. The size of the neighborhood can be set using the `k` argument, which specify the number of neighbors to consider. Higher values means more local imbalance. 
 
-## Different topology 
+```{r}
+grad <- viridis::plasma(10, begin = 0, end = 1)
+names(grad) <- levels(cut(scores$scores, breaks = 10))
+plot(rd, col = grad[cut(scores$scores, breaks = 10)],
+     asp = 1, pch = 16, xlab = "UMAP-1", ylab = "UMAP-2", cex = .8)
+legend("topleft", legend = names(grad), col = grad, pch = 16, bty = "n", cex = 2 / 3)
+```
+We can then use local smoothers to smooth the scores of individual cells. The smoothness is dictated by the `smooth` argument.
 
-This is actually more common, or at least I have seen a real biology example. For example, in one condition, cells cannot differentiate through one lineage. This is basically the edge case of 1.1.
-
-```{r,eval = FALSE}
-sd <- create_differential_topology(n_cells = 200, shift = 0,
-                                   unbalance_level = 1)
-ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
-  geom_point() +
-  theme_classic() +
-  labs(col = "Condition") +
-  scale_color_brewer(type = "qual", palette = "Dark2")
+```{r}
+grad <- viridis::plasma(10, begin = 0, end = 1)
+names(grad) <- levels(cut(scores$scaled_scores, breaks = 10))
+plot(rd, col = grad[cut(scores$scaled_scores, breaks = 10)],
+     asp = 1, pch = 16, xlab = "UMAP-1", ylab = "UMAP-2", cex = .8)
+legend("topleft", legend = names(grad), col = grad, pch = 16, bty = "n", cex = 2 / 3)
 ```
 
-In that case, though, the second lineage is unchanged. But we can easily imagine a situation where one lineage changes and the other disappears, an edge case of a) and b):
+As could be guessed from the original plot, the bottom lineage shows a lot of imbalance while the top one does not. 
 
-```{r,eval = FALSE}
-sd <- create_differential_topology(n_cells = 300, shift = 10,
-                                   unbalance_level = 1, noise = .1)
-ggplot(data.frame(sd$rd, cl = sd$cl), aes(x = Dim1, y = Dim2, col = cl)) +
-  geom_point() +
-  theme_classic() +
-  labs(col = "Condition") +
-  scale_color_brewer(type = "qual", palette = "Dark2")
+The proximity score can be used to check whether the integration has been successful (at least some regions should be balanced), or to identify the regions of imbalance for further analyses.
+
+## Trajectory Inference
+
+The first step of our workflow is to decide whether or not to infer the trajectories separately or not. On average, it is better to infer a common trajectory, since a) this allow for a wider range of downstream analyses, and b) more cells are used to estimate the trajectory. However, the condition effect might be strong enough to massively disrupt the differentiation process, which would require fitting separate trajectories. 
+
+The __diffTopoTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on permutations of the conditions followed by trajectory inference so it can take a few seconds. It uses a modified version of the  Kolmogorov-Smirnov Two-Sample Test , use `?ks_test` for more details.
+
+```{r}
+sds <- slingshot(rd, cl)
+## Takes ~1mn30s to run
+diffTopoTest(sds = sds, conditions = condition)
 ```
 
-If we can tell them apart (not sure how but maybe we can punt, at least for now), the edge case of a) can fall under the umbrella of a) itself in term of testing. Then, all the solutions in the vignette, 
+The test fails to reject the null that we can fit a common trajectory so we can continue with the `sds` object.
 
-For the edge case of b) (and in general maybe to tell the cases apart), we could forgo the trajectories when doing differential topology. I think a test like Moran’ I test (used in Monocle 3) would actually be very appropriate.
+# Differential Progression
 
-# Differential Gene Expression.
+Even though 
 
-Once we have found the correct topology, gene DE should be quite straightforward using the *tradeSeq* framework, and Koen already did some great work there!!
-I think the main task would be coding a flexible enough framework so that it encompasses cases from a, b and c above without having 200 different functions.
+# Session Info
+
+```{r}
+sessionInfo()
+```

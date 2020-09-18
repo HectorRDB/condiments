@@ -32,9 +32,11 @@
   })
   psts <- lapply(permutations, '[', 1) %>% unlist()
   ws <- lapply(permutations, '[', 2) %>% unlist()
-  return(ks_test(x = og$psts, w_x = og$ws,
+  res <- ks_test(x = og$psts, w_x = og$ws,
                  y = psts, w_y = ws,
-                 thresh = thresh))
+                 thresh = thresh)
+  res$alternative <- "Infer separate trajectories for each condition"
+  return()
 }
 
 

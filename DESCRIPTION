@@ -45,4 +45,5 @@ Suggests:
     knitr,
     testthat,
     rmarkdown,
-    covr
+    covr,
+    viridis
