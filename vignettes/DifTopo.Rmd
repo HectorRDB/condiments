@@ -34,13 +34,21 @@ library(DifTopo)
 library(slingshot)
 library(RColorBrewer)
 library(viridis)
+library(ggplot2)
 set.seed(2071)
+theme_set(theme_classic())
+```
+
+```{r}
 data('slingshotExample')
 rd <- slingshotExample$rd
 cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
-ls()
+df <- data.frame(rd1 = rd[,1],
+                 rd2 = rd[,2],
+                 condition = condition,
+                 cl = cl)
 ```
 
 As such, we start with a matrix `rd` of the cells in the reduced dimension space. In addition, we have a vector conditions `conditions` and a vector a cluster labels `cl`. 
@@ -53,32 +61,31 @@ For a more complete example, please see our [Bioconductor Workshop](https://kstr
 We can first plot the cells on the reduced dimensions
 
 ```{r}
-plot(rd, asp = 1, pch = 16, col = brewer.pal(3,'Set1')[condition], las=1)
-legend('topleft','(x,y)',legend = c('A','B'), title = 'Condition', pch=16, col = brewer.pal(3,'Set1')[1:2])
+ggplot(df, aes(x = rd1, y = rd2, col = condition)) +
+  geom_point() +
+  scale_color_brewer(type = "qual")
 ```
 We can then compute the __proximity score__ of each cell using the *proximity_score* function.
 
 ```{r}
 scores <- proximity_score(Object = rd, conditions = condition)
+df$scores <- scores$scores
+df$scaled_scores <- scores$scaled_scores
 ```
 
 There are two types of scores. The raw score is computed on each cell and looks at the condition distribution of its neighbors compared the the overall distribution. The size of the neighborhood can be set using the `k` argument, which specify the number of neighbors to consider. Higher values means more local imbalance. 
 
 ```{r}
-grad <- viridis::plasma(10, begin = 0, end = 1)
-names(grad) <- levels(cut(scores$scores, breaks = 10))
-plot(rd, col = grad[cut(scores$scores, breaks = 10)],
-     asp = 1, pch = 16, xlab = "UMAP-1", ylab = "UMAP-2", cex = .8)
-legend("topleft", legend = names(grad), col = grad, pch = 16, bty = "n", cex = 2 / 3)
+ggplot(df, aes(x = rd1, y = rd2, col = scores)) +
+  geom_point() +
+  scale_color_viridis_c(option = "C")
 ```
 We can then use local smoothers to smooth the scores of individual cells. The smoothness is dictated by the `smooth` argument.
 
 ```{r}
-grad <- viridis::plasma(10, begin = 0, end = 1)
-names(grad) <- levels(cut(scores$scaled_scores, breaks = 10))
-plot(rd, col = grad[cut(scores$scaled_scores, breaks = 10)],
-     asp = 1, pch = 16, xlab = "UMAP-1", ylab = "UMAP-2", cex = .8)
-legend("topleft", legend = names(grad), col = grad, pch = 16, bty = "n", cex = 2 / 3)
+ggplot(df, aes(x = rd1, y = rd2, col = scaled_scores)) +
+  geom_point() +
+  scale_color_viridis_c(option = "C")
 ```
 
 As could be guessed from the original plot, the bottom lineage shows a lot of imbalance while the top one does not. 
@@ -101,7 +108,53 @@ The test fails to reject the null that we can fit a common trajectory so we can 
 
 # Differential Progression
 
-Even though 
+Even though we can fit a common trajectory, it does not mean that the cells will differentiate similarly between the conditions. The first question we can ask is: for a given lineage, are cells equally represented along pseudotime between conditions? 
+
+```{r}
+df$pst1 <- slingPseudotime(sds)[, 1]
+df$pst2 <- slingPseudotime(sds)[, 2]
+
+```
+
+## Visualization
+
+```{r, warning=FALSE}
+ggplot(df, aes(x = pst1, fill = condition)) +
+  geom_density(alpha = .5) +
+  scale_fill_brewer(type = "qual")+
+  labs(x = "Pseudotime for lineage 1", title = "Pseudotime distribution for lineage 1")
+```
+The pseudotime distributions are identical across lineages.
+
+```{r, warning=FALSE}
+ggplot(df, aes(x = pst2, fill = condition)) +
+  geom_density(alpha = .5) +
+  scale_fill_brewer(type = "qual")+
+  labs(x = "Pseudotime for lineage 2", title = "Pseudotime distribution for lineage 2")
+```
+There are clear differences between the two differences
+
+## Testing for differential progression
+
+To test for differential progression, we use the __diffProgressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __diffProgressionTest__ function. Here, we will use the default, the custom KS test. 
+
+```{r}
+diffProgressionTest(sds, conditions = condition, method = "KS",
+                    global = TRUE, lineages = TRUE)
+```
+As expected, there is a global difference over all lineages, which is driven by differences of distribution across lineage 2 (i.e. the bottom one).
+
+# Differential Expression
+
+The workflow above focus on global differences, looking at broad patterns of differentiation. While this is a necessary first step, gene-level information is also quite meaningful. To do so, we refer the reader to versions of __tradeSeq__ > 1.xx, and to the accompanying [Bioconductor workshop](https://kstreet13.github.io/bioc2020trajectories/articles/workshopTrajectories.html#differential-expression-1).
+
+# Conclusion
+
+An earlier version of this vignette has been produced by Kelly Street and Koen Van den Berge and can be found [here](https://bioconductor.org/packages/release/bioc/vignettes/slingshot/inst/doc/conditionsVignette.html).
+
+For both of the above procedures, it is important to note that we are making multiple comparisons (in this case, 2). The p-values we obtain from these tests should be corrected for multiple testing, especially for trajectories with a large number of lineages.
+
+That said, trajectory inference is often one of the last computational methods in a very long analysis pipeline (generally including gene-level quantification, gene filtering / feature selection, and dimensionality reduction). Hence, we strongly discourage the reader from putting too much faith in any p-value that comes out of this analysis. Such values may be useful suggestions, indicating particular features or cells for follow-up study, but should not be treated as meaningful statistical quantities.
 
 # Session Info
 

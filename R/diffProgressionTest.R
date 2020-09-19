@@ -29,12 +29,13 @@
     }
   }) %>%
     dplyr::bind_rows(.id = "Lineage") %>%
-    dplyr::mutate(Lineage = as.character(Lineage))
+    dplyr::mutate(Lineage = as.character(Lineage)) %>%
+    select.list(Lineage, Pval, Statistic)
   glob_test <- .Stouffer(pvals = lineages_test$Pval,
                          weights = colSums(w))
-  glob_test <- data.frame("Pval" = glob_test$Pval,
-                          "Statistic" = glob_test$Statistic,
-                          "Lineage" = "All")
+  glob_test <- data.frame("Lineage" = "All",
+                          "Pval" = glob_test$Pval,
+                          "Statistic" = glob_test$Statistic)
   if (global == TRUE & lineages == FALSE) return(glob_test)
   if (global == FALSE & lineages == TRUE) return(lineages_test)
   if (global == TRUE & lineages == TRUE) {
