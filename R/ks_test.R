@@ -10,7 +10,7 @@
 #' @importFrom spatstat ewcdf
 #' @examples
 #'  x <- runif(100)
-#'  y <- runif(100, min = .001, max = .001)
+#'  y <- runif(100, min = .5, max = .5)
 #'  ks_test(x, y, thresh = .001)
 #' @details
 #' The usual Kolmogorov-Smirnov test for two vectors **X** and **Y**, of size m
@@ -72,17 +72,17 @@ ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
   xy <- c(x, y)
   STATISTIC <- max(abs(x_ewcdf(xy) - y_ewcdf(xy)))
   pkstwo <- function(x, tol = 1e-06) {
-    if (is.numeric(x))
+    if (is.numeric(x)) {
       x <- as.double(x)
-    else stop("argument 'x' must be numeric")
-    p <- rep(0, length(x))
-    p[is.na(x)] <- NA
-    IND <- which(!is.na(x) & (x > 0))
-    if (length(IND))
-      # If ever need source code, here it is
-      # https://github.com/cran/distr/blob/48282955480c31bea1c8cf519d0c865708934a6c/src/ks.c
-      p[IND] <- .Call(stats:::C_pKS2, p = x[IND], tol)
-    p
+    }
+    else {
+      stop("argument 'x' must be numeric")
+    }
+    if (is.na(x)) {
+      return(NA)
+    } else {
+      return(.pKS2(x = x, tol = tol))
+    }
   }
   PVAL <- 1 - pkstwo(sqrt(w) * STATISTIC)
 
