@@ -15,8 +15,8 @@ vignette: >
 ```{r packages, include=F}
 library(knitr)
 opts_chunk$set(
-  fig.pos = "!h", out.extra = "", warning = F, message = F, 
-  fig.align = "center", echo = F
+  fig.pos = "!h", out.extra = "", warning = FALSE, message = FALSE, 
+  fig.align = "center", echo = FALSE
 )
 ```
 

@@ -22,9 +22,17 @@
 #' @param global If TRUE, test for all pairs simultaneously.
 #' @param pairwise If TRUE, test for all pairs independently.
 #' @param method For now, only "Permutation" is accepted.
-#' @import slingshot
+#' @importFrom slingshot slingshot SlingshotDataSet
 #' @importFrom utils combn
-#' @export
+#' @return A data frame with 3 columns:
+#' \itemize{
+#'   \item *Pval* the pvalue for the test at the global or lineage level
+#'   \item *Statistic* for individual lineages, either the modified KS statistic
+#'   if \code{method = "KS"}, or the weighted difference of means, if
+#'   \code{method = "Permutation"}. For the global test, the combined Z-score.
+#'   \item *Pair* for individual pairs, the lineages numbers. For global,
+#'   \code{"All"}.
+#' }
 #' @examples
 #' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
@@ -48,9 +56,8 @@ setMethod(f = "diffDifferentiationTest",
 )
 
 
-#' @export
 #' @rdname diffDifferentiationTest
-#' @import SingleCellExperiment
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),

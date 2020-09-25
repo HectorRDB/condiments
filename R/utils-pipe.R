@@ -6,6 +6,9 @@
 #' @rdname pipe
 #' @keywords internal
 #' @export
+#' @return The pipe
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
+#' @example
+#' 1 %>% identity()
 NULL

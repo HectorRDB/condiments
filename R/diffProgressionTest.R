@@ -15,12 +15,12 @@
                         thresh = thresh)
       return(c("Pval" = test_l$p.value, "Statistic" = test_l$statistic))
     } else if (method == "Permutation") {
-      d_l <- weighted.mean(pst_l[conditions== A], w_l[conditions == A]) -
-        weighted.mean(pst_l[conditions== B], w_l[conditions == B])
+      d_l <- stats::weighted.mean(pst_l[conditions== A], w_l[conditions == A]) -
+        stats::weighted.mean(pst_l[conditions== B], w_l[conditions == B])
       d_il <- replicate(rep, {
         conditions_i <- sample(conditions)
-        return(weighted.mean(pst_l[conditions_i== A], w_l[conditions_i == A]) -
-                 weighted.mean(pst_l[conditions_i== B], w_l[conditions_i == B]))
+        return(stats::weighted.mean(pst_l[conditions_i== A], w_l[conditions_i == A]) -
+                 stats::weighted.mean(pst_l[conditions_i== B], w_l[conditions_i == B]))
       })
       return(c("Pval" = mean(abs(d_l) > abs(d_il)),
                "Statistic" = d_l))
@@ -30,7 +30,7 @@
   }) %>%
     dplyr::bind_rows(.id = "Lineage") %>%
     dplyr::mutate(Lineage = as.character(Lineage)) %>%
-    select.list(Lineage, Pval, Statistic)
+    dplyr::select(Lineage, Pval, Statistic)
   glob_test <- .Stouffer(pvals = lineages_test$Pval,
                          weights = colSums(w))
   glob_test <- data.frame("Lineage" = "All",
@@ -61,8 +61,9 @@
 #' Ignored if \code{method = "Permutation"}. Default to .05.
 #' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
 #' Default to \code{1e4}.
-#' @import slingshot
-#' @importFrom dplyr n_distinct bind_rows mutate
+#' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
+#' @importFrom stats weighted.mean
+#' @importFrom dplyr n_distinct bind_rows mutate select
 #' @details
 #' For every lineage, we compare the pseudotimes of the cells from either
 #' conditions, using the lineage weights as observations weights.
@@ -120,7 +121,7 @@ setMethod(f = "diffProgressionTest",
 
 #' @export
 #' @rdname diffProgressionTest
-#' @import SingleCellExperiment
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffProgressionTest",
           signature = c(sds = "SingleCellExperiment"),

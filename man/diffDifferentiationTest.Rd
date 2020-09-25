@@ -39,6 +39,17 @@ column of the metadata contains this vector}
 
 \item{method}{For now, only "Permutation" is accepted.}
 }
+\value{
+A data frame with 3 columns:
+\itemize{
+  \item *Pval* the pvalue for the test at the global or lineage level
+  \item *Statistic* for individual lineages, either the modified KS statistic
+  if \code{method = "KS"}, or the weighted difference of means, if
+  \code{method = "Permutation"}. For the global test, the combined Z-score.
+  \item *Pair* for individual pairs, the lineages numbers. For global,
+  \code{"All"}.
+}
+}
 \description{
 Test whether or not the cell repartition between lineages is
 independent of the conditions

@@ -25,6 +25,9 @@ column of the metadata contains this vector.}
 
 \item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
 }
+\value{
+The test output. An object of class \code{htest}
+}
 \description{
 Test whether or not slingshot should be fitted independently
 for different conditions or not.

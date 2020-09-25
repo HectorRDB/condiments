@@ -14,7 +14,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 URL: https://hectorrdb.github.io/DT/index.html
-Depends: R (>= 3.6)
+Depends: R (>= 4.0)
 VignetteBuilder: knitr
 biocViews:
     Clustering,
@@ -38,12 +38,13 @@ Imports:
     spatstat,
     utils,
     magrittr,
-    dplyr,
-    RColorBrewer
+    dplyr
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     testthat,
     rmarkdown,
     covr,
-    viridis
+    viridis,
+    ggplot2,
+    RColorBrewer

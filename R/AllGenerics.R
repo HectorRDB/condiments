@@ -35,8 +35,6 @@ setGeneric(
   }
 )
 
-
-#' @export
 #' @name diffDifferentiationTest
 #' @title Differential Differentiation Test
 #' @param ... parameters including:

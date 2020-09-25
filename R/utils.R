@@ -1,19 +1,20 @@
 # Stats ----
 .Stouffer <- function(pvals, weights) {
   Zs <- lapply(pvals, function(pval) {
-    return(qnorm(pval / 2, lower.tail = FALSE))
+    return(stats::qnorm(pval / 2, lower.tail = FALSE))
   }) %>%
     unlist()
   Z <- sum(Zs * weights) / sqrt(sum(weights^2))
-  return(list("Pval" = pnorm(Z, lower.tail = FALSE), "Statistic" = Z))
+  return(list("Pval" = stats::pnorm(Z, lower.tail = FALSE), "Statistic" = Z))
 }
 
 # Toy examples ----
 .create_fork <- function(n_cells, noise) {
   rd <- matrix(0, ncol = 2, nrow = n_cells)
   common <- round(n_cells / 3)
-  rd[, 1] <- c(runif(common, -40, -10), runif(n_cells - common, -10, 30))
-  lineages <- rbinom(n_cells, 1, .5) * 2 - 1
+  rd[, 1] <- c(stats::runif(common, -40, -10),
+               stats::runif(n_cells - common, -10, 30))
+  lineages <- stats::rbinom(n_cells, 1, .5) * 2 - 1
   for (i in seq_len(n_cells)) {
     rd[i, 2] <- tanh(rd[i, 1] / 10) * lineages[i] +
       rnorm(n = 1, mean = lineages[i], sd = noise)
@@ -42,6 +43,7 @@
 #' }
 #' @examples
 #' sd <- create_differential_topology()
+#' @importFrom stats runif qnorm pnorm rbinom rnorm
 #' @export
 create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
                                          unbalance_level = .9) {
@@ -52,9 +54,9 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   shifted <- sd_2$rd[sd_2$lineages == 1, 1] - shift
   to_end <- which(shifted < -40)
   sd_2$rd[sd_2$lineages == 1, 1] <- shifted
-  for (i in 1:length(to_end)) {
+  for (i in seq_len(to_end)) {
     new_dim_1 <- shifted[to_end[i]] + 60 + shift
-    new_dim_2 <- tanh(new_dim_1 / 10) + rnorm(n = 1, mean = 1, sd = noise)
+    new_dim_2 <- tanh(new_dim_1 / 10) + stats::rnorm(n = 1, mean = 1, sd = noise)
     sd_2$rd[sd_2$lineages == 1, 1][to_end[i]] <- new_dim_1
     sd_2$rd[sd_2$lineages == 1 , 2][to_end[i]] <- new_dim_2
   }

@@ -9,7 +9,7 @@
   }
   else {
     mat <- matrix(rep(0, groups - 1), nrow = 1)
-    for (i in 1:size) {
+    for (i in seq_len(size)) {
       mat <- rbind(mat, .findVectors(groups - 1, i))
     }
     mat <- cbind(mat, size - rowSums(mat))
@@ -25,7 +25,7 @@
   })
   pvalues <- apply(cdMatrix, 1, function(conds){
     real <- as.vector(table(factor(conds, levels = groups)))
-    pObs <- dmultinom(real, size, props)
+    pObs <- stats::dmultinom(real, size, props)
     p.value <- sum(eventProb[eventProb <= pObs])
     return(p.value)
   })
@@ -68,8 +68,8 @@
   formula <- paste0("scores ~ s(",
                     paste0("rd[, ", seq_len(ncol(rd)), "], ", collapse = ""),
                     "k = smooth)")
-  mm <- mgcv::gam(as.formula(formula))
-  scaled_scores <- predict(mm, type = "response")
+  mm <- mgcv::gam(stats::as.formula(formula))
+  scaled_scores <- mgcv::predict.gam(mm, type = "response")
 
   return(list("scores" = scores, "scaled_scores" = scaled_scores))
 }
@@ -90,8 +90,9 @@
 #'  Default to 10.
 #' @param smooth The smoothing parameter. Default to k. Lower values mean that
 #' we smooth more.
-#' @import RANN
-#' @importFrom mgcv gam
+#' @importFrom RANN nn2
+#' @importFrom mgcv gam predict.gam
+#' @importFrom stats dmultinom qnorm as.formula
 #' @return Either a list with the \code{scaled_scores} and the \code{scores} for
 #'  each cell, if input is a matrix, or the \code{\link{SingleCellExperiment}}
 #'  object, wit this list in the \code{\link{colData}}.
@@ -118,7 +119,8 @@ setMethod(f = "proximity_score",
 #' @export
 #' @rdname proximity_score
 #' @importFrom SummarizedExperiment colData
-#' @import SingleCellExperiment
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom SingleCellExperiment reducedDims
 setMethod(f = "proximity_score",
           signature = c(Object = "SingleCellExperiment"),
           definition = function(Object,

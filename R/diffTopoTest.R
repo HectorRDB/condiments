@@ -36,7 +36,7 @@
                  y = psts, w_y = ws,
                  thresh = thresh)
   res$alternative <- "Infer separate trajectories for each condition"
-  return()
+  return(res)
 }
 
 
@@ -51,7 +51,9 @@
 #' column of the metadata contains this vector.
 #' @param rep How many permutations to run. Default to 200.
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
-#' @import slingshot
+#' @return
+#' The test output. An object of class \code{htest}
+#' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @examples
 #' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
@@ -74,7 +76,7 @@ setMethod(f = "diffTopoTest",
 
 #' @export
 #' @rdname diffTopoTest
-#' @import SingleCellExperiment
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SingleCellExperiment"),
