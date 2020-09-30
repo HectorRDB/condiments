@@ -49,17 +49,7 @@
   # neighbour
   tmp <- RANN::nn2(rd, rd, k + 1, searchtype = "standard")
   neighborMatrix <- tmp[[1]]
-  # Remove each cell from being it's own neighbour
-  distMatrix <- tmp[[2]][, -1]
-  distMatrix <- 1 / distMatrix
-  distMatrix <- distMatrix / rowSums(distMatrix)
   cdMatrix <- matrix(factor(conditions)[neighborMatrix], ncol = k + 1)
-  simMatrix <- cdMatrix == cdMatrix[, 1]
-  # Remove each cell from being it's own neighbour
-  simMatrix <- simMatrix[, -1]
-
-  # Get the basic scores
-  scores <- rowMeans(simMatrix)
 
   # Get the smoothed scores
   scores <- .multinomial.test(cdMatrix, groups, props)
