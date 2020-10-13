@@ -47,8 +47,8 @@
 ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
                       w_y = rep(1, length(y))) {
   # Inspired by https://stackoverflow.com/a/55664242/13768995
-  DNAME <- deparse1(substitute(x))
-  DNAME <- paste(DNAME, "and", deparse1(substitute(y)))
+  DNAME <- base::deparse(substitute(x))
+  DNAME <- paste(DNAME, "and", base::deparse(substitute(y)))
   w_x <- w_x[!is.na(x)]
   x <- x[!is.na(x)]
   x <- x[w_x > 0]
