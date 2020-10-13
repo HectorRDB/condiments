@@ -40,9 +40,11 @@ theme_set(theme_classic())
 ```
 
 ```{r}
-data('slingshotExample', package = "slingshot")
-rd <- slingshotExample$rd
-cl <- slingshotExample$cl
+data(list = 'slingshotExample', package = "slingshot")
+if (!"cl" %in% ls()) {
+  rd <- slingshotExample$rd
+  cl <- slingshotExample$cl  
+}
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 df <- data.frame(rd1 = rd[,1],
