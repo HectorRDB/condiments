@@ -40,7 +40,7 @@ theme_set(theme_classic())
 ```
 
 ```{r}
-data('slingshotExample')
+data('slingshotExample', package = "slingshot")
 rd <- slingshotExample$rd
 cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
