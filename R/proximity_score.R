@@ -130,9 +130,11 @@ setMethod(f = "proximity_score",
             } else {
               rd <- SingleCellExperiment::reducedDims(Object)[[dimred]]
             }
-            Object$scores <- .proximity_score(rd = rd,
-                                              conditions = conditions,
-                                              k = k, smooth = smooth)
+            Object$scores <- as.data.frame(
+              .proximity_score(rd = rd,
+                               conditions = conditions,
+                               k = k, smooth = smooth)
+            )
             return(Object)
           }
 )

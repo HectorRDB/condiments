@@ -22,7 +22,7 @@
         return(stats::weighted.mean(pst_l[conditions_i== A], w_l[conditions_i == A]) -
                  stats::weighted.mean(pst_l[conditions_i== B], w_l[conditions_i == B]))
       })
-      return(c("Pval" = mean(abs(d_l) > abs(d_il)),
+      return(c("Pval" = max(mean(abs(d_l) > abs(d_il)), 1 / rep),
                "Statistic" = d_l))
     } else {
       stop("Method must be one of KS or permutation")
