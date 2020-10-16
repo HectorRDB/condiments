@@ -9,6 +9,6 @@
 #' @return The pipe
 #' @importFrom magrittr %>%
 #' @usage lhs \%>\% rhs
-#' @example
+#' @examples
 #' 1 %>% identity()
 NULL
