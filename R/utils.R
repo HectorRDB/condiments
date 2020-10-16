@@ -136,3 +136,65 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
     return(New)
   }
 }
+
+#' Merge slingshots datasets
+#'
+#' @description If trajectory inference needs to be manually done condition per condition,
+#' this allows to merge them into one. It requires manual mapping of lineages.
+#'
+#' @param ... Slingshot datasets
+#' @param mapping a matrix, one column per dataset. Each row amounts to lineage mapping. 
+#' @param condition_id A vector of condition for each condition. Default to integer values
+#' in order of appearance
+#' @return A modified slingshot dataset that can be used for downstream steps.
+#' @import slingshot
+#' @importFrom dplyr bind_rows
+#' @details The function assumes that each lineage in a dataset maps to exactly one lineage
+#' in another dataset. Anything else needs to be done manually.
+#' @export
+merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping))) {
+  sdss <- list(...)
+  names(sdss) <- condition_id
+  # Checking inputs ----
+  classes <- unlist(lapply(sdss, class))
+  if (!all(classes %in% c("SingleCellExperiment", "SlingshotDataSet"))) {
+    stop("The datasets must either be SlingshotDataset or SingleCellExperiment objects")
+  }
+  sdss <- lapply(sdss, SlingshotDataSet)
+  # Add something if one is null
+  if (ncol(mapping) != length(sdss)) {
+    stop("mapping should have one column per dataset")
+  }
+  nCurves <- lapply(sdss, function(sds) {
+    length(slingCurves(sds))
+  })
+  if (length(unique(unlist(nCurves))) != 1) {
+    stop("All datasets must have the same number of lineages")
+  }
+  nCurves <- nCurves[[1]]
+  if (nrow(mapping) != nCurves) stop("Some lineages are not mapped")
+  mapped <- apply(mapping, 2, function(maps) {
+    sort(maps) == seq_len(nCurves)
+  })
+  if (!all(mapped)) stop("Some lineages are not mapped")
+
+  # Merging per say ----
+  sds <- sdss[[1]]
+  sds@reducedDim <- do.call('rbind', lapply(sdss, reducedDim))
+  sds@clusterLabels <- do.call('rbind', lapply(sdss, slingClusterLabels))
+  mapping <- as.data.frame(t(mapping))
+  sds@curves <- lapply(mapping, function(map) {
+    curves_i <- Map(function(n_lin, n_dataset) {
+      slingCurves(sdss[[n_dataset]])[[n_lin]]
+    }, n_lin = map, n_dataset = seq_along(map))
+    curve_i <- curves_i[[1]]
+    curve_i$s <- do.call('rbind', lapply(curves_i, "[[", "s"))
+    curve_i$ord <- do.call('c', lapply(curves_i, "[[", 'ord'))
+    curve_i$lambda <- do.call('c', lapply(curves_i, "[[", 'lambda'))
+    curve_i$dist_ind <- do.call('c', lapply(curves_i, "[[", 'dist_ind'))
+    curve_i$dist <- do.call('sum', lapply(curves_i, "[[", 'dist'))
+    curve_i$w <- do.call('c', lapply(curves_i, "[[", 'w'))
+    return(curve_i)
+  })
+  return(sds)
+}
