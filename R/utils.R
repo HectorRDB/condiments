@@ -54,11 +54,11 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   shifted <- sd_2$rd[sd_2$lineages == 1, 1] - shift
   to_end <- which(shifted < -40)
   sd_2$rd[sd_2$lineages == 1, 1] <- shifted
-  for (i in seq_len(to_end)) {
-    new_dim_1 <- shifted[to_end[i]] + 60 + shift
+  for (i in to_end) {
+    new_dim_1 <- shifted[i] + 60 + shift
     new_dim_2 <- tanh(new_dim_1 / 10) + stats::rnorm(n = 1, mean = 1, sd = noise)
-    sd_2$rd[sd_2$lineages == 1, 1][to_end[i]] <- new_dim_1
-    sd_2$rd[sd_2$lineages == 1 , 2][to_end[i]] <- new_dim_2
+    sd_2$rd[sd_2$lineages == 1, 1][i] <- new_dim_1
+    sd_2$rd[sd_2$lineages == 1 , 2][i] <- new_dim_2
   }
   sd <- list(rd = rbind(sd_1$rd, sd_2$rd),
              lineages = c(sd_1$lineages, sd_2$lineages),
@@ -143,7 +143,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #' this allows to merge them into one. It requires manual mapping of lineages.
 #'
 #' @param ... Slingshot datasets
-#' @param mapping a matrix, one column per dataset. Each row amounts to lineage mapping. 
+#' @param mapping a matrix, one column per dataset. Each row amounts to lineage mapping.
 #' @param condition_id A vector of condition for each condition. Default to integer values
 #' in order of appearance
 #' @return A modified slingshot dataset that can be used for downstream steps.
