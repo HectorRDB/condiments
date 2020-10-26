@@ -130,13 +130,16 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #' @param mapping a matrix, one column per dataset. Each row amounts to lineage mapping.
 #' @param condition_id A vector of condition for each condition. Default to integer values
 #' in order of appearance
+#' @param scale If TRUE (default), lineages that are mapped are scaled to have the same
+#' lenght.
 #' @return A modified slingshot dataset that can be used for downstream steps.
 #' @import slingshot
 #' @importFrom dplyr bind_rows
 #' @details The function assumes that each lineage in a dataset maps to exactly one lineage
 #' in another dataset. Anything else needs to be done manually.
 #' @export
-merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping))) {
+merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
+                      scale = TRUE) {
   sdss <- list(...)
   names(sdss) <- condition_id
   # Checking inputs ----
@@ -172,9 +175,17 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping))) {
       slingCurves(sdss[[n_dataset]])[[n_lin]]
     }, n_lin = map, n_dataset = seq_along(map))
     curve_i <- curves_i[[1]]
+    min_ref <- min(curve_i[["lambda"]])
+    length_ref <- length(curve_i[["lambda"]])
     curve_i$s <- do.call('rbind', lapply(curves_i, "[[", "s"))
     curve_i$ord <- do.call('c', lapply(curves_i, "[[", 'ord'))
-    curve_i$lambda <- do.call('c', lapply(curves_i, "[[", 'lambda'))
+    curve_i$lambda <- do.call('c',lapply(curves_i, function(crv){
+     lambda <- crv[["lambda"]]
+     if (scale) {
+       lambda <- (lambda - min(lambda)) / (max(lambda) - min(lambda))
+       lambda <- lambda * length_ref + min_ref
+      }
+    }))
     curve_i$dist_ind <- do.call('c', lapply(curves_i, "[[", 'dist_ind'))
     curve_i$dist <- do.call('sum', lapply(curves_i, "[[", 'dist'))
     curve_i$w <- do.call('c', lapply(curves_i, "[[", 'w'))
