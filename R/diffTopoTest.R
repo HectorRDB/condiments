@@ -12,7 +12,7 @@
     # sds_cond@lineages <- lapply(sds_cond@lineages, function(l) {
     #   return(l[!l %in% names(missing_clusters)])
     # })
-    sds_cond <- slingshot::getCurves(sds_cond)
+    sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
     pst_cond <- slingshot::slingPseudotime(sds_cond) %>% as.vector()
     psts <- c(psts, pst_cond)
     w_conds <- slingshot::slingCurveWeights(sds_cond)

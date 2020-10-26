@@ -70,7 +70,7 @@ ks_test <-  function (x, y, thresh = .05, w_x = rep(1, length(x)),
   x_ewcdf <- spatstat::ewcdf(x, weights = w_x)
   y_ewcdf <- spatstat::ewcdf(y, weights = w_y)
   xy <- c(x, y)
-  STATISTIC <- max(abs(x_ewcdf(xy) - y_ewcdf(xy)))
+  STATISTIC <- max(abs(x_ewcdf(xy) - y_ewcdf(xy)) - thresh, 0)
   pkstwo <- function(x, tol = 1e-06) {
     if (is.numeric(x)) {
       x <- as.double(x)

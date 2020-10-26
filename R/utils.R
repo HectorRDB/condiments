@@ -74,24 +74,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   return(sd)
 }
 
-# create_differential_1D_topology <- function(seed = 5491, n_cells = 200,
-#                                             noise = .15, split = 0) {
-#   set.seed(seed)
-#   rd <- matrix(0, ncol = 2, nrow = n_cells)
-#   common <- round(n_cells / 3)
-#   rd[, 1] <- c(runif(common, -40, -10), runif(n_cells - common, -10, 30))
-#   lineages <- rbinom(n_cells, 1, .5) * 2 - 1
-#   for (i in seq_len(n_cells)) {
-#     rd[i, 2] <- tanh(rd[i, 1] / 10) * lineages[i] * split +
-#       rnorm(n = 1, mean = lineages[i] * split, sd = noise)
-#   }
-#   colnames(rd) <- c("Dim1", "Dim2")
-#   return(list("rd" = rd, "lineages" = lineages))
-#
-#   return(sd)
-# }
-
-
+# KS test
 .pKS2 <- function(x, n = length(x), tol) {
   # x[1:n] is input and output
   #
@@ -115,12 +98,13 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   #   /
   #   double New, old, s, w, z;
   # int i, k, k_max;
-
+  if (x == 0) {
+    return(1)
+  }
   k_max <- sqrt(2 - log(tol))
   if (x < 1) {
     z <- - pi^2/ (8 * x^2)
     w <- log(x)
-    s <- 0
     s <- seq(1, k_max, 2)
     s <- sum(exp(s^2 * z - w))
     return(s * sqrt(2 * pi))
