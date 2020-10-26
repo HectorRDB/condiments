@@ -3,6 +3,7 @@
   A <- unique(conditions)[1]
   B <- unique(conditions)[2]
   pst <- slingshot::slingPseudotime(sds, na = TRUE)
+  colnames(pst) <- paste0("Lineage", seq_len(ncol(pst)))
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
   lineages_test <- lapply(seq_len(ncol(pst)), function(l){
     w_l <- w[, l]
