@@ -4,7 +4,7 @@
 \alias{merge_sds}
 \title{Merge slingshots datasets}
 \usage{
-merge_sds(..., mapping, condition_id = seq_len(ncol(mapping)))
+merge_sds(..., mapping, condition_id = seq_len(ncol(mapping)), scale = TRUE)
 }
 \arguments{
 \item{...}{Slingshot datasets}
@@ -13,6 +13,9 @@ merge_sds(..., mapping, condition_id = seq_len(ncol(mapping)))
 
 \item{condition_id}{A vector of condition for each condition. Default to integer values
 in order of appearance}
+
+\item{scale}{If TRUE (default), lineages that are mapped are scaled to have the same
+lenght.}
 }
 \value{
 A modified slingshot dataset that can be used for downstream steps.
