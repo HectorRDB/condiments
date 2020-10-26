@@ -4,8 +4,9 @@
   B <- unique(conditions)[2]
   pst <- slingshot::slingPseudotime(sds, na = TRUE)
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
-  colnames(pst) <- colnames(w) <-
+  lineages <- colnames(pst) <- colnames(w) <-
     paste0("Lineage", seq_len(ncol(pst)))
+  names(lineages) <- lineages
   lineages_test <- lapply(colnames(pst), function(l){
     w_l <- w[, l]
     pst_l <- pst[, l]
