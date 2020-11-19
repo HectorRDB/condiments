@@ -15,10 +15,11 @@ test_that("The diffTopoTest work on expected inputs",{
   # Input SlingshotDataSet
   test <- diffTopoTest(sds = sds, conditions = condition, rep = 10)
   expect_is(test, "list")
-  expect_true(test$statistic > 0)
+  expect_true(test$statistic >= 0)
   expect_true(test$p.value >= 0 & test$p.value <= 1)
   set.seed(12)
   test <- diffTopoTest(sds = sds, conditions = condition, rep = 10, thresh = 0)
+  expect_true(test$statistic > 0)
   expect_is(test, "list")
   # Input SingleCellExperiment
   pd <- DataFrame(cond = condition)
