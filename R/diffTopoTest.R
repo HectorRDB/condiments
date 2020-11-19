@@ -18,7 +18,7 @@
     w_conds <- slingshot::slingCurveWeights(sds_cond)
     ws <- rbind(ws, w_conds)
   }
-  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum)) %>%
+  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   return(list("psts" = psts, "ws" = ws))
 }
 
