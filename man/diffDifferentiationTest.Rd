@@ -13,7 +13,9 @@ diffDifferentiationTest(sds, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = "Permutation"
+  method = "Classifier",
+  thresh = 0.05,
+  ...
 )
 
 \S4method{diffDifferentiationTest}{SingleCellExperiment}(
@@ -21,14 +23,16 @@ diffDifferentiationTest(sds, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = "Permutation"
+  method = "Classifier",
+  thresh = 0.05,
+  ...
 )
 }
 \arguments{
 \item{sds}{The final object after running slingshot. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{parameters including:}
+\item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector}
@@ -37,17 +41,18 @@ column of the metadata contains this vector}
 
 \item{pairwise}{If TRUE, test for all pairs independently.}
 
-\item{method}{For now, only "Permutation" is accepted.}
+\item{method}{For now, only "Classifier" is accepted.}
+
+\item{thresh}{The threshold for the classifier test. See details.
+Default to .05.}
 }
 \value{
 A data frame with 3 columns:
 \itemize{
-  \item *Pval* the pvalue for the test at the global or lineage level
-  \item *Statistic* for individual lineages, either the modified KS statistic
-  if \code{method = "KS"}, or the weighted difference of means, if
-  \code{method = "Permutation"}. For the global test, the combined Z-score.
-  \item *Pair* for individual pairs, the lineages numbers. For global,
+  \item *pair* for individual pairs, the lineages numbers. For global,
   \code{"All"}.
+  \item *p.value* the pvalue for the test at the global or pair level
+  \item *statistic* The classifier accuracy
 }
 }
 \description{
@@ -61,5 +66,5 @@ cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 sds <- slingshot::slingshot(rd, cl)
-#diffDifferentiationTest(sds, condition)
+diffDifferentiationTest(sds, condition)
 }

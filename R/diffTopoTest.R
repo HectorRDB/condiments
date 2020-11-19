@@ -57,8 +57,8 @@
       as.vector()
     ws <- ws / rep
     og_ws <- og$ws %>% as.vector()
-    res <- Ecume::ks_test(x = og_psts[, 1], w_x = og$ws[, 1],
-                              y = psts[, 1], w_y = ws[, 1],
+    res <- Ecume::ks_test(x = og_psts, w_x = og_ws,
+                              y = psts, w_y = ws,
                               thresh = thresh)
   } else if (method == "Classifier") {
     psts <- lapply(permutations, '[[', 1) %>%
@@ -77,7 +77,7 @@
     colnames(ws) <- colnames(og$ws)
     res <- Ecume::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
   }
-  return(res[c("statistics", "p.value")])
+  return(res[c("statistic", "p.value")])
 }
 
 
@@ -117,7 +117,7 @@
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, rep = 200, thresh = .05,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     ...){
             if (n_distinct(conditions) > 2 && method != "classifier") {
               warning(paste0("Changing to method classifier since more than ",
@@ -138,7 +138,7 @@ setMethod(f = "diffTopoTest",
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, rep = 200, thresh = .05,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")

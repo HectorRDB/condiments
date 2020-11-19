@@ -13,7 +13,7 @@ diffTopoTest(sds, ...)
   conditions,
   rep = 200,
   thresh = 0.05,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   ...
 )
 
@@ -22,7 +22,7 @@ diffTopoTest(sds, ...)
   conditions,
   rep = 200,
   thresh = 0.05,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   ...
 )
 }

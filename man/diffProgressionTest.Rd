@@ -13,7 +13,7 @@ diffProgressionTest(sds, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
   thresh = 0.05,
   rep = 10000,
   ...
@@ -24,7 +24,7 @@ diffProgressionTest(sds, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
   thresh = 0.05,
   rep = 10000,
   ...
@@ -47,7 +47,7 @@ which column of the metadata contains this vector.}
 for the classifier method or "Permutation" for a permutation. See details.
 Default to KS if there is two conditions and to "Classifier" otherwise.}
 
-\item{thresh}{The threshold for the KS test. See \code{\link{ks_test}}.
+\item{thresh}{The threshold for the KS test or Classifier test.
 Ignored if \code{method = "Permutation"}. Default to .05.}
 
 \item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
@@ -56,12 +56,12 @@ Default to \code{1e4}.}
 \value{
 A data frame with 3 columns:
 \itemize{
-\item \emph{Pval} the pvalue for the test at the global or lineage level
-\item \emph{Statistic} for individual lineages, either the modified KS statistic
+\item \emph{lineage} for individual lineages, the lineage number. For global,
+\code{"All"}.
+\item \emph{p.value} the pvalue for the test at the global or lineage level
+\item \emph{statistic} for individual lineages, either the modified KS statistic
 if \code{method = "KS"}, or the weighted difference of means, if
 \code{method = "Permutation"}. For the global test, the combined Z-score.
-\item \emph{Lineage} for individual lineages, the lineage number. For global,
-\code{"All"}.
 }
 }
 \description{
