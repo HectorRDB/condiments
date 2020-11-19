@@ -34,7 +34,7 @@ diffProgressionTest(sds, ...)
 \item{sds}{The final object after running slingshot. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{Other arguments passed to \code{statUtils::classifier_test}.}
+\item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
 
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}

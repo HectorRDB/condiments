@@ -51,9 +51,9 @@
     xs <- lapply(seq_len(n_conditions), function(cond) {
       pst[conditions == cond, ]
     })
-    glob_test <- statUtils::classifier_test(xs, thresh = thresh, ...)
+    glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   } else {
-    glob_test <- statUtils::stouffer_zscore(pvals = lineages_test$p.value / 2,
+    glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
                                             weights = colSums(w))
   }
   glob_test <- data.frame("Lineage" = "All",
@@ -85,7 +85,7 @@
 #' Ignored if \code{method = "Permutation"}. Default to .05.
 #' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
 #' Default to \code{1e4}.
-#' @param ... Other arguments passed to \code{statUtils::classifier_test}.
+#' @param ... Other arguments passed to \link[Ecume]{classifier_test}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
 #' @importFrom dplyr n_distinct bind_rows mutate select
@@ -126,7 +126,7 @@
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
 #' diffProgressionTest(sds, condition)
-#' @importFrom statUtils classifier_test ks_test stouffer_zscore
+#' @importFrom Ecume classifier_test ks_test stouffer_zscore
 #' @export
 #' @rdname diffProgressionTest
 setMethod(f = "diffProgressionTest",

@@ -57,7 +57,7 @@
       as.vector()
     ws <- ws / rep
     og_ws <- og$ws %>% as.vector()
-    res <- statUtils::ks_test(x = og_psts[, 1], w_x = og$ws[, 1],
+    res <- Ecume::ks_test(x = og_psts[, 1], w_x = og$ws[, 1],
                               y = psts[, 1], w_y = ws[, 1],
                               thresh = thresh)
   } else if (method == "Classifier") {
@@ -75,7 +75,7 @@
       Reduce(f = '+')
     ws <- ws / rep
     colnames(ws) <- colnames(og$ws)
-    res <- statUtils::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
+    res <- Ecume::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
   }
   return(res[c("statistics", "p.value")])
 }
@@ -94,7 +94,7 @@
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
 #' @param method The method to use to test. One of 'KS_mean', "KS_all' and 'Classifier'.
 #' See details. Default to 'KS_mean' if two conditions and 'Classifier' otherwise.
-#' @param ... Other arguments passed to \link{statUtils::classifier_test}
+#' @param ... Other arguments passed to \link[Ecume]{classifier_test}
 #' @return
 #' A list containing the following components:
 #' \itemize{
@@ -110,7 +110,7 @@
 #' sds <- slingshot::getLineages(rd, cl)
 #' diffTopoTest(sds, condition, rep = 20)
 #' @export
-#' @importFrom statUtils classifier_test ks_test
+#' @importFrom Ecume classifier_test ks_test
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @importFrom dplyr n_distinct
 #' @rdname diffTopoTest

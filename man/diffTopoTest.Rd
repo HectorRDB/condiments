@@ -30,7 +30,7 @@ diffTopoTest(sds, ...)
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{Other arguments passed to \link{statUtils::classifier_test}}
+\item{...}{Other arguments passed to \link[Ecume]{classifier_test}}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector.}
