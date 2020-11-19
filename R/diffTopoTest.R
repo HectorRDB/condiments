@@ -5,7 +5,7 @@
     sds_cond <- sds
     sds_cond@reducedDim <- sds_cond@reducedDim[conditions == cond, ]
     sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
-    # TODO: handle cases where one cluster copntains only one condition!!
+    # TODO: handle cases where one cluster contains only one condition!!
     # missing_clusters <- which(colSums(sds_cond@clusterLabels) == 0)
     # sds_cond@clusterLabels <- sds_cond@clusterLabels[, -missing_clusters]
     # sds_cond@adjacency <- sds_cond@adjacency[-missing_clusters, -missing_clusters]
@@ -13,13 +13,12 @@
     #   return(l[!l %in% names(missing_clusters)])
     # })
     sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
-    pst_cond <- slingshot::slingPseudotime(sds_cond) %>% as.vector()
-    psts <- c(psts, pst_cond)
+    pst_cond <- slingshot::slingPseudotime(sds_cond)
+    psts <- cbind(psts, pst_cond)
     w_conds <- slingshot::slingCurveWeights(sds_cond)
-    w_conds <- sweep(w_conds, 1, FUN = "/", STATS = apply(w_conds, 1, sum)) %>%
-      as.vector()
-    ws <- c(ws, w_conds)
+    ws <- cbind(ws, w_conds)
   }
+  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum)) %>%
   return(list("psts" = psts, "ws" = ws))
 }
 

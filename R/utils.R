@@ -1,13 +1,3 @@
-# Stats ----
-.Stouffer <- function(pvals, weights) {
-  Zs <- lapply(pvals, function(pval) {
-    return(stats::qnorm(pval / 2, lower.tail = FALSE))
-  }) %>%
-    unlist()
-  Z <- sum(Zs * weights) / sqrt(sum(weights^2))
-  return(list("Pval" = stats::pnorm(Z, lower.tail = FALSE), "Statistic" = Z))
-}
-
 # Toy examples ----
 .create_fork <- function(n_cells, noise) {
   rd <- matrix(0, ncol = 2, nrow = n_cells)
@@ -74,52 +64,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   return(sd)
 }
 
-# KS test
-.pKS2 <- function(x, n = length(x), tol) {
-  # x[1:n] is input and output
-  #
-  #  Compute
-  #    \sum_{k=-\infty}^\infty (-1)^k e^{-2 k^2 x^2}
-  #    = 1 + 2 \sum_{k=1}^\infty (-1)^k e^{-2 k^2 x^2}
-  #    = \frac{\sqrt{2\pi}}{x} \sum_{k=1}^\infty \exp(-(2k-1)^2\pi^2/(8x^2))
-  #
-  #    See e.g. J. Durbin (1973), Distribution Theory for Tests Based on the
-  #  Sample Distribution Function.  SIAM.
-  #
-  #    The 'standard' series expansion obviously cannot be used close to 0;
-  #  we use the alternative series for x < 1, and a rather crude estimate
-  #  of the series remainder term in this case, in particular using that
-  #  ue^(-lu^2) \le e^(-lu^2 + u) \le e^(-(l-1)u^2 - u^2+u) \le e^(-(l-1))
-  #  provided that u and l are >= 1.
-  #
-  #    (But note that for reasonable tolerances, one could simply take 0 as
-  #       the value for x < 0.2, and use the standard expansion otherwise.)
-  #
-  #   /
-  #   double New, old, s, w, z;
-  # int i, k, k_max;
-  if (x == 0) {
-    return(1)
-  }
-  k_max <- sqrt(2 - log(tol))
-  if (x < 1) {
-    z <- - pi^2/ (8 * x^2)
-    w <- log(x)
-    s <- seq(1, k_max, 2)
-    s <- sum(exp(s^2 * z - w))
-    return(s * sqrt(2 * pi))
-  } else {
-    z <- -2 * x^2
-    s = -1; k = 1; old = 0; New = 1
-    while(abs(old - New) > tol) {
-      old <- New
-      New <- New + 2 * s * exp(z * k * k);
-      s <- -s
-      k <- k + 1
-    }
-    return(New)
-  }
-}
+# Sds merge ----
 
 #' Merge slingshots datasets
 #'

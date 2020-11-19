@@ -45,3 +45,15 @@ setGeneric(
     standardGeneric("diffDifferentiationTest")
   }
 )
+
+#' @name nLineages
+#' @title Number of lineages
+#' @param ... parameters including:
+setGeneric(
+  name = "nLineages",
+  signature = "sds",
+  def = function(sds, ...) {
+    standardGeneric("nLineages")
+  }
+)
+
