@@ -136,23 +136,26 @@ ggplot(df, aes(x = pst2, fill = condition)) +
 ```
 There are clear differences between the two conditions
 
-## Testing for differential differentiation
-
-Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the classifier test. The idea is that, if two conditions are identical, the accuracy of any classifier will never be higher than chance. This method is very versatile and can accommodate more than two conditions, and multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
-
-```{r}
-diffProgressionTest(sds, conditions = condition, global = FALSE, pairs = TRUE)
-```
-
 ## Testing for differential progression
 
-To test for differential progression, we use the __diffProgressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __diffProgressionTest__ function. Here, we will use the default, the custom KS test. 
+To test for differential progression, we use the __diffProgressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __diffProgressionTest__ function. Here, we will use the default, the custom KS test.
 
 ```{r}
 diffProgressionTest(sds, conditions = condition, method = "KS",
                     global = TRUE, lineages = TRUE)
 ```
+
 As expected, there is a global difference over all lineages, which is driven by differences of distribution across lineage 2 (i.e. the bottom one).
+
+## Testing for differential differentiation
+
+Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the classifier test. The idea is that, if two conditions are identical, the accuracy of any classifier will never be higher than chance. This method is very versatile and can accommodate more than two conditions, and multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
+
+```{r}
+set.seed(12)
+diffDifferentiationTest(sds, conditions = condition, global = FALSE, 
+                        pairwise = TRUE, thresh = 0)
+```
 
 # Differential Expression
 
