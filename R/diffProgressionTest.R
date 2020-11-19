@@ -53,7 +53,7 @@
     })
     glob_test <- statUtils::classifier_test(xs, thresh = thresh, ...)
   } else {
-    glob_test <- statUtils::stouffer_zscore(pvals = lineages_test$p.value,
+    glob_test <- statUtils::stouffer_zscore(pvals = lineages_test$p.value / 2,
                                             weights = colSums(w))
   }
   glob_test <- data.frame("Lineage" = "All",
