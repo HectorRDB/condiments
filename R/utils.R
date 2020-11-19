@@ -129,7 +129,8 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
      if (scale) {
        lambda <- (lambda - min(lambda)) / (max(lambda) - min(lambda))
        lambda <- lambda * length_ref + min_ref
-      }
+     }
+     return(lambda)
     }))
     curve_i$dist_ind <- do.call('c', lapply(curves_i, "[[", 'dist_ind'))
     curve_i$dist <- do.call('sum', lapply(curves_i, "[[", 'dist'))

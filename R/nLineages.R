@@ -1,6 +1,9 @@
 #' nLineages
 #'
 #' @description Return the number of lineages for a slingshot object
+#' @param sds A slingshot object already run on the full dataset. Can be either a
+#' \code{\link[slingshot]{SlingshotDataSet}} or a
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @export
 #' @rdname nLineages
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
