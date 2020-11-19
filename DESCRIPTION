@@ -38,7 +38,8 @@ Imports:
     spatstat,
     utils,
     magrittr,
-    dplyr (>= 1.0)
+    dplyr (>= 1.0),
+    statUtils
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

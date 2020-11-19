@@ -13,9 +13,10 @@ diffProgressionTest(sds, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = "KS",
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
   thresh = 0.05,
-  rep = 10000
+  rep = 10000,
+  ...
 )
 
 \S4method{diffProgressionTest}{SingleCellExperiment}(
@@ -23,16 +24,17 @@ diffProgressionTest(sds, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = "KS",
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
   thresh = 0.05,
-  rep = 10000
+  rep = 10000,
+  ...
 )
 }
 \arguments{
 \item{sds}{The final object after running slingshot. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{parameters including:}
+\item{...}{Other arguments passed to \code{statUtils::classifier_test}.}
 
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}
@@ -41,8 +43,9 @@ which column of the metadata contains this vector.}
 
 \item{lineages}{If TRUE, test for all lineages independently.}
 
-\item{method}{Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
-for a permutation. See details. Default to KS.}
+\item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
+for the classifier method or "Permutation" for a permutation. See details.
+Default to KS if there is two conditions and to "Classifier" otherwise.}
 
 \item{thresh}{The threshold for the KS test. See \code{\link{ks_test}}.
 Ignored if \code{method = "Permutation"}. Default to .05.}
@@ -71,12 +74,15 @@ conditions, using the lineage weights as observations weights.
 \itemize{
 \item If \code{method = "KS"}, this uses the updated KS test,
 see \code{\link{ks_test}} for details.
+\item If \code{method = "Classifier"}, this uses a classifier to assess if
+that classifier can do better than chance on the conditions
 \item If \code{method = "Permutation"}, the difference of weighted mean
 pseudotime between condition is computed, and a p-value is found by
 permuting the condition labels.
 }
-Lineage-levels p-values are combined using Stouffer's Z-score method, using
-the sum of cellweights per lineage to weight each p-value.
+If the method is not "Classifier", lineage-levels p-values are combined using
+Stouffer's Z-score method, using the sum of cellweights per lineage to weight
+each p-value.
 }
 \examples{
 data('slingshotExample', package = "slingshot")

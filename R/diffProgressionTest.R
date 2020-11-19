@@ -1,44 +1,64 @@
+.perm <- function(pst_l, w_l, conditions) {
+  d_l <- stats::weighted.mean(pst_l[conditions == unique(conditions)[1]],
+                              w_l[conditions == unique(conditions)[1]]) -
+         stats::weighted.mean(pst_l[conditions == unique(conditions)[2]],
+                              w_l[conditions == unique(conditions)[2]])
+  return(dl)
+}
+
 .diffProgressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
-                                 method = "KS", thresh = 0.05, rep = 1e4) {
-  A <- unique(conditions)[1]
-  B <- unique(conditions)[2]
+                                 method = "KS", thresh = 0.05, rep = 1e4, ...) {
+  # Get variables
   pst <- slingshot::slingPseudotime(sds, na = TRUE)
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
   lineages <- colnames(pst) <- colnames(w) <-
     paste0("Lineage", seq_len(ncol(pst)))
   names(lineages) <- lineages
+  n_conditions <- dplyr::n_distinct(conditions)
+  # Get lineage levels p-values
   lineages_test <- lapply(colnames(pst), function(l){
     w_l <- w[, l]
     pst_l <- pst[, l]
     if (method == "KS") {
-      test_l <- ks_test(x = pst_l[conditions == A],
-                        w_x = w_l[conditions == A],
-                        y = pst_l[conditions == B],
-                        w_y = w_l[conditions == B],
+      test_l <- ks_test(x = pst_l[conditions == unique(conditions)[1]],
+                        w_x = w_l[conditions == unique(conditions)[1]],
+                        y = pst_l[conditions == unique(conditions)[2]],
+                        w_y = w_l[conditions == unique(conditions)[2]],
                         thresh = thresh)
-      return(c("Pval" = test_l$p.value, "Statistic" = test_l$statistic))
+      return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     } else if (method == "Permutation") {
-      d_l <- stats::weighted.mean(pst_l[conditions== A], w_l[conditions == A]) -
-        stats::weighted.mean(pst_l[conditions== B], w_l[conditions == B])
+      dl <- .perm(pst_l, w_l, conditions)
       d_il <- replicate(rep, {
         conditions_i <- sample(conditions)
-        return(stats::weighted.mean(pst_l[conditions_i== A], w_l[conditions_i == A]) -
-                 stats::weighted.mean(pst_l[conditions_i== B], w_l[conditions_i == B]))
+        return(.perm(pst_l, w_l, conditions_i))
       })
-      return(c("Pval" = max(mean(abs(d_l) > abs(d_il)), 1 / rep),
-               "Statistic" = d_l))
+      return(c("statistic" = d_l,
+               "p.value" = max(mean(abs(d_l) > abs(d_il)), 1 / rep)))
+    } else if (method == "Classifier") {
+      xs <- lapply(seq_len(n_conditions), function(cond) {
+        pst_l[conditions == cond]
+      })
+      test_l <- classifier_test(x = xs, thresh = thresh, ...)
+      return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     } else {
-      stop("Method must be one of KS or permutation")
+      stop("Method must be one of KS, Classifier or permutation")
     }
   }) %>%
     dplyr::bind_rows(.id = "Lineage") %>%
     dplyr::mutate(Lineage = as.character(Lineage)) %>%
-    dplyr::select(Lineage, Pval, Statistic)
-  glob_test <- .Stouffer(pvals = lineages_test$Pval,
-                         weights = colSums(w))
+    dplyr::select(Lineage, statistic, p.value)
+  if (method == "Classifier") {
+    xs <- lapply(seq_len(n_conditions), function(cond) {
+      pst[conditions == cond, ]
+    })
+    glob_test <- statUtils::classifier_test(xs, thresh = thresh, ...)
+  } else {
+    glob_test <- statUtils::stouffer_zscore(pvals = lineages_test$p.value,
+                                            weights = colSums(w))
+  }
   glob_test <- data.frame("Lineage" = "All",
-                          "Pval" = glob_test$Pval,
-                          "Statistic" = glob_test$Statistic)
+                          "statistic" = glob_test$statistic,
+                          "p.value" = glob_test$p.value)
   if (global == TRUE & lineages == FALSE) return(glob_test)
   if (global == FALSE & lineages == TRUE) return(lineages_test)
   if (global == TRUE & lineages == TRUE) {
@@ -58,12 +78,14 @@
 #' which column of the metadata contains this vector.
 #' @param global If TRUE, test for all lineages simultaneously.
 #' @param lineages If TRUE, test for all lineages independently.
-#' @param method Either "KS" for the weighted Kolmogorov-Smirnov or "Permutation"
-#' for a permutation. See details. Default to KS.
+#' @param method One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
+#' for the classifier method or "Permutation" for a permutation. See details.
+#' Default to KS if there is two conditions and to "Classifier" otherwise.
 #' @param thresh The threshold for the KS test. See \code{\link{ks_test}}.
 #' Ignored if \code{method = "Permutation"}. Default to .05.
 #' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
 #' Default to \code{1e4}.
+#' @param ... Other arguments passed to \code{statUtils::classifier_test}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
 #' @importFrom dplyr n_distinct bind_rows mutate select
@@ -73,12 +95,15 @@
 #' \itemize{
 #'   \item If \code{method = "KS"}, this uses the updated KS test,
 #'   see \code{\link{ks_test}} for details.
+#'   \item If \code{method = "Classifier"}, this uses a classifier to assess if
+#'   that classifier can do better than chance on the conditions
 #'   \item If \code{method = "Permutation"}, the difference of weighted mean
 #'   pseudotime between condition is computed, and a p-value is found by
 #'   permuting the condition labels.
 #' }
-#' Lineage-levels p-values are combined using Stouffer's Z-score method, using
-#' the sum of cellweights per lineage to weight each p-value.
+#' If the method is not "Classifier", lineage-levels p-values are combined using
+#' Stouffer's Z-score method, using the sum of cellweights per lineage to weight
+#' each p-value.
 #' @references  Stouffer, S.A.; Suchman, E.A.; DeVinney, L.C.; Star, S.A.;
 #' Williams, R.M. Jr. (1949).
 #' *The American Soldier, Vol.1: Adjustment during Army Life.*
@@ -101,14 +126,18 @@
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
 #' diffProgressionTest(sds, condition)
+#' @importFrom statUtils classifier_test ks_test stouffer_zscore
 #' @export
 #' @rdname diffProgressionTest
 setMethod(f = "diffProgressionTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
-                                method = "KS", thresh = .05, rep = 1e4){
-            if (n_distinct(conditions) != 2) {
-              stop("For now, this test only works with two conditions")
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    thresh = .05, rep = 1e4, ...){
+            if (n_distinct(conditions) > 2 && method != "classifier") {
+              warning(paste0("Changing to method classifier since more than ",
+                             "two conditions are present."))
+              method <- "classifier"
             }
             res <- .diffProgressionTest(sds = sds,
                                         conditions = conditions,
@@ -116,7 +145,8 @@ setMethod(f = "diffProgressionTest",
                                         lineages = lineages,
                                         method = method,
                                         thresh = thresh,
-                                        rep = rep)
+                                        rep = rep,
+                                        ...)
             return(res)
           }
 )
@@ -128,8 +158,9 @@ setMethod(f = "diffProgressionTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffProgressionTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions,  global = TRUE, lineages = FALSE,
-                                method = "KS", thresh = .05, rep = 1e4){
+          definition = function(sds, conditions, global = TRUE, lineages = FALSE,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    thresh = .05, rep = 1e4, ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -146,6 +177,7 @@ setMethod(f = "diffProgressionTest",
                                        lineages = lineages,
                                        method = method,
                                        thresh = thresh,
-                                       rep = rep))
+                                       rep = rep,
+                                       ...))
           }
 )

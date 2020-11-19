@@ -8,25 +8,46 @@
 \usage{
 diffTopoTest(sds, ...)
 
-\S4method{diffTopoTest}{SlingshotDataSet}(sds, conditions, rep = 200, thresh = 0.05)
+\S4method{diffTopoTest}{SlingshotDataSet}(
+  sds,
+  conditions,
+  rep = 200,
+  thresh = 0.05,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  ...
+)
 
-\S4method{diffTopoTest}{SingleCellExperiment}(sds, conditions = conditions, rep = 200, thresh = 0.05)
+\S4method{diffTopoTest}{SingleCellExperiment}(
+  sds,
+  conditions,
+  rep = 200,
+  thresh = 0.05,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+  ...
+)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{parameters including:}
+\item{...}{Other arguments passed to \link{statUtils::classifier_test}}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector.}
 
-\item{rep}{How many permutations to run. Default to 200.}
+\item{rep}{How many permutations to run. Default to 50.}
 
 \item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
+
+\item{method}{The method to use to test. One of 'KS_mean', "KS_all' and 'Classifier'.
+See details. Default to 'KS_mean' if two conditions and 'Classifier' otherwise.}
 }
 \value{
-The test output. An object of class \code{htest}
+A list containing the following components:
+\itemize{
+  \item *statistic* the value of the test statistic.
+  \item *p.value* the p-value of the test.
+}
 }
 \description{
 Test whether or not slingshot should be fitted independently

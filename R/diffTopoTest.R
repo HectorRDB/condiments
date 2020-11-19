@@ -75,7 +75,7 @@
       Reduce(f = '+')
     ws <- ws / rep
     colnames(ws) <- colnames(og$ws)
-    res <-classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
+    res <- statUtils::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
   }
   return(res[c("statistics", "p.value")])
 }
@@ -94,14 +94,13 @@
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
 #' @param method The method to use to test. One of 'KS_mean', "KS_all' and 'Classifier'.
 #' See details. Default to 'KS_mean' if two conditions and 'Classifier' otherwise.
-#' @param ... Other arguments
+#' @param ... Other arguments passed to \link{statUtils::classifier_test}
 #' @return
 #' A list containing the following components:
 #' \itemize{
 #'   \item *statistic* the value of the test statistic.
 #'   \item *p.value* the p-value of the test.
 #' }
-#' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @examples
 #' data('slingshotExample', package = "slingshot")
 #' rd <- slingshotExample$rd
@@ -111,12 +110,22 @@
 #' sds <- slingshot::getLineages(rd, cl)
 #' diffTopoTest(sds, condition, rep = 20)
 #' @export
+#' @importFrom statUtils classifier_test ks_test
+#' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
+#' @importFrom dplyr n_distinct
 #' @rdname diffTopoTest
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, rep = 200, thresh = .05){
+          definition = function(sds, conditions, rep = 200, thresh = .05,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    ...){
+            if (n_distinct(conditions) > 2 && method != "classifier") {
+              warning(paste0("Changing to method classifier since more than ",
+                             "two conditions are present."))
+              method <- "classifier"
+            }
             res <- .diffTopoTest(sds = sds, conditions = conditions, rep = rep,
-                                 thresh = thresh)
+                                 thresh = thresh, method = method, ...)
             return(res)
           }
 )
@@ -128,8 +137,9 @@ setMethod(f = "diffTopoTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions = conditions, rep = 200,
-                                thresh = .05){
+          definition = function(sds, conditions, rep = 200, thresh = .05,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "classifier"),
+    ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -143,6 +153,8 @@ setMethod(f = "diffTopoTest",
             return(diffTopoTest(slingshot::SlingshotDataSet(sds),
                                 conditions = conditions,
                                 rep = rep,
-                                thresh = thresh))
+                                thresh = thresh,
+                                method = method,
+                                ...))
           }
 )
