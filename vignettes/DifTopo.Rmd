@@ -134,7 +134,15 @@ ggplot(df, aes(x = pst2, fill = condition)) +
   scale_fill_brewer(type = "qual")+
   labs(x = "Pseudotime for lineage 2", title = "Pseudotime distribution for lineage 2")
 ```
-There are clear differences between the two differences
+There are clear differences between the two conditions
+
+## Testing for differential differentiation
+
+Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the classifier test. The idea is that, if two conditions are identical, the accuracy of any classifier will never be higher than chance. This method is very versatile and can accommodate more than two conditions, and multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
+
+```{r}
+diffProgressionTest(sds, conditions = condition, global = FALSE, pairs = TRUE)
+```
 
 ## Testing for differential progression
 
@@ -148,7 +156,7 @@ As expected, there is a global difference over all lineages, which is driven by 
 
 # Differential Expression
 
-The workflow above focus on global differences, looking at broad patterns of differentiation. While this is a necessary first step, gene-level information is also quite meaningful. To do so, we refer the reader to versions of __tradeSeq__ > 1.xx, and to the accompanying [Bioconductor workshop](https://kstreet13.github.io/bioc2020trajectories/articles/workshopTrajectories.html#differential-expression-1).
+The workflow above focus on global differences, looking at broad patterns of differentiation. While this is a necessary first step, gene-level information is also quite meaningful. To do so, we refer the reader to versions of __tradeSeq__ > 1.3.0, and to the accompanying [Bioconductor workshop](https://kstreet13.github.io/bioc2020trajectories/articles/workshopTrajectories.html#differential-expression-1).
 
 # Conclusion
 
