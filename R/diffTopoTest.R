@@ -14,9 +14,9 @@
     # })
     sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
     pst_cond <- slingshot::slingPseudotime(sds_cond)
-    psts <- cbind(psts, pst_cond)
+    psts <- rbind(psts, pst_cond)
     w_conds <- slingshot::slingCurveWeights(sds_cond)
-    ws <- cbind(ws, w_conds)
+    ws <- rbind(ws, w_conds)
   }
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum)) %>%
   return(list("psts" = psts, "ws" = ws))
