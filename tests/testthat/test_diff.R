@@ -64,28 +64,28 @@ test_that("The diffProgressionTest work on expected inputs",{
 test_that("The diffDifferentiationTest work on expected inputs",{
   # Input SlingshotDataSet
   set.seed(23)
-  test <- diffDifferentiationTest(sds = sds, conditions = condition, rep = 10)
+  test <- diffDifferentiationTest(sds = sds, conditions = condition)
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
-  expect_equal(colnames(test),  c("Lineage", "Pval", "Statistic"))
+  expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
   set.seed(23)
-  test_all <- diffDifferentiationTest(sds = sds, conditions = condition, rep = 10, lineage = TRUE)
-  expect_equal(nrow(test_all), length(slingCurves(sds)) + 1)
-  expect_equal(test[, 2:3], test_all[1, 2:3])
+  test_all <- diffDifferentiationTest(sds = sds, conditions = condition, pair = TRUE)
+  expect_equal(nrow(test_all), choose(nLineages(sds), 2) + 1)
+  expect_equal(test, test_all[1,])
   set.seed(23)
-  test_lineages <- diffDifferentiationTest(sds = sds, conditions = condition, rep = 10,
-                                       lineage = TRUE, global = FALSE)
-  test_lineages <- as.data.frame(test_lineages)
-  rownames(test_lineages) <- 2:3
-  expect_equal(nrow(test_lineages), length(slingCurves(sds)))
-  expect_equal(test_lineages[1, 2:3], test_all[2, 2:3])
+  test_pairs <- diffDifferentiationTest(sds = sds, conditions = condition,
+                                        pair = TRUE, global = FALSE)
+  test_pairs <- as.data.frame(test_pairs)
+  rownames(test_pairs) <- "2"
+  expect_equal(nrow(test_pairs), choose(nLineages(sds), 2))
+  expect_equivalent(test_pairs[1, ], test_all[2, ])
   # Input SingleCellExperiment
   pd <- DataFrame(cond = condition)
   rownames(pd) <- colnames(sds)
   sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
                               colData = pd)
   sce@int_metadata$slingshot <- sds
-  set.seed(12)
-  test_sce <- diffDifferentiationTest(sds = sce, conditions = "cond", rep = 10)
+  set.seed(23)
+  test_sce <- diffDifferentiationTest(sds = sce, conditions = "cond")
   expect_identical(test_sce, test)
 })
