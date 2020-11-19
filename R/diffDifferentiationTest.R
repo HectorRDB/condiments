@@ -4,21 +4,26 @@
   if (method != "Classifier") stop("Only Classifier is possible for now")
   pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
   n_conditions <- dplyr::n_distinct(conditions)
-  pairwise_test <- apply(pairs, 1, function(pair) {
-    ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
-    ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
-    xs <- lapply(seq_len(n_conditions), function(cond) {
-      ws[conditions == cond, ]
-    })
-    return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
+  nrows <- min(table(conditions))
+  pairwise_test <- apply(pairs, 2, function(pair) {
+    if(method == "Classifier") {
+      ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
+      ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+      xs <- lapply(unique(conditions), function(cond) {
+        ws_cond <- ws[conditions == cond, ]
+        ws_cond <- ws_cond[sample(seq_len(nrow(cond), ws_cond)), ]
+      })
+      return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
+    }
   }) %>%
     dplyr::bind_rows(.id = "pair") %>%
     dplyr::mutate(pair = as.character(pair)) %>%
     dplyr::select(pair, statistic, p.value)
   if (method == "Classifier") {
     ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
-    xs <- lapply(seq_len(n_conditions), function(cond) {
-      ws[conditions == cond, ]
+    xs <- lapply(unique(conditions), function(cond) {
+      ws_cond <- ws[conditions == cond, ]
+      ws_cond <- ws_cond[sample(seq_len(nrow(cond), ws_cond)), ]
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }

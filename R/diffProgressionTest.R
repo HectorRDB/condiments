@@ -47,7 +47,7 @@
     dplyr::mutate(lineage = as.character(lineage)) %>%
     dplyr::select(lineage, statistic, p.value)
   if (method == "Classifier") {
-    xs <- lapply(seq_len(n_conditions), function(cond) {
+    xs <- lapply(unique(conditions), function(cond) {
       pst[conditions == cond, ]
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)

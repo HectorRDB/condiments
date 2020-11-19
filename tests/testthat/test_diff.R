@@ -37,7 +37,7 @@ test_that("The diffProgressionTest work on expected inputs",{
   test <- diffProgressionTest(sds = sds, conditions = condition, rep = 10)
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
-  expect_equal(colnames(test),  c("lineage", "p.value", "statistic"))
+  expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
   set.seed(23)
   test_all <- diffProgressionTest(sds = sds, conditions = condition, rep = 10, lineage = TRUE)
   expect_equal(nrow(test_all), length(slingCurves(sds)) + 1)
