@@ -23,19 +23,61 @@
 }
 
 
-.diffTopoTest <- function(sds, conditions, rep = 200, thresh = .05) {
+.diffTopoTest <- function(sds, conditions, rep = 200, thresh = .05,
+                          method = "KS_mean", ...) {
   og <- .condition_sling(sds, conditions)
   permutations <- lapply(seq_len(rep), function(i) {
     condition <- sample(conditions)
     return(.condition_sling(sds, condition))
   })
-  psts <- lapply(permutations, '[', 1) %>% unlist()
-  ws <- lapply(permutations, '[', 2) %>% unlist()
-  res <- ks_test(x = og$psts, w_x = og$ws,
-                 y = psts, w_y = ws,
-                 thresh = thresh)
-  res$alternative <- "Infer separate trajectories for each condition"
-  return(res)
+  if (method == "KS_all") {
+    psts <- lapply(permutations, '[[', 1) %>% do.call(what = 'rbind') %>%
+      as.vector()
+    ws <- lapply(permutations, '[[', 2) %>% do.call(what = 'rbind') %>%
+      as.vector()
+    og_psts <- og$psts %>% as.vector()
+    og_ws <- og$ws %>% as.vector()
+    res <- ks_test(x = og_psts, w_x = og_ws,
+                   y = psts, w_y = ws,
+                   thresh = thresh)
+  } else if (method == "KS_mean") {
+    psts <- lapply(permutations, '[[', 1) %>%
+      lapply(function(df) {
+        as.matrix(df[rownames(reducedDim(sds)), ])
+      }) %>%
+      Reduce(f = '+') %>%
+      as.vector()
+    psts <- psts / rep
+    og_psts <- og$psts %>% as.vector()
+    ws <- lapply(permutations, '[[', 2) %>%
+      lapply(function(df) {
+        as.matrix(df[rownames(reducedDim(sds)), ])
+      }) %>%
+      Reduce(f = '+') %>%
+      as.vector()
+    ws <- ws / rep
+    og_ws <- og$ws %>% as.vector()
+    res <- statUtils::ks_test(x = og_psts[, 1], w_x = og$ws[, 1],
+                              y = psts[, 1], w_y = ws[, 1],
+                              thresh = thresh)
+  } else if (method == "Classifier") {
+    psts <- lapply(permutations, '[[', 1) %>%
+      lapply(function(df) {
+        as.matrix(df[colnames(sce), ])
+      }) %>%
+      Reduce(f = '+')
+    psts <- psts / rep
+    colnames(psts) <- colnames(og$psts)
+    ws <- lapply(permutations, '[[', 2) %>%
+      lapply(function(df) {
+        as.matrix(df[colnames(sce), ])
+      }) %>%
+      Reduce(f = '+')
+    ws <- ws / rep
+    colnames(ws) <- colnames(og$ws)
+    res <-classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
+  }
+  return(res[c("statistics", "p.value")])
 }
 
 
@@ -48,10 +90,17 @@
 #' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector.
-#' @param rep How many permutations to run. Default to 200.
+#' @param rep How many permutations to run. Default to 50.
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
+#' @param method The method to use to test. One of 'KS_mean', "KS_all' and 'Classifier'.
+#' See details. Default to 'KS_mean' if two conditions and 'Classifier' otherwise.
+#' @param ... Other arguments
 #' @return
-#' The test output. An object of class \code{htest}
+#' A list containing the following components:
+#' \itemize{
+#'   \item *statistic* the value of the test statistic.
+#'   \item *p.value* the p-value of the test.
+#' }
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @examples
 #' data('slingshotExample', package = "slingshot")
