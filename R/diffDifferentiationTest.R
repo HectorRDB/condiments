@@ -11,7 +11,7 @@
       ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
       xs <- lapply(unique(conditions), function(cond) {
         ws_cond <- ws[conditions == cond, ]
-        ws_cond <- ws_cond[sample(seq_len(nrow(cond), ws_cond)), ]
+        ws_cond <- ws_cond[sample(seq_len(nrow(cond)), ws_cond), ]
       })
       return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
     }
@@ -23,7 +23,7 @@
     ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
     xs <- lapply(unique(conditions), function(cond) {
       ws_cond <- ws[conditions == cond, ]
-      ws_cond <- ws_cond[sample(seq_len(nrow(cond), ws_cond)), ]
+      ws_cond <- ws_cond[sample(seq_len(nrow(cond)), ws_cond), ]
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
