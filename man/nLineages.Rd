@@ -13,6 +13,10 @@ nLineages(sds, ...)
 \S4method{nLineages}{SlingshotDataSet}(sds)
 }
 \arguments{
+\item{sds}{A slingshot object already run on the full dataset. Can be either a
+\code{\link[slingshot]{SlingshotDataSet}} or a
+\code{\link[SingleCellExperiment]{SingleCellExperiment}} object.}
+
 \item{...}{parameters including:}
 }
 \description{
