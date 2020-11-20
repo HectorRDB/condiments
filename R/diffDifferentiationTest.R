@@ -6,30 +6,39 @@
   n_conditions <- dplyr::n_distinct(conditions)
   nmin <- min(table(conditions))
   pairwise_test <- apply(pairs, 2, function(pair) {
-    if(method == "Classifier") {
-      ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
-      ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
-      xs <- lapply(unique(conditions), function(cond) {
-        ws_cond <- ws[conditions == cond, ]
-        ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
-      })
+    ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
+    ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+    xs <- lapply(unique(conditions), function(cond) {
+      ws_cond <- ws[conditions == cond, ]
+      ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
+    })
+    if (method == "Classifier") {
       return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
+    }
+    if (method == "mmd2") {
+      return(Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...))
     }
   }) %>%
     dplyr::bind_rows(.id = "pair") %>%
     dplyr::mutate(pair = as.character(pair)) %>%
     dplyr::select(pair, statistic, p.value)
+
+  ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
+  xs <- lapply(unique(conditions), function(cond) {
+    ws_cond <- ws[conditions == cond, ]
+    ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
+  })
   if (method == "Classifier") {
-    ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
-    xs <- lapply(unique(conditions), function(cond) {
-      ws_cond <- ws[conditions == cond, ]
-      ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
-    })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
+  if (method == "mmd2") {
+    glob_test <- Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...)
+  }
+
   glob_test <- data.frame("pair" = "All",
                           "statistic" = glob_test$statistic,
                           "p.value" = glob_test$p.value)
+
   if (global == TRUE & pairwise == FALSE) return(glob_test)
   if (global == FALSE & pairwise == TRUE) return(pairwise_test)
   if (global == TRUE & pairwise == TRUE) {
@@ -49,14 +58,14 @@
 #' column of the metadata contains this vector
 #' @param global If TRUE, test for all pairs simultaneously.
 #' @param pairwise If TRUE, test for all pairs independently.
-#' @param method For now, only "Classifier" is accepted.
+#' @param method One of "Classifier" or "mmd2".
 #' @param thresh The threshold for the classifier test. See details.
 #' Default to .05.
 #' @param ... Other arguments passed to \link[Ecume]{classifier_test}.
 #' @importFrom slingshot slingshot SlingshotDataSet
 #' @importFrom utils combn
 #' @importFrom dplyr n_distinct
-#' @importFrom Ecume classifier_test
+#' @importFrom Ecume classifier_test mmd_test
 #' @return A data frame with 3 columns:
 #' \itemize{
 #'   \item *pair* for individual pairs, the lineages numbers. For global,
@@ -77,7 +86,14 @@
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
-                                method = "Classifier", thresh = .05, ...){
+                                method = c("mmd2", "Classifier"), thresh = .05,
+                                ...){
+            method <- match.arg(method)
+            if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
+              method <- "Classifier"
+              warning(paste0("If more than two conditions are present, ",
+                             "only the Classifier method is possible."))
+            }
             res <- .diffDifferentiationTest(sds = sds,
                                             conditions = conditions,
                                             global = global,
@@ -96,9 +112,9 @@ setMethod(f = "diffDifferentiationTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions,  global = TRUE,
-                                pairwise = FALSE, method = "Classifier",
-                                thresh = .05, ...){
+          definition = function(sds, conditions,  global = TRUE, pairwise = FALSE,
+                                method = c("Classifier", "mmd2"), thresh = .05,
+                                ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }

@@ -39,7 +39,8 @@ Imports:
     utils,
     magrittr,
     dplyr (>= 1.0),
-    Ecume
+    Ecume,
+    methods
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

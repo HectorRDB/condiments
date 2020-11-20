@@ -79,10 +79,13 @@ that classifier can do better than chance on the conditions
 \item If \code{method = "Permutation"}, the difference of weighted mean
 pseudotime between condition is computed, and a p-value is found by
 permuting the condition labels.
+\item If \code{method = "mmd2"}, this uses the mean maximum discrepancies
+statistics.
 }
-If the method is not "Classifier", lineage-levels p-values are combined using
-Stouffer's Z-score method, using the sum of cellweights per lineage to weight
-each p-value.
+The p-value at the global level can be computed in two ways. method is \code{"KS"} or
+\code{"Permutation"}, then the p-values are computed using stouffer's
+z-score method, with the lineages weights acting as weights. Otherwise,
+the test works on multivariate data and is applied on all pseudotime values.
 }
 \examples{
 data('slingshotExample', package = "slingshot")

@@ -7,7 +7,7 @@
 }
 
 .diffProgressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
-                                 method = "KS", thresh = 0.05, rep = 1e4, ...) {
+                                 method = "KS",  thresh = 0.05, rep = 1e4, ...) {
   # Get variables
   pst <- slingshot::slingPseudotime(sds, na = TRUE)
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
@@ -19,13 +19,14 @@
     w_l <- w[, l]
     pst_l <- pst[, l]
     if (method == "KS") {
-      test_l <- ks_test(x = pst_l[conditions == unique(conditions)[1]],
-                        w_x = w_l[conditions == unique(conditions)[1]],
-                        y = pst_l[conditions == unique(conditions)[2]],
-                        w_y = w_l[conditions == unique(conditions)[2]],
-                        thresh = thresh)
+      test_l <- Ecume::ks_test(x = pst_l[conditions == unique(conditions)[1]],
+                               w_x = w_l[conditions == unique(conditions)[1]],
+                               y = pst_l[conditions == unique(conditions)[2]],
+                               w_y = w_l[conditions == unique(conditions)[2]],
+                               thresh = thresh)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
-    } else if (method == "Permutation") {
+    }
+    if (method == "Permutation") {
       dl <- .perm(pst_l, w_l, conditions)
       d_il <- replicate(rep, {
         conditions_i <- sample(conditions)
@@ -33,14 +34,19 @@
       })
       return(c("statistic" = d_l,
                "p.value" = max(mean(abs(d_l) > abs(d_il)), 1 / rep)))
-    } else if (method == "Classifier") {
+    }
+    if (method == "Classifier") {
       xs <- lapply(seq_len(n_conditions), function(cond) {
         pst_l[conditions == cond]
       })
-      test_l <- classifier_test(x = xs, thresh = thresh, ...)
+      test_l <- Ecume::classifier_test(x = xs, thresh = thresh, ...)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
-    } else {
-      stop("Method must be one of KS, Classifier or permutation")
+    }
+    if(method == "mmd2") {
+      test_l <- Ecume::mmd_test(x = pst_l[conditions == unique(conditions)[1]],
+                                y = pst_l[conditions == unique(conditions)[2]],
+                                ...)
+      return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
   }) %>%
     dplyr::bind_rows(.id = "lineage") %>%
@@ -51,10 +57,17 @@
       pst[conditions == cond, ]
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
-  } else {
+  }
+  if (method == "mmd2") {
+    glob_test <- Ecume::mmd_test(x = pst[conditions == unique(conditions)[1], ],
+                                 y = pst[conditions == unique(conditions)[2], ],
+                                 ...)
+  }
+  if (method %in% c("KS", "Permutation")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
                                             weights = colSums(w))
   }
+
   glob_test <- data.frame("lineage" = "All",
                           "statistic" = glob_test$statistic,
                           "p.value" = glob_test$p.value)
@@ -99,10 +112,13 @@
 #'   \item If \code{method = "Permutation"}, the difference of weighted mean
 #'   pseudotime between condition is computed, and a p-value is found by
 #'   permuting the condition labels.
+#'   \item If \code{method = "mmd2"}, this uses the mean maximum discrepancies
+#'    statistics.
 #' }
-#' If the method is not "Classifier", lineage-levels p-values are combined using
-#' Stouffer's Z-score method, using the sum of cellweights per lineage to weight
-#' each p-value.
+#' The p-value at the global level can be computed in two ways. method is \code{"KS"} or
+#'  \code{"Permutation"}, then the p-values are computed using stouffer's
+#'  z-score method, with the lineages weights acting as weights. Otherwise,
+#'  the test works on multivariate data and is applied on all pseudotime values.
 #' @references  Stouffer, S.A.; Suchman, E.A.; DeVinney, L.C.; Star, S.A.;
 #' Williams, R.M. Jr. (1949).
 #' *The American Soldier, Vol.1: Adjustment during Army Life.*
@@ -125,7 +141,7 @@
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
 #' diffProgressionTest(sds, condition)
-#' @importFrom Ecume classifier_test ks_test stouffer_zscore
+#' @importFrom Ecume classifier_test ks_test stouffer_zscore mmd_test
 #' @export
 #' @rdname diffProgressionTest
 setMethod(f = "diffProgressionTest",
@@ -133,10 +149,16 @@ setMethod(f = "diffProgressionTest",
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = .05, rep = 1e4, ...){
-            if (n_distinct(conditions) > 2 && method != "classifier") {
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd2")) {
+              stop("Method must be one of KS, Classifier, mmd2 or permutation")
+            }
+            if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning(paste0("Changing to method classifier since more than ",
                              "two conditions are present."))
-              method <- "classifier"
+              method <- "Classifier"
+            }
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd2")) {
+              stop("Method must be one of KS, Classifier, mmd2 or permutation")
             }
             res <- .diffProgressionTest(sds = sds,
                                         conditions = conditions,

@@ -30,7 +30,7 @@ diffTopoTest(sds, ...)
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{Other arguments passed to \link[Ecume]{classifier_test}}
+\item{...}{Other arguments passed to the test method. See details}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector.}
@@ -39,8 +39,8 @@ column of the metadata contains this vector.}
 
 \item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
 
-\item{method}{The method to use to test. One of 'KS_mean', "KS_all' and 'Classifier'.
-See details. Default to 'KS_mean' if two conditions and 'Classifier' otherwise.}
+\item{method}{The method to use to test. One of 'KS_mean', "KS_all', "mmd2'
+and 'Classifier'. See details.}
 }
 \value{
 A list containing the following components:
@@ -52,6 +52,10 @@ A list containing the following components:
 \description{
 Test whether or not slingshot should be fitted independently
 for different conditions or not.
+}
+\details{
+If there is only two conditions, default to `KS_mean`. Otherwise,
+uses a classifier.
 }
 \examples{
 data('slingshotExample', package = "slingshot")
