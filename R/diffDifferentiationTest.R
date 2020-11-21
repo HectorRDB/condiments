@@ -112,7 +112,7 @@ setMethod(f = "diffDifferentiationTest",
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions,  global = TRUE, pairwise = FALSE,
-                                method = c("Classifier", "mmd2"), thresh = .05,
+                                method = c("mmd2", "Classifier"), thresh = .05,
                                 ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
