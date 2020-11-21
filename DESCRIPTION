@@ -40,7 +40,8 @@ Imports:
     magrittr,
     dplyr (>= 1.0),
     Ecume,
-    methods
+    methods,
+    pbapply
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

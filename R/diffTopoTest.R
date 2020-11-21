@@ -61,18 +61,11 @@
 .diffTopoTest_classifier <- function(permutations, og, thresh, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[colnames(sds), ])
+      as.matrix(df[rownames(reducedDim(sds)), ])
     }) %>%
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  ws <- lapply(permutations, '[[', 2) %>%
-    lapply(function(df) {
-      as.matrix(df[colnames(sds), ])
-    }) %>%
-    Reduce(f = '+')
-  ws <- ws / rep
-  colnames(ws) <- colnames(og$ws)
   res <- Ecume::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
   return(res)
 }
@@ -80,18 +73,11 @@
 .diffTopoTest_mmd2 <- function(permutations, og, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[colnames(sds), ])
+      as.matrix(df[rownames(reducedDim(sds)), ])
     }) %>%
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  ws <- lapply(permutations, '[[', 2) %>%
-    lapply(function(df) {
-      as.matrix(df[colnames(sds), ])
-    }) %>%
-    Reduce(f = '+')
-  ws <- ws / rep
-  colnames(ws) <- colnames(og$ws)
   res <- Ecume::mmd_test(x = og$psts, y = psts, ...)
   return(res)
 }
@@ -99,7 +85,7 @@
 .diffTopoTest <- function(sds, conditions, rep = 200, thresh = .05,
                           method = "KS_mean", ...) {
   og <- .condition_sling(sds, conditions)
-  permutations <- lapply(seq_len(rep), function(i) {
+  permutations <- pbapply::pblapply(seq_len(rep), function(i) {
     condition <- sample(conditions)
     return(.condition_sling(sds, condition))
   })
@@ -150,6 +136,7 @@
 #' @importFrom Ecume classifier_test ks_test
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @importFrom dplyr n_distinct
+#' @importFrom pbapply pblapply
 #' @rdname diffTopoTest
 setMethod(f = "diffTopoTest",
           signature = c(sds = "SlingshotDataSet"),
