@@ -23,7 +23,7 @@ diffDifferentiationTest(sds, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("Classifier", "mmd2"),
+  method = c("mmd2", "Classifier"),
   thresh = 0.05,
   ...
 )
