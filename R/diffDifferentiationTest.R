@@ -1,7 +1,6 @@
 .diffDifferentiationTest <- function(sds, conditions, global = TRUE,
                                      pairwise = FALSE, method = "Classifier",
                                      thresh, ...) {
-  if (method != "Classifier") stop("Only Classifier is possible for now")
   pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
   n_conditions <- dplyr::n_distinct(conditions)
   nmin <- min(table(conditions))
@@ -118,7 +117,7 @@ setMethod(f = "diffDifferentiationTest",
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
-            if (length(conditions == 1)) {
+            if (length(conditions) == 1) {
               if (conditions %in% colnames(SummarizedExperiment::colData(sds))) {
                 conditions <- SummarizedExperiment::colData(sds)[, conditions]
               } else {

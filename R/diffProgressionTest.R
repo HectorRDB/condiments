@@ -185,7 +185,7 @@ setMethod(f = "diffProgressionTest",
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
-            if (length(conditions == 1)) {
+            if (length(conditions) == 1) {
               if (conditions %in% colnames(SummarizedExperiment::colData(sds))) {
                 conditions <- SummarizedExperiment::colData(sds)[, conditions]
               } else {
