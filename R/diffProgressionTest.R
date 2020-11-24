@@ -62,9 +62,12 @@
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
   if (method == "mmd2") {
-    glob_test <- Ecume::mmd_test(x = pst[conditions == unique(conditions)[1], ],
-                                 y = pst[conditions == unique(conditions)[2], ],
-                                 ...)
+    n <- max(table(conditions))
+    frac <- 10^5 / (n * (n - 1))
+    glob_test <- Ecume::mmd_test(
+      x = as.matrix(pst[conditions == unique(conditions)[1], ]),
+      y = as.matrix(pst[conditions == unique(conditions)[2], ]),
+      frac = frac, ...)
   }
   if (method %in% c("KS", "Permutation")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
