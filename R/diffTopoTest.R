@@ -78,7 +78,8 @@
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  res <- Ecume::mmd_test(x = og$psts, y = psts, ...)
+  frac <- 10^5 / (nrow(psts) * (nrow(psts) - 1))
+  res <- Ecume::mmd_test(x = og$psts, y = psts, frac = frac, ...)
   return(res)
 }
 
