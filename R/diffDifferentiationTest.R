@@ -88,6 +88,9 @@ setMethod(f = "diffDifferentiationTest",
                                 method = c("mmd2", "Classifier"), thresh = .05,
                                 ...){
             method <- match.arg(method)
+            if (nLineages(sds) == 1) {
+              stop("This only works with more than one lineage.")
+            }
             if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
               method <- "Classifier"
               warning(paste0("If more than two conditions are present, ",
