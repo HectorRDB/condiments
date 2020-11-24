@@ -3,7 +3,7 @@
                               w_l[conditions == unique(conditions)[1]]) -
          stats::weighted.mean(pst_l[conditions == unique(conditions)[2]],
                               w_l[conditions == unique(conditions)[2]])
-  return(dl)
+  return(d_l)
 }
 
 .diffProgressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
@@ -27,7 +27,7 @@
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
     if (method == "Permutation") {
-      dl <- .perm(pst_l, w_l, conditions)
+      d_l <- .perm(pst_l, w_l, conditions)
       d_il <- replicate(rep, {
         conditions_i <- sample(conditions)
         return(.perm(pst_l, w_l, conditions_i))
@@ -36,16 +36,17 @@
                "p.value" = max(mean(abs(d_l) > abs(d_il)), 1 / rep)))
     }
     if (method == "Classifier") {
-      xs <- lapply(seq_len(n_conditions), function(cond) {
-        pst_l[conditions == cond]
+      xs <- lapply(unique(conditions), function(cond) {
+        return(as.matrix(pst_l[conditions == cond]))
       })
       test_l <- Ecume::classifier_test(x = xs, thresh = thresh, ...)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
     if(method == "mmd2") {
-      test_l <- Ecume::mmd_test(x = pst_l[conditions == unique(conditions)[1]],
-                                y = pst_l[conditions == unique(conditions)[2]],
-                                ...)
+      test_l <- Ecume::mmd_test(
+        x = as.matrix(pst_l[conditions == unique(conditions)[1]]),
+        y = as.matrix(pst_l[conditions == unique(conditions)[2]]),
+        ...)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
   }) %>%
@@ -54,7 +55,7 @@
     dplyr::select(lineage, statistic, p.value)
   if (method == "Classifier") {
     xs <- lapply(unique(conditions), function(cond) {
-      pst[conditions == cond, ]
+      as.matrix(pst[conditions == cond, ])
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
