@@ -1,4 +1,4 @@
-.perm <- function(pst_l, w_l, conditions) {
+.perm_stat <- function(pst_l, w_l, conditions) {
   d_l <- stats::weighted.mean(pst_l[conditions == unique(conditions)[1]],
                               w_l[conditions == unique(conditions)[1]]) -
          stats::weighted.mean(pst_l[conditions == unique(conditions)[2]],
@@ -27,13 +27,13 @@
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
     if (method == "Permutation") {
-      d_l <- .perm(pst_l, w_l, conditions)
+      d_l <- .perm_stat(pst_l, w_l, conditions)
       d_il <- replicate(rep, {
         conditions_i <- sample(conditions)
-        return(.perm(pst_l, w_l, conditions_i))
+        return(.perm_stat(pst_l, w_l, conditions_i))
       })
       return(c("statistic" = d_l,
-               "p.value" = max(mean(abs(d_l) > abs(d_il)), 1 / rep)))
+               "p.value" = max(mean(abs(d_l) <= abs(d_il)), 1 / rep)))
     }
     if (method == "Classifier") {
       xs <- lapply(unique(conditions), function(cond) {
@@ -43,10 +43,12 @@
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
     if(method == "mmd2") {
+      n <- max(table(conditions))
+      frac <- 10^5 / (n * (n - 1))
       test_l <- Ecume::mmd_test(
         x = as.matrix(pst_l[conditions == unique(conditions)[1]]),
         y = as.matrix(pst_l[conditions == unique(conditions)[2]]),
-        ...)
+        frac = frac, ...)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
   }) %>%
