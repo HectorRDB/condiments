@@ -98,7 +98,7 @@ The proximity score can be used to check whether the integration has been succes
 
 The first step of our workflow is to decide whether or not to infer the trajectories separately or not. On average, it is better to infer a common trajectory, since a) this allow for a wider range of downstream analyses, and b) more cells are used to estimate the trajectory. However, the condition effect might be strong enough to massively disrupt the differentiation process, which would require fitting separate trajectories. 
 
-The __diffTopoTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on permutations of the conditions followed by trajectory inference so it can take a few seconds. It uses a modified version of the  Kolmogorov-Smirnov Two-Sample Test , use `?ks_test` for more details.
+The __diffTopoTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on repeated permutations of the conditions followed by trajectory inference so it can take a few seconds.
 
 ```{r}
 sds <- slingshot(rd, cl)
@@ -115,7 +115,6 @@ Even though we can fit a common trajectory, it does not mean that the cells will
 ```{r}
 df$pst1 <- slingPseudotime(sds)[, 1]
 df$pst2 <- slingPseudotime(sds)[, 2]
-
 ```
 
 ## Visualization
@@ -134,6 +133,7 @@ ggplot(df, aes(x = pst2, fill = condition)) +
   scale_fill_brewer(type = "qual")+
   labs(x = "Pseudotime for lineage 2", title = "Pseudotime distribution for lineage 2")
 ```
+
 There are clear differences between the two conditions
 
 ## Testing for differential progression
@@ -149,12 +149,12 @@ As expected, there is a global difference over all lineages, which is driven by 
 
 ## Testing for differential differentiation
 
-Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the classifier test. The idea is that, if two conditions are identical, the accuracy of any classifier will never be higher than chance. This method is very versatile and can accommodate more than two conditions, and multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
+Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the kernel two-sample test of Gretton et al. This method is very versatile and can accommodate multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
 
 ```{r}
 set.seed(12)
 diffDifferentiationTest(sds, conditions = condition, global = FALSE, 
-                        pairwise = TRUE, thresh = 0)
+                        pairwise = TRUE)
 ```
 
 # Differential Expression

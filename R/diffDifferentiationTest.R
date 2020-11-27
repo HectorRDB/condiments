@@ -14,7 +14,7 @@
     if (method == "Classifier") {
       return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
     }
-    if (method == "mmd2") {
+    if (method == "mmd") {
       return(Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...))
     }
   }) %>%
@@ -30,7 +30,7 @@
   if (method == "Classifier") {
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
-  if (method == "mmd2") {
+  if (method == "mmd") {
     glob_test <- Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...)
   }
 
@@ -57,7 +57,7 @@
 #' column of the metadata contains this vector
 #' @param global If TRUE, test for all pairs simultaneously.
 #' @param pairwise If TRUE, test for all pairs independently.
-#' @param method One of "Classifier" or "mmd2".
+#' @param method One of "Classifier" or "mmd".
 #' @param thresh The threshold for the classifier test. See details.
 #' Default to .05.
 #' @param ... Other arguments passed to \link[Ecume]{classifier_test}.
@@ -85,7 +85,7 @@
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
-                                method = c("mmd2", "Classifier"), thresh = .05,
+                                method = c("mmd", "Classifier"), thresh = .05,
                                 ...){
             method <- match.arg(method)
             if (nLineages(sds) == 1) {
@@ -115,7 +115,7 @@ setMethod(f = "diffDifferentiationTest",
 setMethod(f = "diffDifferentiationTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions,  global = TRUE, pairwise = FALSE,
-                                method = c("mmd2", "Classifier"), thresh = .05,
+                                method = c("mmd", "Classifier"), thresh = .05,
                                 ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")

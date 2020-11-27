@@ -39,7 +39,7 @@ column of the metadata contains this vector.}
 
 \item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
 
-\item{method}{The method to use to test. One of 'KS_mean', "KS_all', "mmd2'
+\item{method}{The method to use to test. One of 'KS_mean', "KS_all', "mmd'
 and 'Classifier'. See details.}
 }
 \value{

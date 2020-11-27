@@ -79,7 +79,7 @@ that classifier can do better than chance on the conditions
 \item If \code{method = "Permutation"}, the difference of weighted mean
 pseudotime between condition is computed, and a p-value is found by
 permuting the condition labels.
-\item If \code{method = "mmd2"}, this uses the mean maximum discrepancies
+\item If \code{method = "mmd"}, this uses the mean maximum discrepancies
 statistics.
 }
 The p-value at the global level can be computed in two ways. method is \code{"KS"} or

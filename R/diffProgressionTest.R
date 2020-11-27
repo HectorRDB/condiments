@@ -9,7 +9,7 @@
 .diffProgressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
                                  method = "KS",  thresh = 0.05, rep = 1e4, ...) {
   # Get variables
-  pst <- slingshot::slingPseudotime(sds, na = TRUE)
+  pst <- slingshot::slingPseudotime(sds, na = FALSE)
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
   colnames(pst) <- colnames(w) <-
     paste0("lineage", seq_len(ncol(pst)))
@@ -42,7 +42,7 @@
       test_l <- Ecume::classifier_test(x = xs, thresh = thresh, ...)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
-    if(method == "mmd2") {
+    if(method == "mmd") {
       n <- max(table(conditions))
       frac <- 10^5 / (n * (n - 1))
       test_l <- Ecume::mmd_test(
@@ -61,7 +61,7 @@
     })
     glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
   }
-  if (method == "mmd2") {
+  if (method == "mmd") {
     n <- max(table(conditions))
     frac <- 10^5 / (n * (n - 1))
     glob_test <- Ecume::mmd_test(
@@ -118,7 +118,7 @@
 #'   \item If \code{method = "Permutation"}, the difference of weighted mean
 #'   pseudotime between condition is computed, and a p-value is found by
 #'   permuting the condition labels.
-#'   \item If \code{method = "mmd2"}, this uses the mean maximum discrepancies
+#'   \item If \code{method = "mmd"}, this uses the mean maximum discrepancies
 #'    statistics.
 #' }
 #' The p-value at the global level can be computed in two ways. method is \code{"KS"} or
@@ -155,16 +155,16 @@ setMethod(f = "diffProgressionTest",
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = .05, rep = 1e4, ...){
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd2")) {
-              stop("Method must be one of KS, Classifier, mmd2 or permutation")
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+              stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning(paste0("Changing to method classifier since more than ",
                              "two conditions are present."))
               method <- "Classifier"
             }
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd2")) {
-              stop("Method must be one of KS, Classifier, mmd2 or permutation")
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+              stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             res <- .diffProgressionTest(sds = sds,
                                         conditions = conditions,

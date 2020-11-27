@@ -70,7 +70,7 @@
   return(res)
 }
 
-.diffTopoTest_mmd2 <- function(permutations, og, sds, rep, ...){
+.diffTopoTest_mmd <- function(permutations, og, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -96,8 +96,8 @@
     res <- .diffTopoTest_ks_mean(permutations, og, thresh, sds, rep)
   } else if (method == "Classifier") {
     res <- .diffTopoTest_classifier(permutations, og, thresh, sds, rep, ...)
-  } else if (method == "mmd2") {
-    res <- .diffTopoTest_mmd2(permutations, og, sds, rep, ...)
+  } else if (method == "mmd") {
+    res <- .diffTopoTest_mmd(permutations, og, sds, rep, ...)
   }
   return(res[c("statistic", "p.value")])
 }
@@ -114,7 +114,7 @@
 #' column of the metadata contains this vector.
 #' @param rep How many permutations to run. Default to 50.
 #' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
-#' @param method The method to use to test. One of 'KS_mean', "KS_all', "mmd2'
+#' @param method The method to use to test. One of 'KS_mean', "KS_all', "mmd'
 #' and 'Classifier'. See details.
 #' @param ... Other arguments passed to the test method. See details
 #' @return

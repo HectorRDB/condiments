@@ -13,7 +13,7 @@ diffDifferentiationTest(sds, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("mmd2", "Classifier"),
+  method = c("mmd", "Classifier"),
   thresh = 0.05,
   ...
 )
@@ -23,7 +23,7 @@ diffDifferentiationTest(sds, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("mmd2", "Classifier"),
+  method = c("mmd", "Classifier"),
   thresh = 0.05,
   ...
 )
@@ -41,7 +41,7 @@ column of the metadata contains this vector}
 
 \item{pairwise}{If TRUE, test for all pairs independently.}
 
-\item{method}{One of "Classifier" or "mmd2".}
+\item{method}{One of "Classifier" or "mmd".}
 
 \item{thresh}{The threshold for the classifier test. See details.
 Default to .05.}
