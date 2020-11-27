@@ -39,3 +39,16 @@ test_that("The diffDifferentiationTest work on expected inputs",{
   test_sce <- diffDifferentiationTest(sds = sce, conditions = "cond")
   expect_identical(test_sce, test)
 })
+
+test_that("The diffDifferentiationTest work on all tests",{
+  # Input SlingshotDataSet
+  set.seed(23)
+  test <- diffDifferentiationTest(sds = sds, conditions = condition, method = "Classifier")
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
+  test <- diffDifferentiationTest(sds = sds, conditions = condition, method = "mmd")
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
+})

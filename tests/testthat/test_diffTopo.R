@@ -34,16 +34,16 @@ test_that("The diffTopoTest work on expected inputs",{
 
 test_that("The diffTopoTest work on expected tests",{
   # Input SlingshotDataSet
-  test <- diffTopoTest(sds = sds, conditions = condition, method)
+  set.seed(21)
+  test <- diffTopoTest(sds = sds, conditions = condition, rep = 2, method = "KS_all")
   expect_is(test, "list")
   expect_true(test$statistic >= 0)
   expect_true(test$p.value >= 0 & test$p.value <= 1)
-  test <- diffTopoTest(sds = sds, conditions = condition, method)
+  test <- diffTopoTest(sds = sds, conditions = condition, rep = 2, method = "Classifier")
   expect_is(test, "list")
   expect_true(test$statistic >= 0)
   expect_true(test$p.value >= 0 & test$p.value <= 1)
-  test <- diffTopoTest(sds = sds, conditions = condition, method)
+  test <- diffTopoTest(sds = sds, conditions = condition, rep = 2, method = "mmd")
   expect_is(test, "list")
-  expect_true(test$statistic >= 0)
   expect_true(test$p.value >= 0 & test$p.value <= 1)
 })

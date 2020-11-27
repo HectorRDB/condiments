@@ -3,13 +3,12 @@ Type: Package
 Title: Differential Topology
 Version: 0.1.0
 Date: 2020-09-17
-Authors@R: c(person("Koen", "Van den Berge", role = c("aut"),
-                     email = "koen.vandenberge@ugent.be"),
-              person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
+Authors@R: c(person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
                      email = "hector.rouxdebezieux@berkeley.edu",
 		     comment = c(ORCID = "0000-0002-1489-8339")),
+		person("Koen", "Van den Berge", role = "ctb"),
 		person("Kelly","Street", role = "ctb"))
-Description: Need to update.
+Description: This package encapsulate many functions to conduct a differential topology analysis..
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
@@ -18,8 +17,6 @@ Depends: R (>= 4.0)
 VignetteBuilder: knitr
 biocViews:
     Clustering,
-    DifferentialExpression,
-    GeneExpression,
     RNASeq,
     Sequencing,
     Software,
@@ -27,7 +24,7 @@ biocViews:
     Transcriptomics,
     MultipleComparison,
     Visualization
-BugReports: https://github.com/statOmics/tradeSeq/issues
+BugReports: https://github.com/HectorRDB/DifTopo/issues
 Imports: 
     mgcv,
     RANN,
@@ -51,3 +48,4 @@ Suggests:
     viridis,
     ggplot2,
     RColorBrewer
+Remotes: github::HectorRDB/Ecume

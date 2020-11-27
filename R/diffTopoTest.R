@@ -13,7 +13,7 @@
     #   return(l[!l %in% names(missing_clusters)])
     # })
     sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
-    pst_cond <- slingshot::slingPseudotime(sds_cond)
+    pst_cond <- slingshot::slingPseudotime(sds_cond, na = FALSE)
     psts <- rbind(psts, pst_cond)
     w_conds <- slingshot::slingCurveWeights(sds_cond)
     ws <- rbind(ws, w_conds)

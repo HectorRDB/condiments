@@ -1,8 +1,9 @@
 #' @export
 #' @name proximity_score
 #' @title Proximity Score
+#' @import methods
 #' @param ... parameters including:
-setGeneric(
+methods::setGeneric(
   name = "proximity_score",
   signature = "Object",
   def = function(Object, ...) {
@@ -15,7 +16,8 @@ setGeneric(
 #' @name diffTopoTest
 #' @title Differential Topology Test
 #' @param ... parameters including:
-setGeneric(
+#' @import methods
+methods::setGeneric(
   name = "diffTopoTest",
   signature = "sds",
   def = function(sds, ...) {
@@ -27,7 +29,8 @@ setGeneric(
 #' @name diffProgressionTest
 #' @title Differential Progression Test
 #' @param ... parameters including:
-setGeneric(
+#' @import methods
+methods::setGeneric(
   name = "diffProgressionTest",
   signature = "sds",
   def = function(sds, ...) {
@@ -38,7 +41,9 @@ setGeneric(
 #' @name diffDifferentiationTest
 #' @title Differential Differentiation Test
 #' @param ... parameters including:
-setGeneric(
+#' @import methods
+methods::setGeneric(
+
   name = "diffDifferentiationTest",
   signature = "sds",
   def = function(sds, ...) {
@@ -49,7 +54,8 @@ setGeneric(
 #' @name nLineages
 #' @title Number of lineages
 #' @param ... parameters including:
-setGeneric(
+#' @import methods
+methods::setGeneric(
   name = "nLineages",
   signature = "sds",
   def = function(sds, ...) {
