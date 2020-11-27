@@ -82,14 +82,17 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #' @importFrom dplyr bind_rows
 #' @details The function assumes that each lineage in a dataset maps to exactly one lineage
 #' in another dataset. Anything else needs to be done manually.
+#' @examples
+#' data(list = 'slingshotExample', package = "slingshot")
+#' merge_sds(sds, sds, mapping = matrix(1, 1, 2, 2), nrow = 2)
 #' @export
 merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
                       scale = TRUE) {
   sdss <- list(...)
   names(sdss) <- condition_id
   # Checking inputs ----
-  classes <- unlist(lapply(sdss, class))
-  if (!all(classes %in% c("SingleCellExperiment", "SlingshotDataSet"))) {
+  ises <- unlist(lapply(sdss, is))
+  if (!all(ises %in% c("SingleCellExperiment", "SlingshotDataSet"))) {
     stop("The datasets must either be SlingshotDataset or SingleCellExperiment objects")
   }
   sdss <- lapply(sdss, SlingshotDataSet)

@@ -5,8 +5,12 @@
 #' \code{\link[slingshot]{SlingshotDataSet}} or a
 #' \code{\link[SingleCellExperiment]{SingleCellExperiment}} object.
 #' @export
+#' @examples
+#' data(list = 'slingshotExample', package = "slingshot")
+#' nLineages(sds)
 #' @rdname nLineages
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
+#' @return The number of lineages in the slingshot object
 #' @importFrom slingshot SlingshotDataSet
 setMethod(f = "nLineages",
           signature = c(sds = "SingleCellExperiment"),

@@ -28,3 +28,7 @@ this allows to merge them into one. It requires manual mapping of lineages.
 The function assumes that each lineage in a dataset maps to exactly one lineage
 in another dataset. Anything else needs to be done manually.
 }
+\examples{
+data(list = 'slingshotExample', package = "slingshot")
+merge_sds(sds, sds, mapping = matrix(1, 1, 2, 2), nrow = 2)
+}

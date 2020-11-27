@@ -19,6 +19,13 @@ nLineages(sds, ...)
 
 \item{...}{parameters including:}
 }
+\value{
+The number of lineages in the slingshot object
+}
 \description{
 Return the number of lineages for a slingshot object
+}
+\examples{
+data(list = 'slingshotExample', package = "slingshot")
+nLineages(sds)
 }
