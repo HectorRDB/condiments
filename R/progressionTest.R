@@ -6,8 +6,8 @@
   return(d_l)
 }
 
-.diffProgressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
-                                 method = "KS",  thresh = 0.05, rep = 1e4, ...) {
+.progressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
+                             method = "KS",  thresh = 0.05, rep = 1e4, ...) {
   # Get variables
   pst <- slingshot::slingPseudotime(sds, na = FALSE)
   w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
@@ -146,11 +146,11 @@
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
-#' diffProgressionTest(sds, condition)
+#' progressionTest(sds, condition)
 #' @importFrom Ecume classifier_test ks_test stouffer_zscore mmd_test
 #' @export
-#' @rdname diffProgressionTest
-setMethod(f = "diffProgressionTest",
+#' @rdname progressionTest
+setMethod(f = "progressionTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
@@ -166,24 +166,20 @@ setMethod(f = "diffProgressionTest",
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
-            res <- .diffProgressionTest(sds = sds,
-                                        conditions = conditions,
-                                        global = global,
-                                        lineages = lineages,
-                                        method = method,
-                                        thresh = thresh,
-                                        rep = rep,
-                                        ...)
+            res <- .progressionTest(sds = sds, conditions = conditions,
+                                    global = global, lineages = lineages,
+                                    method = method, thresh = thresh,
+                                    rep = rep, ...)
             return(res)
           }
 )
 
 
 #' @export
-#' @rdname diffProgressionTest
+#' @rdname progressionTest
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
-setMethod(f = "diffProgressionTest",
+setMethod(f = "progressionTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, global = TRUE, lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
@@ -198,13 +194,9 @@ setMethod(f = "diffProgressionTest",
                 stop("conditions is not a column of colData(sds)")
               }
             }
-            return(diffProgressionTest(slingshot::SlingshotDataSet(sds),
-                                       conditions = conditions,
-                                       global = global,
-                                       lineages = lineages,
-                                       method = method,
-                                       thresh = thresh,
-                                       rep = rep,
-                                       ...))
+            return(progressionTest(slingshot::SlingshotDataSet(sds),
+                                   conditions = conditions, global = global,
+                                   lineages = lineages, method = method,
+                                   thresh = thresh, rep = rep, ...))
           }
 )

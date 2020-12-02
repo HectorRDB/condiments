@@ -22,7 +22,7 @@
   return(list("psts" = psts, "ws" = ws))
 }
 
-.diffTopoTest_ks_all <- function(permutations, og, thresh) {
+.topologyTest_ks_all <- function(permutations, og, thresh) {
   psts <- lapply(permutations, '[[', 1) %>% do.call(what = 'rbind') %>%
     as.vector()
   ws <- lapply(permutations, '[[', 2) %>% do.call(what = 'rbind') %>%
@@ -35,7 +35,7 @@
   return(res)
 }
 
-.diffTopoTest_ks_mean <- function(permutations, og, thresh, sds, rep) {
+.topologyTest_ks_mean <- function(permutations, og, thresh, sds, rep) {
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -58,7 +58,7 @@
   return(res)
 }
 
-.diffTopoTest_classifier <- function(permutations, og, thresh, sds, rep, ...){
+.topologyTest_classifier <- function(permutations, og, thresh, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -70,7 +70,7 @@
   return(res)
 }
 
-.diffTopoTest_mmd <- function(permutations, og, sds, rep, ...){
+.topologyTest_mmd <- function(permutations, og, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -83,7 +83,7 @@
   return(res)
 }
 
-.diffTopoTest <- function(sds, conditions, rep = 200, thresh = .05,
+.topologyTest <- function(sds, conditions, rep = 200, thresh = .05,
                           method = "KS_mean", ...) {
   og <- .condition_sling(sds, conditions)
   permutations <- pbapply::pblapply(seq_len(rep), function(i) {
@@ -91,13 +91,13 @@
     return(.condition_sling(sds, condition))
   })
   if (method == "KS_all") {
-    res <- .diffTopoTest_ks_all(permutations, og, thresh)
+    res <- .topologyTest_ks_all(permutations, og, thresh)
   } else if (method == "KS_mean") {
-    res <- .diffTopoTest_ks_mean(permutations, og, thresh, sds, rep)
+    res <- .topologyTest_ks_mean(permutations, og, thresh, sds, rep)
   } else if (method == "Classifier") {
-    res <- .diffTopoTest_classifier(permutations, og, thresh, sds, rep, ...)
+    res <- .topologyTest_classifier(permutations, og, thresh, sds, rep, ...)
   } else if (method == "mmd") {
-    res <- .diffTopoTest_mmd(permutations, og, sds, rep, ...)
+    res <- .topologyTest_mmd(permutations, og, sds, rep, ...)
   }
   return(res[c("statistic", "p.value")])
 }
@@ -130,7 +130,7 @@
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::getLineages(rd, cl)
-#' diffTopoTest(sds, condition, rep = 20)
+#' topologyTest(sds, condition, rep = 20)
 #' @details If there is only two conditions, default to `KS_mean`. Otherwise,
 #' uses a classifier.
 #' @export
@@ -138,8 +138,8 @@
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @importFrom dplyr n_distinct
 #' @importFrom pbapply pblapply
-#' @rdname diffTopoTest
-setMethod(f = "diffTopoTest",
+#' @rdname topologyTest
+setMethod(f = "topologyTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, rep = 200, thresh = .05,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
@@ -149,7 +149,7 @@ setMethod(f = "diffTopoTest",
                              "two conditions are present."))
               method <- "classifier"
             }
-            res <- .diffTopoTest(sds = sds, conditions = conditions, rep = rep,
+            res <- .topologyTest(sds = sds, conditions = conditions, rep = rep,
                                  thresh = thresh, method = method, ...)
             return(res)
           }
@@ -157,10 +157,10 @@ setMethod(f = "diffTopoTest",
 
 
 #' @export
-#' @rdname diffTopoTest
+#' @rdname topologyTest
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
-setMethod(f = "diffTopoTest",
+setMethod(f = "topologyTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, rep = 200, thresh = .05,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
@@ -175,11 +175,8 @@ setMethod(f = "diffTopoTest",
                 stop("conditions is not a column of colData(sds)")
               }
             }
-            return(diffTopoTest(slingshot::SlingshotDataSet(sds),
-                                conditions = conditions,
-                                rep = rep,
-                                thresh = thresh,
-                                method = method,
-                                ...))
+            return(topologyTest(slingshot::SlingshotDataSet(sds),
+                                conditions = conditions, rep = rep,
+                                thresh = thresh, method = method, ...))
           }
 )

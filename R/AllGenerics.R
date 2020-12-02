@@ -1,53 +1,53 @@
 #' @export
-#' @name proximity_score
-#' @title Proximity Score
+#' @name imbalance_score
+#' @title Imbalance Score
 #' @import methods
 #' @param ... parameters including:
 methods::setGeneric(
-  name = "proximity_score",
+  name = "imbalance_score",
   signature = "Object",
   def = function(Object, ...) {
-    standardGeneric("proximity_score")
+    standardGeneric("imbalance_score")
   }
 )
 
 
 #' @export
-#' @name diffTopoTest
+#' @name topologyTest
 #' @title Differential Topology Test
 #' @param ... parameters including:
 #' @import methods
 methods::setGeneric(
-  name = "diffTopoTest",
+  name = "topologyTest",
   signature = "sds",
   def = function(sds, ...) {
-    standardGeneric("diffTopoTest")
+    standardGeneric("topologyTest")
   }
 )
 
 #' @export
-#' @name diffProgressionTest
+#' @name progressionTest
 #' @title Differential Progression Test
 #' @param ... parameters including:
 #' @import methods
 methods::setGeneric(
-  name = "diffProgressionTest",
+  name = "progressionTest",
   signature = "sds",
   def = function(sds, ...) {
-    standardGeneric("diffProgressionTest")
+    standardGeneric("progressionTest")
   }
 )
 
-#' @name diffDifferentiationTest
+#' @name differentiationTest
 #' @title Differential Differentiation Test
 #' @param ... parameters including:
 #' @import methods
 methods::setGeneric(
 
-  name = "diffDifferentiationTest",
+  name = "differentiationTest",
   signature = "sds",
   def = function(sds, ...) {
-    standardGeneric("diffDifferentiationTest")
+    standardGeneric("differentiationTest")
   }
 )
 

@@ -67,10 +67,10 @@ ggplot(df, aes(x = rd1, y = rd2, col = condition)) +
   geom_point() +
   scale_color_brewer(type = "qual")
 ```
-We can then compute the __proximity score__ of each cell using the *proximity_score* function.
+We can then compute the __imbalance score__ of each cell using the *imbalance_score* function.
 
 ```{r}
-scores <- proximity_score(Object = rd, conditions = condition)
+scores <- imbalance_score(Object = rd, conditions = condition)
 df$scores <- scores$scores
 df$scaled_scores <- scores$scaled_scores
 ```
@@ -92,7 +92,7 @@ ggplot(df, aes(x = rd1, y = rd2, col = scaled_scores)) +
 
 As could be guessed from the original plot, the bottom lineage shows a lot of imbalance while the top one does not. 
 
-The proximity score can be used to check whether the integration has been successful (at least some regions should be balanced), or to identify the regions of imbalance for further analyses.
+The imbalance score can be used to check whether the integration has been successful (at least some regions should be balanced), or to identify the regions of imbalance for further analyses.
 
 ## Trajectory Inference
 

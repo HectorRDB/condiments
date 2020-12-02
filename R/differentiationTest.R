@@ -1,6 +1,5 @@
-.diffDifferentiationTest <- function(sds, conditions, global = TRUE,
-                                     pairwise = FALSE, method = "Classifier",
-                                     thresh, ...) {
+.differentiationTest <- function(sds, conditions, global = TRUE, pairwise = FALSE,
+                                 method = "Classifier", thresh, ...) {
   pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
   n_conditions <- dplyr::n_distinct(conditions)
   nmin <- min(table(conditions))
@@ -79,10 +78,10 @@
 #' condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
-#' diffDifferentiationTest(sds, condition)
+#' differentiationTest(sds, condition)
 #' @export
-#' @rdname diffDifferentiationTest
-setMethod(f = "diffDifferentiationTest",
+#' @rdname differentiationTest
+setMethod(f = "differentiationTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
                                 method = c("mmd", "Classifier"), thresh = .05,
@@ -96,23 +95,19 @@ setMethod(f = "diffDifferentiationTest",
               warning(paste0("If more than two conditions are present, ",
                              "only the Classifier method is possible."))
             }
-            res <- .diffDifferentiationTest(sds = sds,
-                                            conditions = conditions,
-                                            global = global,
-                                            pairwise = pairwise,
-                                            method = method,
-                                            thresh = thresh,
-                                            ...)
+            res <- .differentiationTest(sds = sds, conditions = conditions,
+                                        global = global, pairwise = pairwise,
+                                        method = method, thresh = thresh, ...)
             return(res)
           }
 )
 
 
 #' @export
-#' @rdname diffDifferentiationTest
+#' @rdname differentiationTest
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
-setMethod(f = "diffDifferentiationTest",
+setMethod(f = "differentiationTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions,  global = TRUE, pairwise = FALSE,
                                 method = c("mmd", "Classifier"), thresh = .05,
@@ -127,12 +122,9 @@ setMethod(f = "diffDifferentiationTest",
                 stop("conditions is not a column of colData(sds)")
               }
             }
-            return(diffDifferentiationTest(slingshot::SlingshotDataSet(sds),
-                                           conditions = conditions,
-                                           global = global,
-                                           pairwise = pairwise,
-                                           method = method,
-                                           thresh = thresh,
-                                           ...))
+            return(differentiationTest(slingshot::SlingshotDataSet(sds),
+                                       conditions = conditions, global = global,
+                                       pairwise = pairwise, method = method,
+                                       thresh = thresh, ...))
           }
 )

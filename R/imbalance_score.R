@@ -33,7 +33,7 @@
   return(res)
 }
 
-.proximity_score <- function(rd, conditions, k = 10, smooth = k) {
+.imbalance_score <- function(rd, conditions, k = 10, smooth = k) {
   # Code inspired from the monocle3 package
   # https://github.com/cole-trapnell-lab/monocle3/blob/9becd94f60930c2a9b51770e3818c194dd8201eb/R/cluster_cells.R#L194
   if (length(conditions) != nrow(rd)) {
@@ -65,9 +65,9 @@
 }
 
 
-#' Proximity Score
+#' Imbalance Score
 #'
-#' @description Compute a proximity score to show whether nearby cells have the
+#' @description Compute a imbalance score to show whether nearby cells have the
 #' same condition of not
 #'
 #' @param Object A \code{\link{SingleCellExperiment}} object or a matrix
@@ -89,16 +89,16 @@
 #' @examples
 #' sd <- create_differential_topology(n_cells = 200, shift = 0,
 #'                                    unbalance_level = 1)
-#' scores <- proximity_score(sd$rd, sd$conditions, k = 4)
+#' scores <- imbalance_score(sd$rd, sd$conditions, k = 4)
 #' cols <- as.numeric(cut(scores$scaled_scores, 8))
 #' plot(sd$rd[, "Dim1"], sd$rd[, "Dim2"], xlab = "Dim1", ylab = "Dim2",
 #'  pch = 16, col = RColorBrewer::brewer.pal(8, "Blues")[cols])
 #' @export
-#' @rdname proximity_score
-setMethod(f = "proximity_score",
+#' @rdname imbalance_score
+setMethod(f = "imbalance_score",
           signature = c(Object = "matrix"),
           definition = function(Object, conditions, k = 10, smooth = 10){
-            scores <- .proximity_score(rd = Object,
+            scores <- .imbalance_score(rd = Object,
                                        conditions = conditions,
                                        k = k, smooth = smooth)
             return(scores)
@@ -107,11 +107,11 @@ setMethod(f = "proximity_score",
 
 
 #' @export
-#' @rdname proximity_score
+#' @rdname imbalance_score
 #' @importFrom SummarizedExperiment colData
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SingleCellExperiment reducedDims
-setMethod(f = "proximity_score",
+setMethod(f = "imbalance_score",
           signature = c(Object = "SingleCellExperiment"),
           definition = function(Object,
                                 dimred = 1,
@@ -131,7 +131,7 @@ setMethod(f = "proximity_score",
               rd <- SingleCellExperiment::reducedDims(Object)[[dimred]]
             }
             Object$scores <- as.data.frame(
-              .proximity_score(rd = rd,
+              .imbalance_score(rd = rd,
                                conditions = conditions,
                                k = k, smooth = smooth)
             )
