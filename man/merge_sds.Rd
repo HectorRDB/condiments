@@ -34,5 +34,6 @@ if (!"cl" \%in\% ls()) {
   rd <- slingshotExample$rd
   cl <- slingshotExample$cl
 }
+sds <- slingshot(rd, cl)
 merge_sds(sds, sds, mapping = matrix(1, 1, 2, 2), nrow = 2)
 }

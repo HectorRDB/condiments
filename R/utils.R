@@ -88,7 +88,8 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #'   rd <- slingshotExample$rd
 #'   cl <- slingshotExample$cl
 #' }
-#' merge_sds(sds, sds, mapping = matrix(1, 1, 2, 2), nrow = 2)
+#' sds <- slingshot::slingshot(rd, cl)
+#' merge_sds(sds, sds, mapping = matrix(c(1, 2, 1, 2), nrow = 2))
 #' @export
 merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
                       scale = TRUE) {
