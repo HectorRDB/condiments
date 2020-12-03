@@ -30,5 +30,9 @@ in another dataset. Anything else needs to be done manually.
 }
 \examples{
 data(list = 'slingshotExample', package = "slingshot")
+if (!"cl" \%in\% ls()) {
+  rd <- slingshotExample$rd
+  cl <- slingshotExample$cl
+}
 merge_sds(sds, sds, mapping = matrix(1, 1, 2, 2), nrow = 2)
 }
