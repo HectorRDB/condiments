@@ -7,6 +7,11 @@
 #' @export
 #' @examples
 #' data(list = 'slingshotExample', package = "slingshot")
+#' if (!"cl" %in% ls()) {
+#'   rd <- slingshotExample$rd
+#'   cl <- slingshotExample$cl
+#' }
+#' sds <- slingshot::slingshot(rd, cl)
 #' nLineages(sds)
 #' @rdname nLineages
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
