@@ -11,19 +11,19 @@ condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 sds <- slingshot(rd, cl)
 
-test_that("The diffDifferentiationTest work on expected inputs",{
+test_that("The differentiationTest work on expected inputs",{
   # Input SlingshotDataSet
   set.seed(23)
-  test <- diffDifferentiationTest(sds = sds, conditions = condition)
+  test <- differentiationTest(sds = sds, conditions = condition)
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
   set.seed(23)
-  test_all <- diffDifferentiationTest(sds = sds, conditions = condition, pair = TRUE)
+  test_all <- differentiationTest(sds = sds, conditions = condition, pair = TRUE)
   expect_equal(nrow(test_all), choose(nLineages(sds), 2) + 1)
   expect_equal(test, test_all[1,])
   set.seed(23)
-  test_pairs <- diffDifferentiationTest(sds = sds, conditions = condition,
+  test_pairs <- differentiationTest(sds = sds, conditions = condition,
                                         pair = TRUE, global = FALSE)
   test_pairs <- as.data.frame(test_pairs)
   rownames(test_pairs) <- "2"
@@ -36,18 +36,17 @@ test_that("The diffDifferentiationTest work on expected inputs",{
                               colData = pd)
   sce@int_metadata$slingshot <- sds
   set.seed(23)
-  test_sce <- diffDifferentiationTest(sds = sce, conditions = "cond")
+  test_sce <- differentiationTest(sds = sce, conditions = "cond")
   expect_identical(test_sce, test)
 })
-
-test_that("The diffDifferentiationTest work on all tests",{
+test_that("The differentiationTest work on all tests",{
   # Input SlingshotDataSet
   set.seed(23)
-  test <- diffDifferentiationTest(sds = sds, conditions = condition, method = "Classifier")
+  test <- differentiationTest(sds = sds, conditions = condition, method = "Classifier")
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
-  test <- diffDifferentiationTest(sds = sds, conditions = condition, method = "mmd")
+  test <- differentiationTest(sds = sds, conditions = condition, method = "mmd")
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
