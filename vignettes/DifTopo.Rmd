@@ -98,12 +98,12 @@ The imbalance score can be used to check whether the integration has been succes
 
 The first step of our workflow is to decide whether or not to infer the trajectories separately or not. On average, it is better to infer a common trajectory, since a) this allow for a wider range of downstream analyses, and b) more cells are used to estimate the trajectory. However, the condition effect might be strong enough to massively disrupt the differentiation process, which would require fitting separate trajectories. 
 
-The __diffTopoTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on repeated permutations of the conditions followed by trajectory inference so it can take a few seconds.
+The __topologyTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on repeated permutations of the conditions followed by trajectory inference so it can take a few seconds.
 
 ```{r}
 sds <- slingshot(rd, cl)
 ## Takes ~1mn30s to run
-diffTopoTest(sds = sds, conditions = condition)
+topologyTest(sds = sds, conditions = condition)
 ```
 
 The test fails to reject the null that we can fit a common trajectory so we can continue with the `sds` object.
@@ -141,8 +141,7 @@ There are clear differences between the two conditions
 To test for differential progression, we use the __diffProgressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __diffProgressionTest__ function. Here, we will use the default, the custom KS test.
 
 ```{r}
-diffProgressionTest(sds, conditions = condition, method = "KS",
-                    global = TRUE, lineages = TRUE)
+progressionTest(sds, conditions = condition, method = "KS", global = TRUE, lineages = TRUE)
 ```
 
 As expected, there is a global difference over all lineages, which is driven by differences of distribution across lineage 2 (i.e. the bottom one).
@@ -153,8 +152,7 @@ Another way to look at this is to consider how the cells of one condition differ
 
 ```{r}
 set.seed(12)
-diffDifferentiationTest(sds, conditions = condition, global = FALSE, 
-                        pairwise = TRUE)
+differentiationTest(sds, conditions = condition, global = FALSE, pairwise = TRUE)
 ```
 
 # Differential Expression
