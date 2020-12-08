@@ -1,13 +1,14 @@
-.differentiationTest <- function(sds, conditions, global = TRUE, pairwise = FALSE,
+.differentiationTest <- function(ws, conditions, global = TRUE, pairwise = FALSE,
                                  method = "Classifier", thresh, ...) {
-  pairs <- utils::combn(length(slingshot::slingLineages(sds)), 2)
+  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+  pairs <- utils::combn(ncol(ws), 2)
   n_conditions <- dplyr::n_distinct(conditions)
   nmin <- min(table(conditions))
   pairwise_test <- apply(pairs, 2, function(pair) {
-    ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)[, pair]
-    ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+    ws_p <- ws[, pair]
+    ws_p <- sweep(ws_p, 1, FUN = "/", STATS = apply(ws_p, 1, sum))
     xs <- lapply(unique(conditions), function(cond) {
-      ws_cond <- ws[conditions == cond, ]
+      ws_cond <- ws_p[conditions == cond, ]
       ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
     })
     if (method == "Classifier") {
@@ -21,7 +22,6 @@
     dplyr::mutate(pair = as.character(pair)) %>%
     dplyr::select(pair, statistic, p.value)
 
-  ws <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
   xs <- lapply(unique(conditions), function(cond) {
     ws_cond <- ws[conditions == cond, ]
     ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
@@ -50,8 +50,11 @@
 #' @description Test whether or not the cell repartition between lineages is
 #' independent of the conditions
 #'
-#' @param sds The final object after running slingshot. Can be either a
-#' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
+#' @param cellWeights Can be either a \code{\link{SlingshotDataSet}}, a
+#' \code{\link{SingleCellExperiment}} object or a matrix of cell weights
+#' defining the probability that a cell belongs to a particular lineage.
+#' Each row represents a cell and each column represents a lineage. If only a
+#' single lineage, provide a matrix with one column containing all values of 1.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector
 #' @param global If TRUE, test for all pairs simultaneously.
@@ -82,12 +85,12 @@
 #' @export
 #' @rdname differentiationTest
 setMethod(f = "differentiationTest",
-          signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, global = TRUE, pairwise = FALSE,
-                                method = c("mmd", "Classifier"), thresh = .05,
-                                ...){
+          signature = c(cellWeights = "matrix"),
+          definition = function(cellWeights, conditions, global = TRUE,
+                                pairwise = FALSE, method = c("mmd", "Classifier"),
+                                thresh = .05, ...){
             method <- match.arg(method)
-            if (nLineages(sds) == 1) {
+            if (ncol(cellWeights) == 1) {
               stop("This only works with more than one lineage.")
             }
             if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
@@ -95,7 +98,31 @@ setMethod(f = "differentiationTest",
               warning(paste0("If more than two conditions are present, ",
                              "only the Classifier method is possible."))
             }
-            res <- .differentiationTest(sds = sds, conditions = conditions,
+            res <- .differentiationTest(ws = cellWeights, conditions = conditions,
+                                        global = global, pairwise = pairwise,
+                                        method = method, thresh = thresh, ...)
+            return(res)
+          }
+)
+
+
+#' @rdname differentiationTest
+setMethod(f = "differentiationTest",
+          signature = c(cellWeights = "SlingshotDataSet"),
+          definition = function(cellWeights, conditions, global = TRUE,
+                                pairwise = FALSE, method = c("mmd", "Classifier"),
+                                thresh = .05, ...){
+            method <- match.arg(method)
+            if (nLineages(cellWeights) == 1) {
+              stop("This only works with more than one lineage.")
+            }
+            if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
+              method <- "Classifier"
+              warning(paste0("If more than two conditions are present, ",
+                             "only the Classifier method is possible."))
+            }
+            ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
+            res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh, ...)
             return(res)
@@ -108,21 +135,22 @@ setMethod(f = "differentiationTest",
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "differentiationTest",
-          signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions,  global = TRUE, pairwise = FALSE,
-                                method = c("mmd", "Classifier"), thresh = .05,
-                                ...){
-            if (is.null(sds@int_metadata$slingshot)) {
+          signature = c(cellWeights = "SingleCellExperiment"),
+          definition = function(cellWeights, conditions,  global = TRUE,
+                                pairwise = FALSE, method = c("mmd", "Classifier"),
+                                thresh = .05, ...){
+            if (is.null(cellWeights@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {
-              if (conditions %in% colnames(SummarizedExperiment::colData(sds))) {
-                conditions <- SummarizedExperiment::colData(sds)[, conditions]
+              if (conditions %in%
+                  colnames(SummarizedExperiment::colData(cellWeights))) {
+                conditions <- SummarizedExperiment::colData(cellWeights)[, conditions]
               } else {
-                stop("conditions is not a column of colData(sds)")
+                stop("conditions is not a column of colData(cellWeights)")
               }
             }
-            return(differentiationTest(slingshot::SlingshotDataSet(sds),
+            return(differentiationTest(slingshot::SlingshotDataSet(cellWeights),
                                        conditions = conditions, global = global,
                                        pairwise = pairwise, method = method,
                                        thresh = thresh, ...))

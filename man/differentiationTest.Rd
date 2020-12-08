@@ -2,14 +2,25 @@
 % Please edit documentation in R/AllGenerics.R, R/differentiationTest.R
 \name{differentiationTest}
 \alias{differentiationTest}
+\alias{differentiationTest,matrix-method}
 \alias{differentiationTest,SlingshotDataSet-method}
 \alias{differentiationTest,SingleCellExperiment-method}
 \title{Differential Differentiation Test}
 \usage{
-differentiationTest(sds, ...)
+differentiationTest(cellWeights, ...)
+
+\S4method{differentiationTest}{matrix}(
+  cellWeights,
+  conditions,
+  global = TRUE,
+  pairwise = FALSE,
+  method = c("mmd", "Classifier"),
+  thresh = 0.05,
+  ...
+)
 
 \S4method{differentiationTest}{SlingshotDataSet}(
-  sds,
+  cellWeights,
   conditions,
   global = TRUE,
   pairwise = FALSE,
@@ -19,7 +30,7 @@ differentiationTest(sds, ...)
 )
 
 \S4method{differentiationTest}{SingleCellExperiment}(
-  sds,
+  cellWeights,
   conditions,
   global = TRUE,
   pairwise = FALSE,
@@ -29,8 +40,11 @@ differentiationTest(sds, ...)
 )
 }
 \arguments{
-\item{sds}{The final object after running slingshot. Can be either a
-\code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
+\item{cellWeights}{Can be either a \code{\link{SlingshotDataSet}}, a
+\code{\link{SingleCellExperiment}} object or a matrix of cell weights
+defining the probability that a cell belongs to a particular lineage.
+Each row represents a cell and each column represents a lineage. If only a
+single lineage, provide a matrix with one column containing all values of 1.}
 
 \item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
 

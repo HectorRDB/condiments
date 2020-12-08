@@ -2,39 +2,58 @@
 % Please edit documentation in R/AllGenerics.R, R/progressionTest.R
 \name{progressionTest}
 \alias{progressionTest}
+\alias{progressionTest,matrix-method}
 \alias{progressionTest,SlingshotDataSet-method}
 \alias{progressionTest,SingleCellExperiment-method}
 \title{Differential Progression Test}
 \usage{
-progressionTest(sds, ...)
+progressionTest(pseudotime, ...)
 
-\S4method{progressionTest}{SlingshotDataSet}(
-  sds,
+\S4method{progressionTest}{matrix}(
+  pseudotime,
+  cellWeights,
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
   thresh = 0.05,
   rep = 10000,
-  ...
+  ...,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
+)
+
+\S4method{progressionTest}{SlingshotDataSet}(
+  pseudotime,
+  conditions,
+  global = TRUE,
+  lineages = FALSE,
+  thresh = 0.05,
+  rep = 10000,
+  ...,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 
 \S4method{progressionTest}{SingleCellExperiment}(
-  sds,
+  pseudotime,
   conditions,
   global = TRUE,
   lineages = FALSE,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
   thresh = 0.05,
   rep = 10000,
-  ...
+  ...,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 }
 \arguments{
-\item{sds}{The final object after running slingshot. Can be either a
-\code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
+\item{pseudotime}{Can be either a \code{\link{SlingshotDataSet}} or a
+\code{\link{SingleCellExperiment}} object or a matrix of pseudotime values,
+each row represents a cell and each column represents a lineage.}
 
 \item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
+
+\item{cellWeights}{A matrix of cell weights defining the probability that a
+cell belongs to a particular lineage. Each row represents a cell and each
+column represents a lineage. If only a single lineage, provide a matrix with
+one column containing all values of 1.}
 
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}
@@ -43,15 +62,15 @@ which column of the metadata contains this vector.}
 
 \item{lineages}{If TRUE, test for all lineages independently.}
 
-\item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
-for the classifier method or "Permutation" for a permutation. See details.
-Default to KS if there is two conditions and to "Classifier" otherwise.}
-
 \item{thresh}{The threshold for the KS test or Classifier test.
 Ignored if \code{method = "Permutation"}. Default to .05.}
 
 \item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
 Default to \code{1e4}.}
+
+\item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
+for the classifier method or "Permutation" for a permutation. See details.
+Default to KS if there is two conditions and to "Classifier" otherwise.}
 }
 \value{
 A data frame with 3 columns:

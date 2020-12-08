@@ -32,8 +32,8 @@ methods::setGeneric(
 #' @import methods
 methods::setGeneric(
   name = "progressionTest",
-  signature = "sds",
-  def = function(sds, ...) {
+  signature = "pseudotime",
+  def = function(pseudotime, ...) {
     standardGeneric("progressionTest")
   }
 )
@@ -43,10 +43,9 @@ methods::setGeneric(
 #' @param ... parameters including:
 #' @import methods
 methods::setGeneric(
-
   name = "differentiationTest",
-  signature = "sds",
-  def = function(sds, ...) {
+  signature = "cellWeights",
+  def = function(cellWeights, ...) {
     standardGeneric("differentiationTest")
   }
 )

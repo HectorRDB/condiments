@@ -6,17 +6,16 @@
   return(d_l)
 }
 
-.progressionTest <- function(sds, conditions, global = TRUE, lineages = FALSE,
+.progressionTest <- function(pst, ws, conditions, global = TRUE, lineages = FALSE,
                              method = "KS",  thresh = 0.05, rep = 1e4, ...) {
   # Get variables
-  pst <- slingshot::slingPseudotime(sds, na = FALSE)
-  w <- slingshot::slingCurveWeights(sds, as.probs = TRUE)
-  colnames(pst) <- colnames(w) <-
+  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+  colnames(pst) <- colnames(ws) <-
     paste0("lineage", seq_len(ncol(pst)))
   n_conditions <- dplyr::n_distinct(conditions)
   # Get lineage levels p-values
   lineages_test <- lapply(colnames(pst), function(l){
-    w_l <- w[, l]
+    w_l <- ws[, l]
     pst_l <- pst[, l]
     if (method == "KS") {
       test_l <- Ecume::ks_test(x = pst_l[conditions == unique(conditions)[1]],
@@ -71,7 +70,7 @@
   }
   if (method %in% c("KS", "Permutation")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
-                                            weights = colSums(w))
+                                        weights = colSums(ws))
   }
 
   glob_test <- data.frame("lineage" = "All",
@@ -90,8 +89,13 @@
 #' @description Test whether or not the pseudotime distribution are identical
 #' within lineages between conditions
 #'
-#' @param sds The final object after running slingshot. Can be either a
-#' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
+#' @param pseudotime Can be either a \code{\link{SlingshotDataSet}} or a
+#' \code{\link{SingleCellExperiment}} object or a matrix of pseudotime values,
+#' each row represents a cell and each column represents a lineage.
+#' @param cellWeights	 A matrix of cell weights defining the probability that a
+#' cell belongs to a particular lineage. Each row represents a cell and each
+#' column represents a lineage. If only a single lineage, provide a matrix with
+#' one column containing all values of 1.
 #' @param conditions Either the vector of conditions, or a character indicating
 #' which column of the metadata contains this vector.
 #' @param global If TRUE, test for all lineages simultaneously.
@@ -151,10 +155,10 @@
 #' @export
 #' @rdname progressionTest
 setMethod(f = "progressionTest",
-          signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, global = TRUE, lineages = FALSE,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
-    thresh = .05, rep = 1e4, ...){
+          signature = c(pseudotime = "matrix"),
+          definition = function(pseudotime, cellWeights, conditions,
+    global = TRUE, lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
@@ -166,7 +170,34 @@ setMethod(f = "progressionTest",
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
-            res <- .progressionTest(sds = sds, conditions = conditions,
+            res <- .progressionTest(pst = pseudotime, ws = cellWeights,
+                                    conditions = conditions, global = global,
+                                    lineages = lineages, method = method,
+                                    thresh = thresh, rep = rep, ...)
+            return(res)
+          }
+)
+
+#' @rdname progressionTest
+setMethod(f = "progressionTest",
+          signature = c(pseudotime = "SlingshotDataSet"),
+          definition = function(pseudotime, conditions, global = TRUE,
+    lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+              stop("Method must be one of KS, Classifier, mmd or permutation")
+            }
+            if (n_distinct(conditions) > 2 && method != "Classifier") {
+              warning(paste0("Changing to method classifier since more than ",
+                             "two conditions are present."))
+              method <- "Classifier"
+            }
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+              stop("Method must be one of KS, Classifier, mmd or permutation")
+            }
+            pst <- slingshot::slingPseudotime(pseudotime, na = FALSE)
+            ws <- slingshot::slingCurveWeights(pseudotime, as.probs = TRUE)
+            res <- .progressionTest(pst = pst, ws = ws, conditions = conditions,
                                     global = global, lineages = lineages,
                                     method = method, thresh = thresh,
                                     rep = rep, ...)
@@ -180,21 +211,24 @@ setMethod(f = "progressionTest",
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "progressionTest",
-          signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions, global = TRUE, lineages = FALSE,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
-    thresh = .05, rep = 1e4, ...){
-            if (is.null(sds@int_metadata$slingshot)) {
+          signature = c(pseudotime = "SingleCellExperiment"),
+          definition = function(pseudotime, conditions, global = TRUE,
+    lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
+            if (is.null(pseudotime@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {
-              if (conditions %in% colnames(SummarizedExperiment::colData(sds))) {
-                conditions <- SummarizedExperiment::colData(sds)[, conditions]
+              if (conditions %in%
+                  colnames(SummarizedExperiment::colData(pseudotime))
+                ) {
+                conditions <-
+                  SummarizedExperiment::colData(pseudotime)[, conditions]
               } else {
-                stop("conditions is not a column of colData(sds)")
+                stop("conditions is not a column of colData(pseudotime)")
               }
             }
-            return(progressionTest(slingshot::SlingshotDataSet(sds),
+            return(progressionTest(slingshot::SlingshotDataSet(pseudotime),
                                    conditions = conditions, global = global,
                                    lineages = lineages, method = method,
                                    thresh = thresh, rep = rep, ...))
