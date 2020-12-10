@@ -28,3 +28,11 @@ test_that("imbalance score works", {
   expect_equal(length(score$scaled_scores), nrow(rd))
   expect_equal(names(score$scaled_scores), rownames(rd))
 })
+
+test_that("example work", {
+  test <- create_differential_topology()
+  expect_equal(length(test$lineages), nrow(test$rd))
+  expect_equal(length(test$conditions), nrow(test$rd))
+})
+
+
