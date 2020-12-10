@@ -2,6 +2,10 @@
                                  method = "Classifier", thresh, ...) {
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   pairs <- utils::combn(ncol(ws), 2)
+  if (ncol(ws) == 2) {
+    global <- FALSE
+    pairwise <- TRUE
+  }
   n_conditions <- dplyr::n_distinct(conditions)
   nmin <- min(table(conditions))
   pairwise_test <- apply(pairs, 2, function(pair) {

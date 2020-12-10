@@ -20,16 +20,15 @@ test_that("The differentiationTest work on expected inputs",{
   expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
   set.seed(23)
   test_all <- differentiationTest(cellWeights = sds, conditions = condition,
-                                  pair = TRUE)
-  expect_equal(nrow(test_all), choose(nLineages(sds), 2) + 1)
+                                  pairwise = TRUE)
+  expect_equal(nrow(test_all), choose(nLineages(sds), 2))
   expect_equal(test, test_all[1,])
   set.seed(23)
   test_pairs <- differentiationTest(cellWeights = sds, conditions = condition,
-                                        pair = TRUE, global = FALSE)
+                                        pairwise = TRUE, global = FALSE)
   test_pairs <- as.data.frame(test_pairs)
-  rownames(test_pairs) <- "2"
   expect_equal(nrow(test_pairs), choose(nLineages(sds), 2))
-  expect_equivalent(test_pairs[1, ], test_all[2, ])
+  expect_equivalent(test_pairs, test_all)
   # Input SingleCellExperiment
   pd <- DataFrame(cond = condition)
   rownames(pd) <- colnames(sds)
@@ -44,6 +43,7 @@ test_that("The differentiationTest work on expected inputs",{
                                   conditions = condition)
   expect_identical(test_mat, test)
 })
+
 test_that("The differentiationTest work on all tests",{
   # Input SlingshotDataSet
   set.seed(23)

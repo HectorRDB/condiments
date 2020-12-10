@@ -12,6 +12,10 @@
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   colnames(pst) <- colnames(ws) <-
     paste0("lineage", seq_len(ncol(pst)))
+  if (ncol(pst) == 1) {
+    global <- FALSE
+    lineages <- TRUE
+  }
   n_conditions <- dplyr::n_distinct(conditions)
   # Get lineage levels p-values
   lineages_test <- lapply(colnames(pst), function(l){
