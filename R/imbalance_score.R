@@ -118,7 +118,7 @@ setMethod(f = "imbalance_score",
                                 conditions, k = 10,
                                 smooth = 10){
             if (ncol(Object) == 1) stop("The dataset only has one cell")
-            if (length(conditions == 1)) {
+            if (length(conditions) == 1) {
               if (conditions %in% colnames(SummarizedExperiment::colData(Object))) {
                 conditions <- SummarizedExperiment::colData(Object)[, conditions]
               } else {
