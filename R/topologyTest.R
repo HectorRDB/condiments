@@ -58,9 +58,8 @@
   ws <- ws / rep
   og_ws <- og$ws %>% as.vector()
   res <- lapply(threshs, function(thresh) {
-    test <- ks_test(x = og_psts, w_x = og_ws,
-                    y = psts, w_y = ws,
-                    thresh = thresh)
+    test <- Ecume::ks_test(x = og_psts, w_x = og_ws,
+                           y = psts, w_y = ws, thresh = thresh)
     return(data.frame("statistic" = test$statistic, "p.value" = test$p.value))
   })
   names(res) <- threshs
@@ -93,8 +92,8 @@
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  frac <- 10^5 / (nrow(psts) * (nrow(psts) - 1))
-  test <- Ecume::mmd_test(x = og$psts, y = psts, frac = frac, ...)
+  frac <- 10^5 / nrow(psts)
+  test <- Ecume::mmd_test(x = as.matrix(og$psts), y = psts, frac = frac, ...)
   return(data.frame("thresh" = NA,
                     "statistic" = test$statistic,
                     "p.value" = test$p.value)
