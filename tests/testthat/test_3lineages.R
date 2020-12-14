@@ -13,7 +13,7 @@ sds <- slingshot(rd, cl, end.clus = 3)
 test_that("All tests work", {
   set.seed(22)
   test <- topologyTest(sds, conditions = condition, rep = 3)
-  expect_is(test, "list")
+  expect_is(test, "data.frame")
   set.seed(07)
   test <- progressionTest(sds, conditions = condition)
   expect_equal(nrow(test), 1)

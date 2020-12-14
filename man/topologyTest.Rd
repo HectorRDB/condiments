@@ -12,8 +12,8 @@ topologyTest(sds, ...)
   sds,
   conditions,
   rep = 200,
-  thresh = 0.05,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+  threshs = 0.05,
+  methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   ...
 )
 
@@ -21,8 +21,8 @@ topologyTest(sds, ...)
   sds,
   conditions,
   rep = 200,
-  thresh = 0.05,
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+  threshs = 0.05,
+  methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   ...
 )
 }
@@ -37,14 +37,17 @@ column of the metadata contains this vector.}
 
 \item{rep}{How many permutations to run. Default to 50.}
 
-\item{thresh}{the threshold for the KS test. See \code{\link{ks_test}}.}
+\item{threshs}{the threshold(s) for the KS test or classifier test.
+See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
-\item{method}{The method to use to test. One of 'KS_mean', "KS_all', "mmd'
-and 'Classifier'. See details.}
+\item{methods}{The method(s) to use to test. Must be among 'KS_mean',
+"KS_all', "mmd', and 'Classifier'. See details.}
 }
 \value{
 A list containing the following components:
 \itemize{
+  \item *method* The method used to test
+  \item *thresh* The threshold (if relevant)
   \item *statistic* the value of the test statistic.
   \item *p.value* the p-value of the test.
 }

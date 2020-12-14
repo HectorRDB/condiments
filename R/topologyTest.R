@@ -22,20 +22,25 @@
   return(list("psts" = psts, "ws" = ws))
 }
 
-.topologyTest_ks_all <- function(permutations, og, thresh) {
+.topologyTest_ks_all <- function(permutations, og, threshs) {
   psts <- lapply(permutations, '[[', 1) %>% do.call(what = 'rbind') %>%
     as.vector()
   ws <- lapply(permutations, '[[', 2) %>% do.call(what = 'rbind') %>%
     as.vector()
   og_psts <- og$psts %>% as.vector()
   og_ws <- og$ws %>% as.vector()
-  res <- ks_test(x = og_psts, w_x = og_ws,
-                 y = psts, w_y = ws,
-                 thresh = thresh)
+  res <- lapply(threshs, function(thresh) {
+    test <- ks_test(x = og_psts, w_x = og_ws,
+                   y = psts, w_y = ws,
+                   thresh = thresh)
+    return(data.frame("statistic" = test$statistic, "p.value" = test$p.value))
+  })
+  names(res) <- threshs
+  res <- bind_rows(res, .id = "thresh")
   return(res)
 }
 
-.topologyTest_ks_mean <- function(permutations, og, thresh, sds, rep) {
+.topologyTest_ks_mean <- function(permutations, og, threshs, sds, rep) {
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -52,13 +57,18 @@
     as.vector()
   ws <- ws / rep
   og_ws <- og$ws %>% as.vector()
-  res <- Ecume::ks_test(x = og_psts, w_x = og_ws,
-                        y = psts, w_y = ws,
-                        thresh = thresh)
+  res <- lapply(threshs, function(thresh) {
+    test <- ks_test(x = og_psts, w_x = og_ws,
+                    y = psts, w_y = ws,
+                    thresh = thresh)
+    return(data.frame("statistic" = test$statistic, "p.value" = test$p.value))
+  })
+  names(res) <- threshs
+  res <- bind_rows(res, .id = "thresh")
   return(res)
 }
 
-.topologyTest_classifier <- function(permutations, og, thresh, sds, rep, ...){
+.topologyTest_classifier <- function(permutations, og, threshs, sds, rep, ...){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -66,7 +76,12 @@
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  res <- Ecume::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
+  res <- lapply(threshs, function(thresh) {
+    test <- Ecume::classifier_test(x = og$psts, y = psts, thresh = thresh, ...)
+    return(data.frame("statistic" = test$statistic, "p.value" = test$p.value))
+  })
+  names(res) <- threshs
+  res <- bind_rows(res, .id = "thresh")
   return(res)
 }
 
@@ -79,27 +94,35 @@
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
   frac <- 10^5 / (nrow(psts) * (nrow(psts) - 1))
-  res <- Ecume::mmd_test(x = og$psts, y = psts, frac = frac, ...)
-  return(res)
+  test <- Ecume::mmd_test(x = og$psts, y = psts, frac = frac, ...)
+  return(data.frame("thresh" = NA,
+                    "statistic" = test$statistic,
+                    "p.value" = test$p.value)
+         )
 }
 
-.topologyTest <- function(sds, conditions, rep = 200, thresh = .05,
-                          method = "KS_mean", ...) {
+.topologyTest <- function(sds, conditions, rep = 200, threshs = .05,
+                          methods = "KS_mean", ...) {
   og <- .condition_sling(sds, conditions)
   permutations <- pbapply::pblapply(seq_len(rep), function(i) {
     condition <- sample(conditions)
     return(.condition_sling(sds, condition))
   })
-  if (method == "KS_all") {
-    res <- .topologyTest_ks_all(permutations, og, thresh)
-  } else if (method == "KS_mean") {
-    res <- .topologyTest_ks_mean(permutations, og, thresh, sds, rep)
-  } else if (method == "Classifier") {
-    res <- .topologyTest_classifier(permutations, og, thresh, sds, rep, ...)
-  } else if (method == "mmd") {
-    res <- .topologyTest_mmd(permutations, og, sds, rep, ...)
+  res <- NULL
+  if ("KS_all" %in% methods) {
+    res[["KS_all"]] <- .topologyTest_ks_all(permutations, og, threshs)
   }
-  return(res[c("statistic", "p.value")])
+  if ("KS_mean" %in% methods) {
+    res[["KS_mean"]] <- .topologyTest_ks_mean(permutations, og, threshs, sds, rep)
+  }
+  if ("Classifier" %in% methods) {
+    res[["Classifier"]] <- .topologyTest_classifier(permutations, og, threshs, sds, rep, ...)
+  }
+  if ("mmd" %in% methods) {
+    res[["mmd"]] <- .topologyTest_mmd(permutations, og, sds, rep, ...)
+  }
+  res <- bind_rows(res, .id = "method")
+  return(res)
 }
 
 
@@ -113,13 +136,16 @@
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector.
 #' @param rep How many permutations to run. Default to 50.
-#' @param thresh the threshold for the KS test. See \code{\link{ks_test}}.
-#' @param method The method to use to test. One of 'KS_mean', "KS_all', "mmd'
-#' and 'Classifier'. See details.
+#' @param threshs the threshold(s) for the KS test or classifier test.
+#' See \code{\link{ks_test}} and \code{\link{classifier_test}}.
+#' @param methods The method(s) to use to test. Must be among 'KS_mean',
+#' "KS_all', "mmd', and 'Classifier'. See details.
 #' @param ... Other arguments passed to the test method. See details
 #' @return
 #' A list containing the following components:
 #' \itemize{
+#'   \item *method* The method used to test
+#'   \item *thresh* The threshold (if relevant)
 #'   \item *statistic* the value of the test statistic.
 #'   \item *p.value* the p-value of the test.
 #' }
@@ -141,16 +167,16 @@
 #' @rdname topologyTest
 setMethod(f = "topologyTest",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, rep = 200, thresh = .05,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+          definition = function(sds, conditions, rep = 200, threshs = .05,
+    methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     ...){
-            if (n_distinct(conditions) > 2 && method != "classifier") {
-              warning(paste0("Changing to method classifier since more than ",
+            if (n_distinct(conditions) > 2 && methods != "classifier") {
+              warning(paste0("Changing to methods `classifier` since more than ",
                              "two conditions are present."))
-              method <- "classifier"
+              methods <- "classifier"
             }
             res <- .topologyTest(sds = sds, conditions = conditions, rep = rep,
-                                 thresh = thresh, method = method, ...)
+                                 threshs = threshs, methods = methods, ...)
             return(res)
           }
 )
@@ -162,8 +188,8 @@ setMethod(f = "topologyTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "topologyTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions, rep = 200, thresh = .05,
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+          definition = function(sds, conditions, rep = 200, threshs = .05,
+    methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     ...){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
@@ -177,6 +203,6 @@ setMethod(f = "topologyTest",
             }
             return(topologyTest(slingshot::SlingshotDataSet(sds),
                                 conditions = conditions, rep = rep,
-                                thresh = thresh, method = method, ...))
+                                threshs = threshs, methods = methods, ...))
           }
 )

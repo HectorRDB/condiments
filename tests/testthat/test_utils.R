@@ -17,7 +17,7 @@ test_that("nLineages work", {
   rownames(pd) <- colnames(sds)
   sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
                               colData = pd)
-  expect_eroor(nLineages(sce))
+  expect_error(nLineages(sce))
   sce@int_metadata$slingshot <- sds
   expect_equal(nLineages(sds), 2)
   expect_equal(nLineages(sce), 2)
