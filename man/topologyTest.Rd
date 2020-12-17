@@ -14,7 +14,8 @@ topologyTest(sds, ...)
   rep = 200,
   threshs = 0.05,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-  ...
+  args_mmd = list(),
+  args_classifier = list()
 )
 
 \S4method{topologyTest}{SingleCellExperiment}(
@@ -23,14 +24,15 @@ topologyTest(sds, ...)
   rep = 200,
   threshs = 0.05,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-  ...
+  args_mmd = list(),
+  args_classifier = list()
 )
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
 \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.}
 
-\item{...}{Other arguments passed to the test method. See details}
+\item{...}{parameters including:}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector.}
@@ -42,6 +44,10 @@ See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
 \item{methods}{The method(s) to use to test. Must be among 'KS_mean',
 "KS_all', "mmd', and 'Classifier'. See details.}
+
+\item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
+
+\item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
 }
 \value{
 A list containing the following components:
