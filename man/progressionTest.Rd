@@ -17,7 +17,8 @@ progressionTest(pseudotime, ...)
   lineages = FALSE,
   thresh = 0.05,
   rep = 10000,
-  ...,
+  args_mmd = list(),
+  args_classifier = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 
@@ -28,7 +29,8 @@ progressionTest(pseudotime, ...)
   lineages = FALSE,
   thresh = 0.05,
   rep = 10000,
-  ...,
+  args_mmd = list(),
+  args_classifier = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 
@@ -39,7 +41,8 @@ progressionTest(pseudotime, ...)
   lineages = FALSE,
   thresh = 0.05,
   rep = 10000,
-  ...,
+  args_mmd = list(),
+  args_classifier = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 }
@@ -48,7 +51,7 @@ progressionTest(pseudotime, ...)
 \code{\link{SingleCellExperiment}} object or a matrix of pseudotime values,
 each row represents a cell and each column represents a lineage.}
 
-\item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
+\item{...}{parameters including:}
 
 \item{cellWeights}{A matrix of cell weights defining the probability that a
 cell belongs to a particular lineage. Each row represents a cell and each
@@ -67,6 +70,10 @@ Ignored if \code{method = "Permutation"}. Default to .05.}
 
 \item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
 Default to \code{1e4}.}
+
+\item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
+
+\item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
 
 \item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
 for the classifier method or "Permutation" for a permutation. See details.

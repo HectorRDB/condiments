@@ -16,7 +16,8 @@ differentiationTest(cellWeights, ...)
   pairwise = FALSE,
   method = c("mmd", "Classifier"),
   thresh = 0.05,
-  ...
+  args_mmd = list(),
+  args_classifier = list()
 )
 
 \S4method{differentiationTest}{SlingshotDataSet}(
@@ -26,7 +27,8 @@ differentiationTest(cellWeights, ...)
   pairwise = FALSE,
   method = c("mmd", "Classifier"),
   thresh = 0.05,
-  ...
+  args_mmd = list(),
+  args_classifier = list()
 )
 
 \S4method{differentiationTest}{SingleCellExperiment}(
@@ -36,7 +38,8 @@ differentiationTest(cellWeights, ...)
   pairwise = FALSE,
   method = c("mmd", "Classifier"),
   thresh = 0.05,
-  ...
+  args_mmd = list(),
+  args_classifier = list()
 )
 }
 \arguments{
@@ -46,7 +49,7 @@ defining the probability that a cell belongs to a particular lineage.
 Each row represents a cell and each column represents a lineage. If only a
 single lineage, provide a matrix with one column containing all values of 1.}
 
-\item{...}{Other arguments passed to \link[Ecume]{classifier_test}.}
+\item{...}{parameters including:}
 
 \item{conditions}{Either the vector of conditions, or a character indicating which
 column of the metadata contains this vector}
@@ -59,6 +62,10 @@ column of the metadata contains this vector}
 
 \item{thresh}{The threshold for the classifier test. See details.
 Default to .05.}
+
+\item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
+
+\item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
 }
 \value{
 A data frame with 3 columns:

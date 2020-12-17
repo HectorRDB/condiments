@@ -7,7 +7,8 @@
 }
 
 .progressionTest <- function(pst, ws, conditions, global = TRUE, lineages = FALSE,
-                             method = "KS",  thresh = 0.05, rep = 1e4, ...) {
+                             method = "KS",  thresh = 0.05, rep = 1e4,
+                             args_mmd = list(), args_classifier = list()) {
   # Get variables
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   colnames(pst) <- colnames(ws) <-
@@ -42,16 +43,19 @@
       xs <- lapply(unique(conditions), function(cond) {
         return(as.matrix(pst_l[conditions == cond]))
       })
-      test_l <- Ecume::classifier_test(x = xs, thresh = thresh, ...)
+      args <- args_classifier
+      args$x <- xs; args$thresh <- thresh
+      test_l <- do.call(Ecume::classifier_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
     if(method == "mmd") {
       n <- max(table(conditions))
       frac <- 10^5 / (n * (n - 1))
-      test_l <- Ecume::mmd_test(
-        x = as.matrix(pst_l[conditions == unique(conditions)[1]]),
-        y = as.matrix(pst_l[conditions == unique(conditions)[2]]),
-        frac = frac, ...)
+      args <- args_mmd
+      args$x <- as.matrix(pst_l[conditions == unique(conditions)[1]])
+      args$y <- as.matrix(pst_l[conditions == unique(conditions)[2]])
+      args$frac <- frac
+      test_l <- do.call(Ecume::mmd_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
   }) %>%
@@ -62,15 +66,18 @@
     xs <- lapply(unique(conditions), function(cond) {
       as.matrix(pst[conditions == cond, ])
     })
-    glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
+    args <- args_classifier
+    args$x <- xs; args$thresh <- thresh
+    glob_test <- do.call(Ecume::classifier_test, args)
   }
   if (method == "mmd") {
     n <- max(table(conditions))
     frac <- 10^5 / (n * (n - 1))
-    glob_test <- Ecume::mmd_test(
-      x = as.matrix(pst[conditions == unique(conditions)[1], ]),
-      y = as.matrix(pst[conditions == unique(conditions)[2], ]),
-      frac = frac, ...)
+    args <- args_mmd
+    args$x <- as.matrix(pst[conditions == unique(conditions)[1], ])
+    args$y <- as.matrix(pst[conditions == unique(conditions)[2], ])
+    args$frac <- frac
+    glob_test <- do.call(Ecume::mmd_test, args)
   }
   if (method %in% c("KS", "Permutation")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
@@ -111,7 +118,8 @@
 #' Ignored if \code{method = "Permutation"}. Default to .05.
 #' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
 #' Default to \code{1e4}.
-#' @param ... Other arguments passed to \link[Ecume]{classifier_test}.
+#' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
+#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
 #' @importFrom dplyr n_distinct bind_rows mutate select
@@ -161,7 +169,8 @@
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "matrix"),
           definition = function(pseudotime, cellWeights, conditions,
-    global = TRUE, lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    global = TRUE, lineages = FALSE, thresh = .05, rep = 1e4,
+    args_mmd = list(), args_classifier = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
@@ -177,7 +186,9 @@ setMethod(f = "progressionTest",
             res <- .progressionTest(pst = pseudotime, ws = cellWeights,
                                     conditions = conditions, global = global,
                                     lineages = lineages, method = method,
-                                    thresh = thresh, rep = rep, ...)
+                                    thresh = thresh, rep = rep,
+                                    args_mmd = args_mmd,
+                                    args_classifier = args_classifier)
             return(res)
           }
 )
@@ -186,7 +197,8 @@ setMethod(f = "progressionTest",
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "SlingshotDataSet"),
           definition = function(pseudotime, conditions, global = TRUE,
-    lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    lineages = FALSE, thresh = .05, rep = 1e4,
+    args_mmd = list(), args_classifier = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
@@ -204,7 +216,8 @@ setMethod(f = "progressionTest",
             res <- .progressionTest(pst = pst, ws = ws, conditions = conditions,
                                     global = global, lineages = lineages,
                                     method = method, thresh = thresh,
-                                    rep = rep, ...)
+                                    rep = rep, args_mmd = args_mmd,
+                                    args_classifier = args_classifier)
             return(res)
           }
 )
@@ -217,7 +230,8 @@ setMethod(f = "progressionTest",
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "SingleCellExperiment"),
           definition = function(pseudotime, conditions, global = TRUE,
-    lineages = FALSE, thresh = .05, rep = 1e4, ...,
+    lineages = FALSE, thresh = .05, rep = 1e4,
+    args_mmd = list(), args_classifier = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (is.null(pseudotime@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
@@ -235,6 +249,8 @@ setMethod(f = "progressionTest",
             return(progressionTest(slingshot::SlingshotDataSet(pseudotime),
                                    conditions = conditions, global = global,
                                    lineages = lineages, method = method,
-                                   thresh = thresh, rep = rep, ...))
+                                   thresh = thresh, rep = rep,
+                                   args_mmd = args_mmd,
+                                   args_classifier = args_classifier))
           }
 )

@@ -1,5 +1,6 @@
 .differentiationTest <- function(ws, conditions, global = TRUE, pairwise = FALSE,
-                                 method = "Classifier", thresh, ...) {
+                                 method = "Classifier", thresh,
+                                 args_mmd = list(), args_classifier = list()) {
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   pairs <- utils::combn(ncol(ws), 2)
   if (ncol(ws) == 2) {
@@ -16,10 +17,14 @@
       ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
     })
     if (method == "Classifier") {
-      return(Ecume::classifier_test(x = xs, thresh = thresh, ...))
+      args <- args_classifier
+      args$x <- xs; args$thresh <- thresh
+      return(do.call(Ecume::classifier_test, args))
     }
     if (method == "mmd") {
-      return(Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...))
+      args <- args_mmd
+      args$x <- xs[[1]]; args$y <- xs[[2]]
+      return(do.call(Ecume::mmd_test, args))
     }
   }) %>%
     dplyr::bind_rows(.id = "pair") %>%
@@ -31,10 +36,14 @@
     ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
   })
   if (method == "Classifier") {
-    glob_test <- Ecume::classifier_test(xs, thresh = thresh, ...)
+    args <- args_classifier
+    args$x <- xs; args$thresh <- thresh
+    glob_test <- do.call(Ecume::classifier_test, args)
   }
   if (method == "mmd") {
-    glob_test <- Ecume::mmd_test(x = xs[[1]], y = xs[[2]], ...)
+    args <- args_mmd
+    args$x <- xs[[1]]; args$y <- xs[[2]]
+    glob_test <- do.call(Ecume::mmd_test, args)
   }
 
   glob_test <- data.frame("pair" = "All",
@@ -66,7 +75,8 @@
 #' @param method One of "Classifier" or "mmd".
 #' @param thresh The threshold for the classifier test. See details.
 #' Default to .05.
-#' @param ... Other arguments passed to \link[Ecume]{classifier_test}.
+#' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
+#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @importFrom slingshot slingshot SlingshotDataSet
 #' @importFrom utils combn
 #' @importFrom dplyr n_distinct
@@ -92,7 +102,8 @@ setMethod(f = "differentiationTest",
           signature = c(cellWeights = "matrix"),
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
-                                thresh = .05, ...){
+                                thresh = .05, args_mmd = list(),
+                                args_classifier = list()){
             method <- match.arg(method)
             if (ncol(cellWeights) == 1) {
               stop("This only works with more than one lineage.")
@@ -104,7 +115,9 @@ setMethod(f = "differentiationTest",
             }
             res <- .differentiationTest(ws = cellWeights, conditions = conditions,
                                         global = global, pairwise = pairwise,
-                                        method = method, thresh = thresh, ...)
+                                        method = method, thresh = thresh,
+                                        args_mmd = args_mmd,
+                                        args_classifier = args_classifier)
             return(res)
           }
 )
@@ -115,7 +128,8 @@ setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SlingshotDataSet"),
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
-                                thresh = .05, ...){
+                                thresh = .05, args_mmd = list(),
+                                args_classifier = list()){
             method <- match.arg(method)
             if (nLineages(cellWeights) == 1) {
               stop("This only works with more than one lineage.")
@@ -128,7 +142,9 @@ setMethod(f = "differentiationTest",
             ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
             res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
-                                        method = method, thresh = thresh, ...)
+                                        method = method, thresh = thresh,
+                                        args_mmd = args_mmd,
+                                        args_classifier = args_classifier)
             return(res)
           }
 )
@@ -142,7 +158,8 @@ setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SingleCellExperiment"),
           definition = function(cellWeights, conditions,  global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
-                                thresh = .05, ...){
+                                thresh = .05, args_mmd = list(),
+                                args_classifier = list()){
             if (is.null(cellWeights@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -157,6 +174,7 @@ setMethod(f = "differentiationTest",
             return(differentiationTest(slingshot::SlingshotDataSet(cellWeights),
                                        conditions = conditions, global = global,
                                        pairwise = pairwise, method = method,
-                                       thresh = thresh, ...))
+                                       thresh = thresh, args_mmd = args_mmd,
+                                       args_classifier = args_classifier))
           }
 )
