@@ -8,7 +8,8 @@
 
 .progressionTest <- function(pst, ws, conditions, global = TRUE, lineages = FALSE,
                              method = "KS",  thresh = 0.05, rep = 1e4,
-                             args_mmd = list(), args_classifier = list()) {
+                             args_mmd = list(), args_wass = list(),
+                             args_classifier = list()) {
   # Get variables
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   colnames(pst) <- colnames(ws) <-
@@ -58,6 +59,16 @@
       test_l <- do.call(Ecume::mmd_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
+    if(method == "wasserstein_permutation") {
+      n <- max(table(conditions))
+      S <- min(10^5, n)
+      args <- args_wass
+      args$x <- as.matrix(pst_l[conditions == unique(conditions)[1]])
+      args$y <- as.matrix(pst_l[conditions == unique(conditions)[2]])
+      args$S <- S; args$fast <- TRUE; args$iterations <- rep
+      test_l <- do.call(Ecume::wasserstein_permut, args)
+      return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
+    }
   }) %>%
     dplyr::bind_rows(.id = "lineage") %>%
     dplyr::mutate(lineage = as.character(lineage)) %>%
@@ -78,6 +89,15 @@
     args$y <- as.matrix(pst[conditions == unique(conditions)[2], ])
     args$frac <- frac
     glob_test <- do.call(Ecume::mmd_test, args)
+  }
+  if (method == "wass") {
+    n <- max(table(conditions))
+    S <- min(10^5, n)
+    args <- args_wass
+    args$x <- as.matrix(pst[conditions == unique(conditions)[1], ])
+    args$y <- as.matrix(pst[conditions == unique(conditions)[2], ])
+    args$S <- S; args$fast <- TRUE; args$iterations <- rep
+    glob_test <- do.call(Ecume::wasserstein_permut, args)
   }
   if (method %in% c("KS", "Permutation")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
@@ -119,6 +139,8 @@
 #' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
 #' Default to \code{1e4}.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
+#' @param args_wass arguments passed to the wasserstein permutation test. See
+#' \code{\link{wasserstein_permut}}.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
@@ -163,14 +185,14 @@
 #' condition[110:139] <- 'A'
 #' sds <- slingshot::slingshot(rd, cl)
 #' progressionTest(sds, condition)
-#' @importFrom Ecume classifier_test ks_test stouffer_zscore mmd_test
+#' @importFrom Ecume classifier_test ks_test stouffer_zscore mmd_test wasserstein_permut
 #' @export
 #' @rdname progressionTest
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "matrix"),
           definition = function(pseudotime, cellWeights, conditions,
     global = TRUE, lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(),
+    args_mmd = list(), args_classifier = list(), args_wass = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
@@ -187,7 +209,7 @@ setMethod(f = "progressionTest",
                                     conditions = conditions, global = global,
                                     lineages = lineages, method = method,
                                     thresh = thresh, rep = rep,
-                                    args_mmd = args_mmd,
+                                    args_mmd = args_mmd, args_wass = args_wass,
                                     args_classifier = args_classifier)
             return(res)
           }
@@ -198,7 +220,7 @@ setMethod(f = "progressionTest",
           signature = c(pseudotime = "SlingshotDataSet"),
           definition = function(pseudotime, conditions, global = TRUE,
     lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(),
+    args_mmd = list(), args_classifier = list(), args_wass = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
@@ -217,6 +239,7 @@ setMethod(f = "progressionTest",
                                     global = global, lineages = lineages,
                                     method = method, thresh = thresh,
                                     rep = rep, args_mmd = args_mmd,
+                                    args_wass = args_wass,
                                     args_classifier = args_classifier)
             return(res)
           }
@@ -231,7 +254,7 @@ setMethod(f = "progressionTest",
           signature = c(pseudotime = "SingleCellExperiment"),
           definition = function(pseudotime, conditions, global = TRUE,
     lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(),
+    args_mmd = list(), args_classifier = list(), args_wass = list(),
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
             if (is.null(pseudotime@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
@@ -250,7 +273,7 @@ setMethod(f = "progressionTest",
                                    conditions = conditions, global = global,
                                    lineages = lineages, method = method,
                                    thresh = thresh, rep = rep,
-                                   args_mmd = args_mmd,
+                                   args_mmd = args_mmd, args_wass = args_wass,
                                    args_classifier = args_classifier))
           }
 )

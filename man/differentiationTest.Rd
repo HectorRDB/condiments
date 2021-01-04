@@ -17,6 +17,7 @@ differentiationTest(cellWeights, ...)
   method = c("mmd", "Classifier"),
   thresh = 0.05,
   args_mmd = list(),
+  args_wass = list(),
   args_classifier = list()
 )
 
@@ -28,6 +29,7 @@ differentiationTest(cellWeights, ...)
   method = c("mmd", "Classifier"),
   thresh = 0.05,
   args_mmd = list(),
+  args_wass = list(),
   args_classifier = list()
 )
 
@@ -39,6 +41,7 @@ differentiationTest(cellWeights, ...)
   method = c("mmd", "Classifier"),
   thresh = 0.05,
   args_mmd = list(),
+  args_wass = list(),
   args_classifier = list()
 )
 }
@@ -64,6 +67,9 @@ column of the metadata contains this vector}
 Default to .05.}
 
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
+
+\item{args_wass}{arguments passed to the wasserstein permutation test. See
+\code{\link{wasserstein_permut}}.}
 
 \item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
 }

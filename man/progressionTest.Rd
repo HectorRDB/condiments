@@ -19,6 +19,7 @@ progressionTest(pseudotime, ...)
   rep = 10000,
   args_mmd = list(),
   args_classifier = list(),
+  args_wass = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 
@@ -31,6 +32,7 @@ progressionTest(pseudotime, ...)
   rep = 10000,
   args_mmd = list(),
   args_classifier = list(),
+  args_wass = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 
@@ -43,6 +45,7 @@ progressionTest(pseudotime, ...)
   rep = 10000,
   args_mmd = list(),
   args_classifier = list(),
+  args_wass = list(),
   method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
 )
 }
@@ -74,6 +77,9 @@ Default to \code{1e4}.}
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
 
 \item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
+
+\item{args_wass}{arguments passed to the wasserstein permutation test. See
+\code{\link{wasserstein_permut}}.}
 
 \item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
 for the classifier method or "Permutation" for a permutation. See details.

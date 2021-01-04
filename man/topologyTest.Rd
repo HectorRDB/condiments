@@ -15,7 +15,8 @@ topologyTest(sds, ...)
   threshs = 0.05,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
-  args_classifier = list()
+  args_classifier = list(),
+  args_wass = list()
 )
 
 \S4method{topologyTest}{SingleCellExperiment}(
@@ -25,7 +26,8 @@ topologyTest(sds, ...)
   threshs = 0.05,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
-  args_classifier = list()
+  args_classifier = list(),
+  args_wass = list()
 )
 }
 \arguments{
@@ -43,11 +45,14 @@ column of the metadata contains this vector.}
 See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
 \item{methods}{The method(s) to use to test. Must be among 'KS_mean',
-"KS_all', "mmd', and 'Classifier'. See details.}
+"KS_all', "mmd', 'wasserstein_permutation' and 'Classifier'. See details.}
 
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
 
 \item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
+
+\item{args_wass}{arguments passed to the wasserstein permutation test. See
+\code{\link{wasserstein_permut}}.}
 }
 \value{
 A list containing the following components:

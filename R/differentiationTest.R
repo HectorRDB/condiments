@@ -1,6 +1,7 @@
 .differentiationTest <- function(ws, conditions, global = TRUE, pairwise = FALSE,
                                  method = "Classifier", thresh,
-                                 args_mmd = list(), args_classifier = list()) {
+                                 args_mmd = list(), args_classifier = list(),
+                                 args_wass = list()) {
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   pairs <- utils::combn(ncol(ws), 2)
   if (ncol(ws) == 2) {
@@ -22,9 +23,19 @@
       return(do.call(Ecume::classifier_test, args))
     }
     if (method == "mmd") {
+      n <- max(table(conditions))
+      frac <- 10^5 / (n * (n - 1))
       args <- args_mmd
-      args$x <- xs[[1]]; args$y <- xs[[2]]
+      args$x <- xs[[1]]; args$y <- xs[[2]]; args$frac <- frac
       return(do.call(Ecume::mmd_test, args))
+    }
+    if (method == "wasserstein_permutation") {
+      n <- max(table(conditions))
+      S <- min(10^5, n)
+      args <- args_wass
+      args$x <- xs[[1]]; args$y <- xs[[2]]
+      args$S <- S; args$fast <- TRUE
+      return(do.call(Ecume::wasserstein_permut, args))
     }
   }) %>%
     dplyr::bind_rows(.id = "pair") %>%
@@ -41,11 +52,19 @@
     glob_test <- do.call(Ecume::classifier_test, args)
   }
   if (method == "mmd") {
+    n <- max(table(conditions))
+    frac <- 10^5 / (n * (n - 1))
     args <- args_mmd
-    args$x <- xs[[1]]; args$y <- xs[[2]]
+    args$x <- xs[[1]]; args$y <- xs[[2]]; args$frac <- frac
     glob_test <- do.call(Ecume::mmd_test, args)
   }
-
+  if (method == "wasserstein_permutation") {
+    n <- max(table(conditions))
+    S <- min(10^5, n)
+    args <- args_wass
+    args$x <- xs[[1]]; args$y <- xs[[2]]; args$S <- S; args$fast <- TRUE
+    glob_test <- do.call(Ecume::wasserstein_permut, args)
+  }
   glob_test <- data.frame("pair" = "All",
                           "statistic" = glob_test$statistic,
                           "p.value" = glob_test$p.value)
@@ -76,11 +95,13 @@
 #' @param thresh The threshold for the classifier test. See details.
 #' Default to .05.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
+#' @param args_wass arguments passed to the wasserstein permutation test. See
+#' \code{\link{wasserstein_permut}}.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @importFrom slingshot slingshot SlingshotDataSet
 #' @importFrom utils combn
 #' @importFrom dplyr n_distinct
-#' @importFrom Ecume classifier_test mmd_test
+#' @importFrom Ecume classifier_test mmd_test wasserstein_permut
 #' @return A data frame with 3 columns:
 #' \itemize{
 #'   \item *pair* for individual pairs, the lineages numbers. For global,
@@ -103,6 +124,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
                                 thresh = .05, args_mmd = list(),
+                                args_wass = list(),
                                 args_classifier = list()){
             method <- match.arg(method)
             if (ncol(cellWeights) == 1) {
@@ -116,7 +138,7 @@ setMethod(f = "differentiationTest",
             res <- .differentiationTest(ws = cellWeights, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
-                                        args_mmd = args_mmd,
+                                        args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
           }
@@ -129,6 +151,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
                                 thresh = .05, args_mmd = list(),
+                                args_wass = list(),
                                 args_classifier = list()){
             method <- match.arg(method)
             if (nLineages(cellWeights) == 1) {
@@ -143,7 +166,7 @@ setMethod(f = "differentiationTest",
             res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
-                                        args_mmd = args_mmd,
+                                        args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
           }
@@ -159,6 +182,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions,  global = TRUE,
                                 pairwise = FALSE, method = c("mmd", "Classifier"),
                                 thresh = .05, args_mmd = list(),
+                                args_wass = list(),
                                 args_classifier = list()){
             if (is.null(cellWeights@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
@@ -175,6 +199,7 @@ setMethod(f = "differentiationTest",
                                        conditions = conditions, global = global,
                                        pairwise = pairwise, method = method,
                                        thresh = thresh, args_mmd = args_mmd,
+                                       args_wass = args_wass,
                                        args_classifier = args_classifier))
           }
 )
