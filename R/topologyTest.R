@@ -130,7 +130,7 @@
     condition <- sample(conditions)
     return(.condition_sling(sds, condition))
   })
-  res <- NULL
+  res <- list()
   if ("KS_all" %in% methods) {
     res[["KS_all"]] <- .topologyTest_ks_all(permutations, og, threshs)
   }
