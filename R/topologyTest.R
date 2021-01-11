@@ -125,6 +125,7 @@
 .topologyTest <- function(sds, conditions, rep = 200, threshs = .05,
                           methods = "KS_mean", args_mmd = list(),
                           args_classifier = list(), args_wass = list()) {
+  message("Generating permuted trajectories")
   og <- .condition_sling(sds, conditions)
   permutations <- pbapply::pblapply(seq_len(rep), function(i) {
     condition <- sample(conditions)
@@ -132,19 +133,24 @@
   })
   res <- list()
   if ("KS_all" %in% methods) {
+    message("Running KS-all test")
     res[["KS_all"]] <- .topologyTest_ks_all(permutations, og, threshs)
   }
   if ("KS_mean" %in% methods) {
+    message("Running KS-mean test")
     res[["KS_mean"]] <- .topologyTest_ks_mean(permutations, og, threshs, sds, rep)
   }
   if ("Classifier" %in% methods) {
+    message("Running Classifier test")
     res[["Classifier"]] <- .topologyTest_classifier(permutations, og, threshs,
                                                     sds, rep, args_classifier)
   }
   if ("mmd" %in% methods) {
+    message("Running mmd test")
     res[["mmd"]] <- .topologyTest_mmd(permutations, og, sds, rep, args_mmd)
   }
   if ("wasserstein_permutation" %in% methods) {
+    message("Running wassertsein permutation test")
     res[["wasserstein_permutation"]] <- .topologyTest_wass(
       permutations, og, sds, rep, args_wass
     )
