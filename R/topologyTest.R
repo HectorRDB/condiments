@@ -217,10 +217,10 @@ setMethod(f = "topologyTest",
     methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     args_mmd = list(), args_classifier = list(), args_wass = list(),
     nmax = nrow(slingshot::slingPseudotime(sds))){
-            if (n_distinct(conditions) > 2 && methods != "classifier") {
+            if (n_distinct(conditions) > 2 && methods != "Classifier") {
               warning(paste0("Changing to methods `classifier` since more than ",
                              "two conditions are present."))
-              methods <- "classifier"
+              methods <- "Classifier"
             }
             res <- .topologyTest(sds = sds, conditions = conditions, rep = rep,
                                  threshs = threshs, methods = methods,
