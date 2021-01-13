@@ -86,7 +86,7 @@
   return(res)
 }
 
-.topologyTest_mmd <- function(permutations, og, sds, rep, args_mmd){
+.topologyTest_mmd <- function(permutations, og, sds, rep, args_mmd, n_max = 2000){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[rownames(reducedDim(sds)), ])
@@ -94,9 +94,10 @@
     Reduce(f = '+')
   psts <- psts / rep
   colnames(psts) <- colnames(og$psts)
-  frac <- 10^5 / nrow(psts)
   args <- args_mmd
-  args$x <- as.matrix(og$psts); args$y <- psts; args$frac <- frac
+  id <- sample(nrow(psts), min(nrow(psts), n_max))
+  if (is.null(args_mmd$frac)) args_mmd$frac <- .5
+  args$x <- as.matrix(og$psts[id, ]); args$y <- as.matrix(psts[id, ])
   test <- do.call(what = Ecume::mmd_test, args = args)
   return(data.frame("thresh" = NA,
                     "statistic" = test$statistic,
