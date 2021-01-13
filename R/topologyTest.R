@@ -125,7 +125,8 @@
 
 .topologyTest <- function(sds, conditions, rep = 200, threshs = .05,
                           methods = "KS_mean", args_mmd = list(),
-                          args_classifier = list(), args_wass = list()) {
+                          args_classifier = list(), args_wass = list(),
+                          nmax = nrow(slingshot::slingPseudotime(sds))) {
   message("Generating permuted trajectories")
   og <- .condition_sling(sds, conditions)
   permutations <- pbapply::pblapply(seq_len(rep), function(i) {
@@ -179,6 +180,7 @@
 #' @param args_wass arguments passed to the wasserstein permutation test. See
 #' \code{\link{wasserstein_permut}}.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
+#' @param nmax How many samples to use to compute the mmd test. See details.
 #' @return
 #' A list containing the following components:
 #' \itemize{
@@ -197,6 +199,12 @@
 #' topologyTest(sds, condition, rep = 20)
 #' @details If there is only two conditions, default to `KS_mean`. Otherwise,
 #' uses a classifier.
+#'
+#' More than one method can be specified at once, which avoids running slingshot on
+#' the permutations more than once (as it is the slowest part).
+#'
+#' For the `mmd_test`, if `null=unbiased`, it is recommand to set `nmax=2000` or
+#' something of that order of magnitude to avoid overflowing the memory.
 #' @export
 #' @importFrom Ecume classifier_test ks_test wasserstein_permut
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
@@ -207,7 +215,8 @@ setMethod(f = "topologyTest",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, rep = 200, threshs = .05,
     methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-    args_mmd = list(), args_classifier = list(), args_wass = list()){
+    args_mmd = list(), args_classifier = list(), args_wass = list(),
+    nmax = nrow(slingshot::slingPseudotime(sds))){
             if (n_distinct(conditions) > 2 && methods != "classifier") {
               warning(paste0("Changing to methods `classifier` since more than ",
                              "two conditions are present."))
@@ -216,7 +225,7 @@ setMethod(f = "topologyTest",
             res <- .topologyTest(sds = sds, conditions = conditions, rep = rep,
                                  threshs = threshs, methods = methods,
                                  args_mmd = args_mmd, args_wass = args_wass,
-                                 args_classifier = args_classifier)
+                                 args_classifier = args_classifier, nmax = nmax)
             return(res)
           }
 )
@@ -230,7 +239,8 @@ setMethod(f = "topologyTest",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, rep = 200, threshs = .05,
     methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-    args_mmd = list(), args_classifier = list(), args_wass = list()){
+    args_mmd = list(), args_classifier = list(), args_wass = list(),
+    nmax = nrow(sds)){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -245,6 +255,7 @@ setMethod(f = "topologyTest",
                                 conditions = conditions, rep = rep,
                                 threshs = threshs, methods = methods,
                                 args_mmd = args_mmd, args_wass = args_wass,
-                                args_classifier = args_classifier))
+                                args_classifier = args_classifier,
+                                nmax = nmax))
           }
 )

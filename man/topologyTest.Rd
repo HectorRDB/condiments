@@ -16,7 +16,8 @@ topologyTest(sds, ...)
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
   args_classifier = list(),
-  args_wass = list()
+  args_wass = list(),
+  nmax = nrow(slingshot::slingPseudotime(sds))
 )
 
 \S4method{topologyTest}{SingleCellExperiment}(
@@ -27,7 +28,8 @@ topologyTest(sds, ...)
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
   args_classifier = list(),
-  args_wass = list()
+  args_wass = list(),
+  nmax = nrow(sds)
 )
 }
 \arguments{
@@ -53,6 +55,8 @@ See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
 \item{args_wass}{arguments passed to the wasserstein permutation test. See
 \code{\link{wasserstein_permut}}.}
+
+\item{nmax}{How many samples to use to compute the mmd test. See details.}
 }
 \value{
 A list containing the following components:
@@ -70,6 +74,12 @@ for different conditions or not.
 \details{
 If there is only two conditions, default to `KS_mean`. Otherwise,
 uses a classifier.
+
+More than one method can be specified at once, which avoids running slingshot on
+the permutations more than once (as it is the slowest part).
+
+For the `mmd_test`, if `null=unbiased`, it is recommand to set `nmax=2000` or
+something of that order of magnitude to avoid overflowing the memory.
 }
 \examples{
 data('slingshotExample', package = "slingshot")
