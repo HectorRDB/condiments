@@ -5,13 +5,13 @@
     sds_cond <- sds
     sds_cond@reducedDim <- sds_cond@reducedDim[conditions == cond, ]
     sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
-    # TODO: handle cases where one cluster contains only one condition!!
-    # missing_clusters <- which(colSums(sds_cond@clusterLabels) == 0)
-    # sds_cond@clusterLabels <- sds_cond@clusterLabels[, -missing_clusters]
-    # sds_cond@adjacency <- sds_cond@adjacency[-missing_clusters, -missing_clusters]
-    # sds_cond@lineages <- lapply(sds_cond@lineages, function(l) {
-    #   return(l[!l %in% names(missing_clusters)])
-    # })
+    if (any(colSums(sds_cond@clusterLabels) == 0)) {
+      clus <- colnames(sds_cond@clusterLabels)[
+        colSums(sds_cond@clusterLabels) == 0][1]
+      stop(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
+      "This means you should either lower the clustering resolution before ",
+      "running trajectory inference or fit one trajectory per condition"))
+    }
     sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
     pst_cond <- slingshot::slingPseudotime(sds_cond, na = FALSE)
     psts <- rbind(psts, pst_cond)
