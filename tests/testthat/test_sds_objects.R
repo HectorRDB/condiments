@@ -24,7 +24,7 @@ test_that("Sds does merge correctly",{
                  quantile(slingPseudotime(sds, na = FALSE)[, 2]))
 })
 
-test_that("sds is fit ok") {
+test_that("sds is fitted ok", {
   sdss <- slingshot_conditions(sds, condition)
   expect_is(sdss, "list")
   expect_is(sdss[[1]], "SlingshotDataSet")
@@ -43,4 +43,4 @@ test_that("sds is fit ok") {
   expect_equal(sdss1, sdss2)
   sdss2 <- slingshot_conditions(sce, "cond")
   expect_equal(sdss1, sdss2)
-}
+})
