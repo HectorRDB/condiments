@@ -44,7 +44,7 @@
     dplyr::mutate(pair = as.numeric(pair),
                   pair = paste0(pairs[1, pair], "vs", pairs[2, pair])) %>%
     dplyr::select(pair, statistic, p.value)
-
+  nmin <- min(table(conditions))
   xs <- lapply(unique(conditions), function(cond) {
     ws_cond <- ws[conditions == cond, ]
     ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
