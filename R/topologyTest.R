@@ -1,23 +1,9 @@
 .condition_sling <- function(sds, conditions) {
-  psts <- NULL
-  ws <- NULL
-  for (cond in unique(conditions)) {
-    sds_cond <- sds
-    sds_cond@reducedDim <- sds_cond@reducedDim[conditions == cond, ]
-    sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
-    if (any(colSums(sds_cond@clusterLabels) == 0)) {
-      clus <- colnames(sds_cond@clusterLabels)[
-        colSums(sds_cond@clusterLabels) == 0][1]
-      stop(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
-      "This means you should either lower the clustering resolution before ",
-      "running trajectory inference or fit one trajectory per condition"))
-    }
-    sds_cond <- slingshot::getCurves(sds_cond, approx_points = 100)
-    pst_cond <- slingshot::slingPseudotime(sds_cond, na = FALSE)
-    psts <- rbind(psts, pst_cond)
-    w_conds <- slingshot::slingCurveWeights(sds_cond)
-    ws <- rbind(ws, w_conds)
-  }
+  sdss <- slingshot_conditions(sds, conditions)
+  psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE)
+  psts <- do.call('rbind', psts)
+  ws <- lapply(sdss, slingshot::slingCurveWeights)
+  ws <- do.call('rbind', ws)
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   return(list("psts" = psts, "ws" = ws))
 }

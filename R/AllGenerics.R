@@ -62,3 +62,14 @@ methods::setGeneric(
   }
 )
 
+#' @name slingshot_conditions
+#' @title Refitting slingshot per condition
+#' @param ... parameters including:
+#' @import methods
+methods::setGeneric(
+  name = "slingshot_conditions",
+  signature = "sds",
+  def = function(sds, ...) {
+    standardGeneric("slingshot_conditions")
+  }
+)
