@@ -40,9 +40,10 @@
       return(c("statistic" = d_l,
                "p.value" = max(mean(abs(d_l) <= abs(d_il)), 1 / rep)))
     }
+    pst_l <- pst_l[w_l > 0]
     if (method == "Classifier") {
       xs <- lapply(unique(conditions), function(cond) {
-        return(as.matrix(pst_l[conditions == cond]))
+        return(as.matrix(pst_l[conditions[w_l > 0] == cond]))
       })
       args <- args_classifier
       args$x <- xs; args$thresh <- thresh
@@ -53,8 +54,8 @@
       n <- max(table(conditions))
       frac <- 10^5 / (n * (n - 1))
       args <- args_mmd
-      args$x <- as.matrix(pst_l[conditions == unique(conditions)[1]])
-      args$y <- as.matrix(pst_l[conditions == unique(conditions)[2]])
+      args$x <- as.matrix(pst_l[conditions[w_l > 0] == unique(conditions)[1]])
+      args$y <- as.matrix(pst_l[conditions[w_l > 0] == unique(conditions)[2]])
       args$frac <- frac
       test_l <- do.call(Ecume::mmd_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
@@ -63,8 +64,8 @@
       n <- max(table(conditions))
       S <- min(10^5, n)
       args <- args_wass
-      args$x <- as.matrix(pst_l[conditions == unique(conditions)[1]])
-      args$y <- as.matrix(pst_l[conditions == unique(conditions)[2]])
+      args$x <- as.matrix(pst_l[conditions[w_l > 0] == unique(conditions)[1]])
+      args$y <- as.matrix(pst_l[conditions[w_l > 0] == unique(conditions)[2]])
       args$S <- S; args$fast <- TRUE; args$iterations <- rep
       test_l <- do.call(Ecume::wasserstein_permut, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))

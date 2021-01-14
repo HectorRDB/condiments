@@ -9,13 +9,15 @@
     pairwise <- TRUE
   }
   n_conditions <- dplyr::n_distinct(conditions)
-  nmin <- min(table(conditions))
   pairwise_test <- apply(pairs, 2, function(pair) {
     ws_p <- ws[, pair]
-    ws_p <- sweep(ws_p, 1, FUN = "/", STATS = apply(ws_p, 1, sum))
+    keep <- rowSums(ws_p) > 0
+    ws_p <- sweep(ws_p[keep, ], 1, FUN = "/", STATS = apply(ws_p[keep, ], 1, sum))
+    nmin <- min(table(conditions[keep]))
     xs <- lapply(unique(conditions), function(cond) {
-      ws_cond <- ws_p[conditions == cond, ]
+      ws_cond <- ws_p[conditions[keep] == cond, ]
       ws_cond <- ws_cond[sample(seq_len(nrow(ws_cond)), nmin), ]
+      return(as.matrix(ws_cond))
     })
     if (method == "Classifier") {
       args <- args_classifier
@@ -39,7 +41,8 @@
     }
   }) %>%
     dplyr::bind_rows(.id = "pair") %>%
-    dplyr::mutate(pair = as.character(pair)) %>%
+    dplyr::mutate(pair = as.numeric(pair),
+                  pair = paste0(pairs[1, pair], "vs", pairs[2, pair])) %>%
     dplyr::select(pair, statistic, p.value)
 
   xs <- lapply(unique(conditions), function(cond) {
@@ -149,7 +152,8 @@ setMethod(f = "differentiationTest",
 setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SlingshotDataSet"),
           definition = function(cellWeights, conditions, global = TRUE,
-                                pairwise = FALSE, method = c("mmd", "Classifier"),
+                                pairwise = FALSE,
+                                method = c("mmd", "Classifier", "wasserstein_permutation"),
                                 thresh = .05, args_mmd = list(),
                                 args_wass = list(),
                                 args_classifier = list()){
@@ -162,7 +166,12 @@ setMethod(f = "differentiationTest",
               warning(paste0("If more than two conditions are present, ",
                              "only the Classifier method is possible."))
             }
-            ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
+            if (slingParams(cellWeights)$reweight | slingParams(cellWeights)$reassign) {
+              ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE) 
+            } else {
+              ws <- .sling_reassign(cellWeights)
+            }
+            
             res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
@@ -180,7 +189,8 @@ setMethod(f = "differentiationTest",
 setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SingleCellExperiment"),
           definition = function(cellWeights, conditions,  global = TRUE,
-                                pairwise = FALSE, method = c("mmd", "Classifier"),
+                                pairwise = FALSE,
+                                method = c("mmd", "Classifier", "wasserstein_permutation"),
                                 thresh = .05, args_mmd = list(),
                                 args_wass = list(),
                                 args_classifier = list()){
