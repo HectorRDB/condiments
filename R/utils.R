@@ -76,7 +76,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #' @param condition_id A vector of condition for each condition. Default to integer values
 #' in order of appearance
 #' @param scale If TRUE (default), lineages that are mapped are scaled to have the same
-#' lenght.
+#' length.
 #' @return A modified slingshot dataset that can be used for downstream steps.
 #' @import slingshot
 #' @importFrom dplyr bind_rows
@@ -92,7 +92,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
 #' merge_sds(sds, sds, mapping = matrix(c(1, 2, 1, 2), nrow = 2))
 #' @export
 merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
-                      scale = TRUE) {
+                      scale = FALSE) {
   sdss <- list(...)
   names(sdss) <- condition_id
   # Checking inputs ----
