@@ -1,3 +1,37 @@
+.clean_mst <- function(sds_cond, cluss) {
+  # Lineage List
+  sds_cond@lineages <- lapply(sds_cond@lineages, function(lin) {
+    return(lin[!lin %in% cluss])
+  })
+  # Adjency matrix
+  mat <- sds_cond@adjacency
+  mat <- mat[!rownames(mat) %in% cluss, ]
+  mat <- mat[, !colnames(mat) %in% cluss]
+  sds_cond@adjacency <- mat
+  # Cluster Labels
+  sds_cond@clusterLabels <- sds_cond@clusterLabels[,
+        !colnames(sds_cond@clusterLabels) %in% cluss]
+  # Clean lineage list
+  inside <- sapply(sds_cond@lineages, function(lin1) {
+    sapply(sds_cond@lineages, function(lin2){
+      return(all(lin1 %in% lin2))
+    })
+  })
+  diag(inside) <- FALSE
+  while (any(inside)) {
+    lin <- which(rowSums(inside) > 0)[1]
+    sds_cond@lineages <- sds_cond@lineages[-lin]
+  }
+  names(sds_cond@lineages) <- paste0("Lineage", seq_along(sds_cond@lineages))
+  # Params
+  sds_cond@slingParams$end.clus <- sapply(sds_cond@lineages, tail, n = 1)
+  dist_mat <- sds_cond@slingParams$dist
+  dist_mat <- dist_mat[!rownames(dist_mat) %in% cluss, ]
+  dist_mat <- dist_mat[, !colnames(dist_mat) %in% cluss]
+  sds_cond@slingParams$dist <- dist_mat
+  return(sds_cond)
+}
+
 .slingshot_conditions <- function(sds, conditions, approx_points = 100, ...) {
   if (n_distinct(conditions) == 1) {
     cond <- conditions[1]
@@ -9,11 +43,13 @@
     sds_cond@reducedDim <- sds_cond@reducedDim[conditions == cond, ]
     sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
     if (any(colSums(sds_cond@clusterLabels) == 0)) {
-      clus <- colnames(sds_cond@clusterLabels)[
-        colSums(sds_cond@clusterLabels) == 0][1]
-      stop(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
-                  "This means you should either lower the clustering resolution before ",
-                  "running trajectory inference or fit one trajectory per condition"))
+      cluss <- colnames(sds_cond@clusterLabels)[
+        colSums(sds_cond@clusterLabels) == 0] 
+      clus <- cluss[1]
+      message(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
+                     "This means you should either lower the clustering resolution before ",
+                     "running trajectory inference or fit one trajectory per condition"))
+      sds_cond <- .clean_mst(sds_cond, cluss)
     }
     sdss[[cond]] <- slingshot::getCurves(sds_cond, approx_points = approx_points,
                                          ...)
