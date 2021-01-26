@@ -1,18 +1,18 @@
-Package: DifTopo
+Package: condiments
 Type: Package
-Title: Differential Topology
+Title: Differential Topology, Progression and Differentiation
 Version: 0.1.0
 Date: 2020-09-17
 Authors@R: c(person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
                      email = "hector.rouxdebezieux@berkeley.edu",
 		     comment = c(ORCID = "0000-0002-1489-8339")),
-		person("Koen", "Van den Berge", role = "ctb"),
-		person("Kelly","Street", role = "ctb"))
-Description: This package encapsulate many functions to conduct a differential topology analysis. It focuses on analyzingan 'omic dataset with multiple conditions. While the package is mostly geared toward scRNASeq, it does not place any restriction on the actual input format.
+		person("Koen", "Van den Berge", role = "aut" , "ctb"),
+		person("Kelly","Street", role = "aut", "ctb"))
+Description: This package encapsulate many functions to conduct a differential topology analysis. It focuses on analyzing an 'omic dataset with multiple conditions. While the package is mostly geared toward scRNASeq, it does not place any restriction on the actual input format.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
-URL: https://hectorrdb.github.io/DT/index.html
+URL: https://hectorrdb.github.io/condiments/index.html
 Depends: R (>= 4.0)
 VignetteBuilder: knitr
 biocViews:
@@ -24,7 +24,7 @@ biocViews:
     Transcriptomics,
     MultipleComparison,
     Visualization
-BugReports: https://github.com/HectorRDB/DifTopo/issues
+BugReports: https://github.com/HectorRDB/condiments/issues
 Imports: 
     mgcv,
     RANN,

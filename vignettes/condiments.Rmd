@@ -1,5 +1,5 @@
 ---
-title: "DifTopo"
+title: "condiments"
 author: "Hector Roux de Bézieux"
 date: '`r format(Sys.time(), "%d %B , %Y")`'
 output: 
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{Using DifTopo}
+  %\VignetteIndexEntry{Using condiments}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,7 +22,7 @@ opts_chunk$set(
 
 # Initial pre-processing
 
-We will use a synthetic dataset to illustrate the functionalities of the _DifTopo_ package. We start directly with a dataset where the following steps are assumed to have been run:
+We will use a synthetic dataset to illustrate the functionalities of the _condiments_ package. We start directly with a dataset where the following steps are assumed to have been run:
 
 + Obtaining count matrices for each setting (i.e. each condition).
 + Integration and normalization between the conditions.
@@ -30,7 +30,7 @@ We will use a synthetic dataset to illustrate the functionalities of the _DifTop
 + (Clustering)
 
 ```{r}
-library(DifTopo)
+library(condiments)
 library(slingshot)
 library(RColorBrewer)
 library(viridis)
