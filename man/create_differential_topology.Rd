@@ -8,7 +8,8 @@ create_differential_topology(
   n_cells = 200,
   noise = 0.15,
   shift = 10,
-  unbalance_level = 0.9
+  unbalance_level = 0.9,
+  speed = 1
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ create_differential_topology(
 
 \item{unbalance_level}{How much should the bottom lineage be unbalanced toward
 condition A.}
+
+\item{speed}{How fast the cells from condition B should differentiate}
 }
 \value{
 A list with three components

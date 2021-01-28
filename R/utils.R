@@ -1,7 +1,8 @@
 # Toy examples ----
-.create_fork <- function(n_cells, noise) {
+.create_fork <- function(n_cells, noise, speed = 1) {
   rd <- matrix(0, ncol = 2, nrow = n_cells)
-  common <- round(n_cells / 3)
+  speed <- speed^(1 / 4) * atanh(2 / 3)
+  common <- round(n_cells - n_cells * tanh(speed))
   rd[, 1] <- c(stats::runif(common, -40, -10),
                stats::runif(n_cells - common, -10, 30))
   lineages <- stats::rbinom(n_cells, 1, .5) * 2 - 1
@@ -22,6 +23,7 @@
 #' @param shift How much should the top lineage shift in condition B.
 #' @param unbalance_level How much should the bottom lineage be unbalanced toward
 #' condition A.
+#' @param speed How fast the cells from condition B should differentiate
 #' @return A list with three components
 #'  \itemize{
 #'   \item \code{rd}: The reduced dimensions coordinates of every cells. An
@@ -36,9 +38,9 @@
 #' @importFrom stats runif qnorm pnorm rbinom rnorm
 #' @export
 create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
-                                         unbalance_level = .9) {
+                                         unbalance_level = .9, speed = 1) {
   sd_1 <- .create_fork(round(n_cells / 2), noise)
-  sd_2 <- .create_fork(round(n_cells / 2), noise)
+  sd_2 <- .create_fork(round(n_cells / 2), noise, speed = speed)
 
   # Shift lineage 1 in the second condition
   shifted <- sd_2$rd[sd_2$lineages == 1, 1] - shift
