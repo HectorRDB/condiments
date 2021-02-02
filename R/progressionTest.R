@@ -74,6 +74,7 @@
     dplyr::bind_rows(.id = "lineage") %>%
     dplyr::mutate(lineage = as.character(lineage)) %>%
     dplyr::select(lineage, statistic, p.value)
+
   if (method == "Classifier") {
     xs <- lapply(unique(conditions), function(cond) {
       as.matrix(pst[conditions == cond, ])
@@ -101,7 +102,7 @@
     glob_test <- do.call(Ecume::wasserstein_permut, args)
   }
   if (method %in% c("KS", "Permutation")) {
-    glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value / 2,
+    glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value,
                                         weights = colSums(ws))
   }
 
