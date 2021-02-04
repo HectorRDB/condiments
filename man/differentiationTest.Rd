@@ -14,11 +14,12 @@ differentiationTest(cellWeights, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("mmd", "Classifier"),
-  thresh = 0.05,
+  method = c("Classifier", "mmd", "wasserstein_permutation"),
+  classifer_method = "rf",
+  thresh = 0.01,
+  args_classifier = list(),
   args_mmd = list(),
-  args_wass = list(),
-  args_classifier = list()
+  args_wass = list()
 )
 
 \S4method{differentiationTest}{SlingshotDataSet}(
@@ -26,11 +27,12 @@ differentiationTest(cellWeights, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("mmd", "Classifier", "wasserstein_permutation"),
-  thresh = 0.05,
+  method = c("Classifier", "mmd", "wasserstein_permutation"),
+  classifer_method = "rf",
+  thresh = 0.01,
+  args_classifier = list(),
   args_mmd = list(),
-  args_wass = list(),
-  args_classifier = list()
+  args_wass = list()
 )
 
 \S4method{differentiationTest}{SingleCellExperiment}(
@@ -38,11 +40,12 @@ differentiationTest(cellWeights, ...)
   conditions,
   global = TRUE,
   pairwise = FALSE,
-  method = c("mmd", "Classifier", "wasserstein_permutation"),
-  thresh = 0.05,
+  method = c("Classifier", "mmd", "wasserstein_permutation"),
+  classifer_method = "rf",
+  thresh = 0.01,
+  args_classifier = list(),
   args_mmd = list(),
-  args_wass = list(),
-  args_classifier = list()
+  args_wass = list()
 )
 }
 \arguments{
@@ -66,12 +69,12 @@ column of the metadata contains this vector}
 \item{thresh}{The threshold for the classifier test. See details.
 Default to .05.}
 
+\item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
+
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
 
 \item{args_wass}{arguments passed to the wasserstein permutation test. See
 \code{\link{wasserstein_permut}}.}
-
-\item{args_classifier}{arguments passed to the classifier test. See \code{\link{classifier_test}}.}
 }
 \value{
 A data frame with 3 columns:

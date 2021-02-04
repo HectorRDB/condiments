@@ -1,5 +1,6 @@
 .differentiationTest <- function(ws, conditions, global = TRUE, pairwise = FALSE,
                                  method = "Classifier", thresh,
+                                 classifer_method = "rf",
                                  args_mmd = list(), args_classifier = list(),
                                  args_wass = list()) {
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
@@ -21,6 +22,7 @@
     })
     if (method == "Classifier") {
       args <- args_classifier
+      args$method <- classifer_method
       args$x <- xs; args$thresh <- thresh
       return(do.call(Ecume::classifier_test, args))
     }
@@ -125,10 +127,11 @@
 setMethod(f = "differentiationTest",
           signature = c(cellWeights = "matrix"),
           definition = function(cellWeights, conditions, global = TRUE,
-                                pairwise = FALSE, method = c("mmd", "Classifier"),
-                                thresh = .05, args_mmd = list(),
-                                args_wass = list(),
-                                args_classifier = list()){
+                                pairwise = FALSE,
+                                method = c("Classifier", "mmd", "wasserstein_permutation"),
+                                classifer_method = "rf",
+                                thresh = .01, args_classifier = list(),
+                                args_mmd = list(), args_wass = list()){
             method <- match.arg(method)
             if (ncol(cellWeights) == 1) {
               stop("This only works with more than one lineage.")
@@ -141,6 +144,7 @@ setMethod(f = "differentiationTest",
             res <- .differentiationTest(ws = cellWeights, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
+                                        classifer_method = classifer_method,
                                         args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
@@ -153,10 +157,10 @@ setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SlingshotDataSet"),
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE,
-                                method = c("mmd", "Classifier", "wasserstein_permutation"),
-                                thresh = .05, args_mmd = list(),
-                                args_wass = list(),
-                                args_classifier = list()){
+                                method = c("Classifier", "mmd", "wasserstein_permutation"),
+                                classifer_method = "rf",
+                                thresh = .01, args_classifier = list(),
+                                args_mmd = list(), args_wass = list()){
             method <- match.arg(method)
             if (nLineages(cellWeights) == 1) {
               stop("This only works with more than one lineage.")
@@ -167,14 +171,15 @@ setMethod(f = "differentiationTest",
                              "only the Classifier method is possible."))
             }
             if (slingParams(cellWeights)$reweight | slingParams(cellWeights)$reassign) {
-              ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE) 
+              ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
             } else {
               ws <- .sling_reassign(cellWeights)
             }
-            
+
             res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
+                                        classifer_method = classifer_method,
                                         args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
@@ -188,12 +193,12 @@ setMethod(f = "differentiationTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SingleCellExperiment"),
-          definition = function(cellWeights, conditions,  global = TRUE,
+          definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE,
-                                method = c("mmd", "Classifier", "wasserstein_permutation"),
-                                thresh = .05, args_mmd = list(),
-                                args_wass = list(),
-                                args_classifier = list()){
+                                method = c("Classifier", "mmd", "wasserstein_permutation"),
+                                classifer_method = "rf",
+                                thresh = .01, args_classifier = list(),
+                                args_mmd = list(), args_wass = list()){
             if (is.null(cellWeights@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -208,6 +213,7 @@ setMethod(f = "differentiationTest",
             return(differentiationTest(slingshot::SlingshotDataSet(cellWeights),
                                        conditions = conditions, global = global,
                                        pairwise = pairwise, method = method,
+                                       classifer_method = classifer_method,
                                        thresh = thresh, args_mmd = args_mmd,
                                        args_wass = args_wass,
                                        args_classifier = args_classifier))
