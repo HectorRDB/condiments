@@ -53,6 +53,7 @@
   })
   if (method == "Classifier") {
     args <- args_classifier
+    args$method <- classifer_method
     args$x <- xs; args$thresh <- thresh
     glob_test <- do.call(Ecume::classifier_test, args)
   }
