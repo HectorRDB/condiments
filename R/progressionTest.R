@@ -125,25 +125,22 @@
 #' @param pseudotime Can be either a \code{\link{SlingshotDataSet}} or a
 #' \code{\link{SingleCellExperiment}} object or a matrix of pseudotime values,
 #' each row represents a cell and each column represents a lineage.
-#' @param cellWeights	 A matrix of cell weights defining the probability that a
-#' cell belongs to a particular lineage. Each row represents a cell and each
-#' column represents a lineage. If only a single lineage, provide a matrix with
-#' one column containing all values of 1.
 #' @param conditions Either the vector of conditions, or a character indicating
 #' which column of the metadata contains this vector.
 #' @param global If TRUE, test for all lineages simultaneously.
 #' @param lineages If TRUE, test for all lineages independently.
-#' @param method One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
-#' for the classifier method or "Permutation" for a permutation. See details.
-#' Default to KS if there is two conditions and to "Classifier" otherwise.
+#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
+#' @param method One of "KS", "Classifier", "mmd", "wasserstein_permutation" or
+#'  "Permutation" for a permutation. See details. Default to KS if there is two
+#' conditions and to "Classifier" otherwise.
 #' @param thresh The threshold for the KS test or Classifier test.
-#' Ignored if \code{method = "Permutation"}. Default to .05.
-#' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
-#' Default to \code{1e4}.
+#' Ignored if \code{method = "Permutation"}. Default to .01 for KS and .05 for
+#' the 'classifier'.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
 #' @param args_wass arguments passed to the wasserstein permutation test. See
 #' \code{\link{wasserstein_permut}}.
-#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
+#' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
+#' Default to \code{1e4}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
 #' @importFrom dplyr n_distinct bind_rows mutate select
@@ -193,10 +190,12 @@
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "matrix"),
           definition = function(pseudotime, cellWeights, conditions,
-    global = TRUE, lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(), args_wass = list(),
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+    global = TRUE, lineages = FALSE,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+    thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
+    args_classifier = list(), args_wass = list(), rep = 1e4){
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
+                               "wasserstein_permutation")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
@@ -221,9 +220,10 @@ setMethod(f = "progressionTest",
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "SlingshotDataSet"),
           definition = function(pseudotime, conditions, global = TRUE,
-    lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(), args_wass = list(),
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
+    lineages = FALSE,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+    thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
+    args_classifier = list(), args_wass = list(), rep = 1e4){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
@@ -255,9 +255,10 @@ setMethod(f = "progressionTest",
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "SingleCellExperiment"),
           definition = function(pseudotime, conditions, global = TRUE,
-    lineages = FALSE, thresh = .05, rep = 1e4,
-    args_mmd = list(), args_classifier = list(), args_wass = list(),
-    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")){
+    lineages = FALSE,
+    method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+    thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
+    args_classifier = list(), args_wass = list(), rep = 1e4){
             if (is.null(pseudotime@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }

@@ -15,12 +15,12 @@ progressionTest(pseudotime, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  thresh = 0.05,
-  rep = 10000,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+  thresh = ifelse(method == "Classifer", 0.05, 0.01),
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
+  rep = 10000
 )
 
 \S4method{progressionTest}{SlingshotDataSet}(
@@ -28,12 +28,12 @@ progressionTest(pseudotime, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  thresh = 0.05,
-  rep = 10000,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+  thresh = ifelse(method == "Classifer", 0.05, 0.01),
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
+  rep = 10000
 )
 
 \S4method{progressionTest}{SingleCellExperiment}(
@@ -41,12 +41,12 @@ progressionTest(pseudotime, ...)
   conditions,
   global = TRUE,
   lineages = FALSE,
-  thresh = 0.05,
-  rep = 10000,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+  thresh = ifelse(method == "Classifer", 0.05, 0.01),
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier")
+  rep = 10000
 )
 }
 \arguments{
@@ -56,11 +56,6 @@ each row represents a cell and each column represents a lineage.}
 
 \item{...}{parameters including:}
 
-\item{cellWeights}{A matrix of cell weights defining the probability that a
-cell belongs to a particular lineage. Each row represents a cell and each
-column represents a lineage. If only a single lineage, provide a matrix with
-one column containing all values of 1.}
-
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}
 
@@ -68,11 +63,13 @@ which column of the metadata contains this vector.}
 
 \item{lineages}{If TRUE, test for all lineages independently.}
 
-\item{thresh}{The threshold for the KS test or Classifier test.
-Ignored if \code{method = "Permutation"}. Default to .05.}
+\item{method}{One of "KS", "Classifier", "mmd", "wasserstein_permutation" or
+"Permutation" for a permutation. See details. Default to KS if there is two
+conditions and to "Classifier" otherwise.}
 
-\item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
-Default to \code{1e4}.}
+\item{thresh}{The threshold for the KS test or Classifier test.
+Ignored if \code{method = "Permutation"}. Default to .01 for KS and .05 for
+the 'classifier'.}
 
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
 
@@ -81,9 +78,8 @@ Default to \code{1e4}.}
 \item{args_wass}{arguments passed to the wasserstein permutation test. See
 \code{\link{wasserstein_permut}}.}
 
-\item{method}{One of "KS" for the weighted Kolmogorov-Smirnov, "Classifier"
-for the classifier method or "Permutation" for a permutation. See details.
-Default to KS if there is two conditions and to "Classifier" otherwise.}
+\item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
+Default to \code{1e4}.}
 }
 \value{
 A data frame with 3 columns:

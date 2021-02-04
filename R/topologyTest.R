@@ -157,16 +157,16 @@
 #' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector.
-#' @param rep How many permutations to run. Default to 50.
+#' @param methods The method(s) to use to test. Must be among 'KS_mean',
+#' 'Classifier', "KS_all', "mmd' and 'wasserstein_permutation'. See details.
 #' @param threshs the threshold(s) for the KS test or classifier test.
 #' See \code{\link{ks_test}} and \code{\link{classifier_test}}.
-#' @param methods The method(s) to use to test. Must be among 'KS_mean',
-#' "KS_all', "mmd', 'wasserstein_permutation' and 'Classifier'. See details.
+#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
 #' @param args_wass arguments passed to the wasserstein permutation test. See
 #' \code{\link{wasserstein_permut}}.
-#' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @param nmax How many samples to use to compute the mmd test. See details.
+#' @param rep How many permutations to run. Default to 50.
 #' @return
 #' A list containing the following components:
 #' \itemize{
