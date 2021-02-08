@@ -45,9 +45,7 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   mst_1 <- data.frame(Dim1 = c(-35, -15, 25, 25),
                       Dim2 = c(0, 0, 2, -2))
   mst_2 <- mst_1
-  mst_2 <- mst2[2, 1] <- mst2[2, 1] - shift
-  data.frame(Dim1 = c(-35, -15, 25, 25),
-                      Dim2 = c(0, 0, 2, -2))
+  mst_2[2, 1] <- mst_2[2, 1] - shift
   mst <- bind_rows("A" = mst_1,
                    "B" = mst_2,
                    .id = "conditions")
