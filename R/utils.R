@@ -32,13 +32,26 @@
 #'   depending of lineage assignment for each cell.
 #'   \item \code{conditions}: A vector of length \code{n_cells}. Either A or B
 #'   depending of condition assignment for each cell.
+#'   \item \code{mst}: a data.frame that contains the skeleton of the trajectories
 #' }
 #' @examples
 #' sd <- create_differential_topology()
 #' @importFrom stats runif qnorm pnorm rbinom rnorm
+#' @importFrom dplyr bind_rows
 #' @export
 create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
                                          unbalance_level = .9, speed = 1) {
+  # Create shape
+  mst_1 <- data.frame(Dim1 = c(-35, -15, 25, 25),
+                      Dim2 = c(0, 0, 2, -2))
+  mst_2 <- mst_1
+  mst_2 <- mst2[2, 1] <- mst2[2, 1] - shift
+  data.frame(Dim1 = c(-35, -15, 25, 25),
+                      Dim2 = c(0, 0, 2, -2))
+  mst <- bind_rows("A" = mst_1,
+                   "B" = mst_2,
+                   .id = "conditions")
+  # Generate cells
   sd_1 <- .create_fork(round(n_cells / 2), noise)
   sd_2 <- .create_fork(round(n_cells / 2), noise, speed = speed)
 
@@ -54,7 +67,8 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
   }
   sd <- list(rd = rbind(sd_1$rd, sd_2$rd),
              lineages = c(sd_1$lineages, sd_2$lineages),
-             conditions = rep(c("A", "B"), each = round(n_cells / 2)))
+             conditions = rep(c("A", "B"), each = round(n_cells / 2)),
+             mst = mst)
 
   # Unbalance lineage 2 toward the first condition
   lineage_2 <- sd$lineages == -1 & sd$rd[, 1] > -10

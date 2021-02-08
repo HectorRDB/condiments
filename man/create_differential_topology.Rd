@@ -33,6 +33,7 @@ A list with three components
   depending of lineage assignment for each cell.
   \item \code{conditions}: A vector of length \code{n_cells}. Either A or B
   depending of condition assignment for each cell.
+  \item \code{mst}: a data.frame that contains the skeleton of the trajectories
 }
 }
 \description{
