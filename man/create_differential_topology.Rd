@@ -25,14 +25,11 @@ condition A.}
 \item{speed}{How fast the cells from condition B should differentiate}
 }
 \value{
-A list with three components
+A list with two components
  \itemize{
-  \item \code{rd}: The reduced dimensions coordinates of every cells. An
-  \code{n_cells} by \code{2} matrix
-  \item \code{lineages}: A vector of length \code{n_cells}. Either 1 or 2
-  depending of lineage assignment for each cell.
-  \item \code{conditions}: A vector of length \code{n_cells}. Either A or B
-  depending of condition assignment for each cell.
+  \item \code{sd}: An \code{n_cells} by \code{4} dataframe that contains the
+  reduced dimensions coordinates, lineage assignment (1 or 2) and condition
+  assignment (A or B) for each cell.
   \item \code{mst}: a data.frame that contains the skeleton of the trajectories
 }
 }

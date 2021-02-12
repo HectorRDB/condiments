@@ -24,14 +24,11 @@
 #' @param unbalance_level How much should the bottom lineage be unbalanced toward
 #' condition A.
 #' @param speed How fast the cells from condition B should differentiate
-#' @return A list with three components
+#' @return A list with two components
 #'  \itemize{
-#'   \item \code{rd}: The reduced dimensions coordinates of every cells. An
-#'   \code{n_cells} by \code{2} matrix
-#'   \item \code{lineages}: A vector of length \code{n_cells}. Either 1 or 2
-#'   depending of lineage assignment for each cell.
-#'   \item \code{conditions}: A vector of length \code{n_cells}. Either A or B
-#'   depending of condition assignment for each cell.
+#'   \item \code{sd}: An \code{n_cells} by \code{4} dataframe that contains the
+#'   reduced dimensions coordinates, lineage assignment (1 or 2) and condition
+#'   assignment (A or B) for each cell.
 #'   \item \code{mst}: a data.frame that contains the skeleton of the trajectories
 #' }
 #' @examples
@@ -63,19 +60,18 @@ create_differential_topology <- function(n_cells = 200, noise = .15, shift = 10,
     sd_2$rd[sd_2$lineages == 1, 1][i] <- new_dim_1
     sd_2$rd[sd_2$lineages == 1 , 2][i] <- new_dim_2
   }
-  sd <- list(rd = rbind(sd_1$rd, sd_2$rd),
-             lineages = c(sd_1$lineages, sd_2$lineages),
-             conditions = rep(c("A", "B"), each = round(n_cells / 2)),
-             mst = mst)
+  sd <- data.frame(rbind(sd_1$rd, sd_2$rd),
+                   "lineages" = c(sd_1$lineages, sd_2$lineages),
+                   "conditions" = rep(c("A", "B"), each = round(n_cells / 2)))
 
   # Unbalance lineage 2 toward the first condition
-  lineage_2 <- sd$lineages == -1 & sd$rd[, 1] > -10
+  lineage_2 <- sd$lineages == -1 & sd$Dim1 > -10
   sd$conditions[lineage_2] <- "B"
   change <- sample(which(lineage_2),
                    size = round(sum(lineage_2) * unbalance_level))
   sd$conditions[change] <- "A"
 
-  return(sd)
+  return(list("sd" = sd, "mst" = mst))
 }
 
 # Sds merge ----
