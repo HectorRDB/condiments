@@ -39,7 +39,6 @@ Imports:
     methods,
     pbapply
 RoxygenNote: 7.1.1
-Remotes: github::HectorRDB/Ecume
 Suggests: 
     knitr,
     testthat,
