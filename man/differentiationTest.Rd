@@ -15,7 +15,7 @@ differentiationTest(cellWeights, ...)
   global = TRUE,
   pairwise = FALSE,
   method = c("Classifier", "mmd", "wasserstein_permutation"),
-  classifer_method = "rf",
+  classifier_method = "rf",
   thresh = 0.01,
   args_classifier = list(),
   args_mmd = list(),
@@ -28,7 +28,7 @@ differentiationTest(cellWeights, ...)
   global = TRUE,
   pairwise = FALSE,
   method = c("Classifier", "mmd", "wasserstein_permutation"),
-  classifer_method = "rf",
+  classifier_method = "rf",
   thresh = 0.01,
   args_classifier = list(),
   args_mmd = list(),
@@ -41,7 +41,7 @@ differentiationTest(cellWeights, ...)
   global = TRUE,
   pairwise = FALSE,
   method = c("Classifier", "mmd", "wasserstein_permutation"),
-  classifer_method = "rf",
+  classifier_method = "rf",
   thresh = 0.01,
   args_classifier = list(),
   args_mmd = list(),
@@ -65,6 +65,9 @@ column of the metadata contains this vector}
 \item{pairwise}{If TRUE, test for all pairs independently.}
 
 \item{method}{One of "Classifier" or "mmd".}
+
+\item{classifier_method}{The method used in the classifier test. Default to
+"rf", i.e random forest.}
 
 \item{thresh}{The threshold for the classifier test. See details.
 Default to .05.}

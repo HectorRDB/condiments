@@ -125,6 +125,9 @@
 #' @param pseudotime Can be either a \code{\link{SlingshotDataSet}} or a
 #' \code{\link{SingleCellExperiment}} object or a matrix of pseudotime values,
 #' each row represents a cell and each column represents a lineage.
+#' @param cellWeights If `pseudotime` is a matrix of pseudotime values, this
+#' represent the cell weights for each lineage. Ignored if `pseudotime` is not
+#' a matrix.
 #' @param conditions Either the vector of conditions, or a character indicating
 #' which column of the metadata contains this vector.
 #' @param global If TRUE, test for all lineages simultaneously.

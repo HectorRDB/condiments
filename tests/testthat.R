@@ -1,3 +1,3 @@
-library(DifTopo)
+library(condiments)
 library(testthat)
-test_check("DifTopo")
+test_check("condiments")

@@ -37,7 +37,8 @@ Imports:
     dplyr (>= 1.0),
     Ecume,
     methods,
-    pbapply
+    pbapply,
+    matrixStats
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

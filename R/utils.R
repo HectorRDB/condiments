@@ -172,7 +172,7 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
   Z.prime <- 1 - Z^2
   Z.prime[W == 0] <- NA
   W0 <- W
-  W <- Z.prime / rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
+  W <- Z.prime / matrixStats::rowMaxs(Z.prime,na.rm = TRUE) #rowMins(D) / D
   W[is.nan(W)] <- 1 # handle 0/0
   W[is.na(W)] <- 0
   W[W > 1] <- 1

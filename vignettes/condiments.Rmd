@@ -42,7 +42,7 @@ theme_set(theme_classic())
 
 ```{r}
 data("toy_dataset", package = "condiments")
-df <- data$sd
+df <- toy_dataset$sd
 ```
 
 As such, we start with a matrix `df` of metadata the cells: coordinates in a reduced dimension space `(Dim1, Dim2)`, a vector of conditions assignments `conditions` (A or B) and a lineage assignment.
@@ -63,10 +63,10 @@ We can also visualize the underlying skeleton structure of the two conditions.
 ```{r}
 p <- ggplot(df, aes(x = Dim1, y = Dim2, col = conditions)) +
   geom_point(alpha = .5) +
-  geom_point(data = data$mst, size = 2) +
+  geom_point(data = toy_dataset$mst, size = 2) +
   # We do two groups here to represent the two paths in the tree structure
-  geom_path(data = data$mst %>% filter(Dim2 >= 0), size = 1.5) +
-  geom_path(data = data$mst %>% filter(Dim2 <= 0), size = 1.5) +
+  geom_path(data = toy_dataset$mst %>% filter(Dim2 >= 0), size = 1.5) +
+  geom_path(data = toy_dataset$mst %>% filter(Dim2 <= 0), size = 1.5) +
   scale_color_brewer(type = "qual") + 
   facet_wrap(~conditions)
 p

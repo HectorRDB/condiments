@@ -1,6 +1,6 @@
 .differentiationTest <- function(ws, conditions, global = TRUE, pairwise = FALSE,
                                  method = "Classifier", thresh,
-                                 classifer_method = "rf",
+                                 classifier_method = "rf",
                                  args_mmd = list(), args_classifier = list(),
                                  args_wass = list()) {
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
@@ -22,7 +22,7 @@
     })
     if (method == "Classifier") {
       args <- args_classifier
-      args$method <- classifer_method
+      args$method <- classifier_method
       args$x <- xs; args$thresh <- thresh
       return(do.call(Ecume::classifier_test, args))
     }
@@ -53,7 +53,7 @@
   })
   if (method == "Classifier") {
     args <- args_classifier
-    args$method <- classifer_method
+    args$method <- classifier_method
     args$x <- xs; args$thresh <- thresh
     glob_test <- do.call(Ecume::classifier_test, args)
   }
@@ -104,10 +104,13 @@
 #' @param args_wass arguments passed to the wasserstein permutation test. See
 #' \code{\link{wasserstein_permut}}.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
+#' @param classifier_method The method used in the classifier test. Default to
+#' "rf", i.e random forest.
 #' @importFrom slingshot slingshot SlingshotDataSet
 #' @importFrom utils combn
 #' @importFrom dplyr n_distinct
 #' @importFrom Ecume classifier_test mmd_test wasserstein_permut
+#' @importFrom matrixStats rowMaxs rowMins
 #' @return A data frame with 3 columns:
 #' \itemize{
 #'   \item *pair* for individual pairs, the lineages numbers. For global,
@@ -130,7 +133,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE,
                                 method = c("Classifier", "mmd", "wasserstein_permutation"),
-                                classifer_method = "rf",
+                                classifier_method = "rf",
                                 thresh = .01, args_classifier = list(),
                                 args_mmd = list(), args_wass = list()){
             method <- match.arg(method)
@@ -145,7 +148,7 @@ setMethod(f = "differentiationTest",
             res <- .differentiationTest(ws = cellWeights, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
-                                        classifer_method = classifer_method,
+                                        classifier_method = classifier_method,
                                         args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
@@ -159,7 +162,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE,
                                 method = c("Classifier", "mmd", "wasserstein_permutation"),
-                                classifer_method = "rf",
+                                classifier_method = "rf",
                                 thresh = .01, args_classifier = list(),
                                 args_mmd = list(), args_wass = list()){
             method <- match.arg(method)
@@ -180,7 +183,7 @@ setMethod(f = "differentiationTest",
             res <- .differentiationTest(ws = ws, conditions = conditions,
                                         global = global, pairwise = pairwise,
                                         method = method, thresh = thresh,
-                                        classifer_method = classifer_method,
+                                        classifier_method = classifier_method,
                                         args_mmd = args_mmd, args_wass = args_wass,
                                         args_classifier = args_classifier)
             return(res)
@@ -197,7 +200,7 @@ setMethod(f = "differentiationTest",
           definition = function(cellWeights, conditions, global = TRUE,
                                 pairwise = FALSE,
                                 method = c("Classifier", "mmd", "wasserstein_permutation"),
-                                classifer_method = "rf",
+                                classifier_method = "rf",
                                 thresh = .01, args_classifier = list(),
                                 args_mmd = list(), args_wass = list()){
             if (is.null(cellWeights@int_metadata$slingshot)) {
@@ -214,7 +217,7 @@ setMethod(f = "differentiationTest",
             return(differentiationTest(slingshot::SlingshotDataSet(cellWeights),
                                        conditions = conditions, global = global,
                                        pairwise = pairwise, method = method,
-                                       classifer_method = classifer_method,
+                                       classifier_method = classifier_method,
                                        thresh = thresh, args_mmd = args_mmd,
                                        args_wass = args_wass,
                                        args_classifier = args_classifier))

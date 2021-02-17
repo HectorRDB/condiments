@@ -40,10 +40,10 @@ Compute a imbalance score to show whether nearby cells have the
 same condition of not
 }
 \examples{
-sd <- create_differential_topology(n_cells = 200, shift = 0,
-                                   unbalance_level = 1)
-scores <- imbalance_score(sd$rd, sd$conditions, k = 4)
+data("toy_dataset")
+scores <- imbalance_score(as.matrix(toy_dataset$sd[,1:2]),
+  toy_dataset$sd$conditions, k = 4)
 cols <- as.numeric(cut(scores$scaled_scores, 8))
-plot(sd$rd[, "Dim1"], sd$rd[, "Dim2"], xlab = "Dim1", ylab = "Dim2",
+plot(as.matrix(toy_dataset$sd[, 1:2]), xlab = "Dim1", ylab = "Dim2",
  pch = 16, col = RColorBrewer::brewer.pal(8, "Blues")[cols])
 }

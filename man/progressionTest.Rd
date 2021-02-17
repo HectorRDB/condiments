@@ -56,6 +56,10 @@ each row represents a cell and each column represents a lineage.}
 
 \item{...}{parameters including:}
 
+\item{cellWeights}{If \code{pseudotime} is a matrix of pseudotime values, this
+represent the cell weights for each lineage. Ignored if \code{pseudotime} is not
+a matrix.}
+
 \item{conditions}{Either the vector of conditions, or a character indicating
 which column of the metadata contains this vector.}
 

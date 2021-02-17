@@ -24,7 +24,7 @@
   }
   names(sds_cond@lineages) <- paste0("Lineage", seq_along(sds_cond@lineages))
   # Params
-  sds_cond@slingParams$end.clus <- sapply(sds_cond@lineages, tail, n = 1)
+  sds_cond@slingParams$end.clus <- sapply(sds_cond@lineages, utils::tail, n = 1)
   dist_mat <- sds_cond@slingParams$dist
   dist_mat <- dist_mat[!rownames(dist_mat) %in% cluss, ]
   dist_mat <- dist_mat[, !colnames(dist_mat) %in% cluss]
@@ -44,7 +44,7 @@
     sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
     if (any(colSums(sds_cond@clusterLabels) == 0)) {
       cluss <- colnames(sds_cond@clusterLabels)[
-        colSums(sds_cond@clusterLabels) == 0] 
+        colSums(sds_cond@clusterLabels) == 0]
       clus <- cluss[1]
       message(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
                      "This means you should either lower the clustering resolution before ",
@@ -80,6 +80,7 @@
 #' sdss <- slingshot_conditions(sds, condition)
 #' @export
 #' @importFrom slingshot SlingshotDataSet getCurves
+#' @importFrom utils tail
 #' @importFrom dplyr n_distinct
 #' @rdname slingshot_conditions
 setMethod(f = "slingshot_conditions",
