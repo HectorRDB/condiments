@@ -109,7 +109,7 @@
   )
 }
 
-.topologyTest <- function(sds, conditions, rep = 200, threshs = .05,
+.topologyTest <- function(sds, conditions, rep = 100, threshs = .01,
                           methods = "KS_mean", args_mmd = list(),
                           args_classifier = list(), args_wass = list(),
                           nmax = nrow(slingshot::slingPseudotime(sds))) {
@@ -159,7 +159,7 @@
 #' column of the metadata contains this vector.
 #' @param methods The method(s) to use to test. Must be among 'KS_mean',
 #' 'Classifier', "KS_all', "mmd' and 'wasserstein_permutation'. See details.
-#' @param threshs the threshold(s) for the KS test or classifier test.
+#' @param threshs the threshold(s) for the KS test or classifier test. Default to .01
 #' See \code{\link{ks_test}} and \code{\link{classifier_test}}.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
@@ -199,7 +199,7 @@
 #' @rdname topologyTest
 setMethod(f = "topologyTest",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, rep = 200, threshs = .05,
+          definition = function(sds, conditions, rep = 100, threshs = .01,
     methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     args_mmd = list(), args_classifier = list(), args_wass = list(),
     nmax = nrow(slingshot::slingPseudotime(sds))){
@@ -223,7 +223,7 @@ setMethod(f = "topologyTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "topologyTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions, rep = 200, threshs = .05,
+          definition = function(sds, conditions, rep = 100, threshs = .01,
     methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
     args_mmd = list(), args_classifier = list(), args_wass = list(),
     nmax = nrow(sds)){

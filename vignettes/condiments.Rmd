@@ -15,13 +15,13 @@ vignette: >
 ```{r packages, include=F}
 library(knitr)
 opts_chunk$set(
-  fig.pos = "!h", out.extra = "", warning = FALSE, message = FALSE, 
-  fig.align = "center", echo = FALSE
+  fig.pos = "!h", out.extra = "",
+  fig.align = "center"
 )
 ```
 
 # Initial pre-processing
-
+## Generating a synthetic dataset 
 We will use a synthetic dataset to illustrate the functionalities of the _condiments_ package. We start directly with a dataset where the following steps are assumed to have been run:
 
 + Obtaining count matrices for each setting (i.e. each condition).
@@ -33,6 +33,7 @@ We will use a synthetic dataset to illustrate the functionalities of the _condim
 library(condiments)
 library(slingshot)
 library(RColorBrewer)
+library(dplyr)
 library(viridis)
 library(ggplot2)
 set.seed(2071)
@@ -40,37 +41,46 @@ theme_set(theme_classic())
 ```
 
 ```{r}
-data(list = 'slingshotExample', package = "slingshot")
-if (!"cl" %in% ls()) {
-  rd <- slingshotExample$rd
-  cl <- slingshotExample$cl  
-}
-condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
-condition[110:139] <- 'A'
-df <- data.frame(rd1 = rd[,1],
-                 rd2 = rd[,2],
-                 condition = condition,
-                 cl = cl)
+data("toy_dataset", package = "condiments")
+df <- data$sd
 ```
 
-As such, we start with a matrix `rd` of the cells in the reduced dimension space. In addition, we have a vector conditions `conditions` and a vector a cluster labels `cl`. 
+As such, we start with a matrix `df` of metadata the cells: coordinates in a reduced dimension space `(Dim1, Dim2)`, a vector of conditions assignments `conditions` (A or B) and a lineage assignment.
 
-For a more complete example, please see our [Bioconductor Workshop](https://kstreet13.github.io/bioc2020trajectories/articles/workshopTrajectories.html) on ‘Trajectory inference across conditions: differential expression and differential progression’.
-
-# Differential Topology
-## Exploratory analysis
+## Vizualisation
 
 We can first plot the cells on the reduced dimensions
 
 ```{r}
-ggplot(df, aes(x = rd1, y = rd2, col = condition)) +
+p <- ggplot(df, aes(x = Dim1, y = Dim2, col = conditions)) +
   geom_point() +
   scale_color_brewer(type = "qual")
+p
 ```
+
+We can also visualize the underlying skeleton structure of the two conditions.
+
+```{r}
+p <- ggplot(df, aes(x = Dim1, y = Dim2, col = conditions)) +
+  geom_point(alpha = .5) +
+  geom_point(data = data$mst, size = 2) +
+  # We do two groups here to represent the two paths in the tree structure
+  geom_path(data = data$mst %>% filter(Dim2 >= 0), size = 1.5) +
+  geom_path(data = data$mst %>% filter(Dim2 <= 0), size = 1.5) +
+  scale_color_brewer(type = "qual") + 
+  facet_wrap(~conditions)
+p
+```
+
+# Differential Topology
+## Exploratory analysis
+
+
 We can then compute the __imbalance score__ of each cell using the *imbalance_score* function.
 
 ```{r}
-scores <- imbalance_score(Object = rd, conditions = condition)
+scores <- imbalance_score(Object = df %>% select(Dim1, Dim2) %>% as.matrix(),
+                          conditions = df$conditions)
 df$scores <- scores$scores
 df$scaled_scores <- scores$scaled_scores
 ```
@@ -78,21 +88,20 @@ df$scaled_scores <- scores$scaled_scores
 There are two types of scores. The raw score is computed on each cell and looks at the condition distribution of its neighbors compared the the overall distribution. The size of the neighborhood can be set using the `k` argument, which specify the number of neighbors to consider. Higher values means more local imbalance. 
 
 ```{r}
-ggplot(df, aes(x = rd1, y = rd2, col = scores)) +
+ggplot(df, aes(x = Dim1, y = Dim2, col = scores)) +
   geom_point() +
   scale_color_viridis_c(option = "C")
 ```
-We can then use local smoothers to smooth the scores of individual cells. The smoothness is dictated by the `smooth` argument.
+
+The local scores are quite noisy so we can then use local smoothers to smooth the scores of individual cells. The smoothness is dictated by the `smooth` argument.
 
 ```{r}
-ggplot(df, aes(x = rd1, y = rd2, col = scaled_scores)) +
+ggplot(df, aes(x = Dim1, y = Dim2, col = scaled_scores)) +
   geom_point() +
   scale_color_viridis_c(option = "C")
 ```
 
-As could be guessed from the original plot, the bottom lineage shows a lot of imbalance while the top one does not. 
-
-The imbalance score can be used to check whether the integration has been successful (at least some regions should be balanced), or to identify the regions of imbalance for further analyses.
+As could be guessed from the original plot, the bottom lineage shows a lot of imbalance while the top one does not. The imbalance score can be used to check whether the integration has been successful (at least some regions should be balanced), or to identify the regions of imbalance for further analyses.
 
 ## Trajectory Inference
 
@@ -101,9 +110,14 @@ The first step of our workflow is to decide whether or not to infer the trajecto
 The __topologyTest__ assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on repeated permutations of the conditions followed by trajectory inference so it can take a few seconds.
 
 ```{r}
-sds <- slingshot(rd, cl)
+ggplot(df, aes(x = Dim1, y = Dim2, col = cl)) +
+  geom_point()
+```
+
+```{r}
+sds <- slingshot(as.matrix(df[,1:2]), df$cl)
 ## Takes ~1mn30s to run
-topologyTest(sds = sds, conditions = condition)
+topologyTest(sds = sds, conditions = df$conditions)
 ```
 
 The test fails to reject the null that we can fit a common trajectory so we can continue with the `sds` object.
@@ -120,15 +134,16 @@ df$pst2 <- slingPseudotime(sds)[, 2]
 ## Visualization
 
 ```{r, warning=FALSE}
-ggplot(df, aes(x = pst1, fill = condition)) +
+ggplot(df, aes(x = pst1, fill = conditions)) +
   geom_density(alpha = .5) +
   scale_fill_brewer(type = "qual")+
   labs(x = "Pseudotime for lineage 1", title = "Pseudotime distribution for lineage 1")
 ```
+
 The pseudotime distributions are identical across lineages.
 
 ```{r, warning=FALSE}
-ggplot(df, aes(x = pst2, fill = condition)) +
+ggplot(df, aes(x = pst2, fill = conditions)) +
   geom_density(alpha = .5) +
   scale_fill_brewer(type = "qual")+
   labs(x = "Pseudotime for lineage 2", title = "Pseudotime distribution for lineage 2")
@@ -138,21 +153,21 @@ There are clear differences between the two conditions
 
 ## Testing for differential progression
 
-To test for differential progression, we use the __diffProgressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __diffProgressionTest__ function. Here, we will use the default, the custom KS test.
+To test for differential progression, we use the __progressionTest__. The test can be run with `global = TRUE` to test when pooling all lineages, or `lineages = TRUE` to test every lineage independently, or both. Several tests are implemented in the __progressionTest__. function. Here, we will use the default, the custom KS test.
 
 ```{r}
-progressionTest(sds, conditions = condition, method = "KS", global = TRUE, lineages = TRUE)
+progressionTest(sds, conditions = df$conditions, global = TRUE, lineages = TRUE)
 ```
 
 As expected, there is a global difference over all lineages, which is driven by differences of distribution across lineage 2 (i.e. the bottom one).
 
 ## Testing for differential differentiation
 
-Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. For this, we rely on the kernel two-sample test of Gretton et al. This method is very versatile and can accommodate multivariate distribution (which is the case for the weights vectors when there is more than one lineage).
+Another way to look at this is to consider how the cells of one condition differentiate between two lineages, compared to other conditions. 
 
 ```{r}
 set.seed(12)
-differentiationTest(sds, conditions = condition, global = FALSE, pairwise = TRUE)
+differentiationTest(sds, conditions = df$conditions, global = FALSE, pairwise = TRUE)
 ```
 
 # Differential Expression

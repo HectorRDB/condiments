@@ -11,8 +11,8 @@ topologyTest(sds, ...)
 \S4method{topologyTest}{SlingshotDataSet}(
   sds,
   conditions,
-  rep = 200,
-  threshs = 0.05,
+  rep = 100,
+  threshs = 0.01,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
   args_classifier = list(),
@@ -23,8 +23,8 @@ topologyTest(sds, ...)
 \S4method{topologyTest}{SingleCellExperiment}(
   sds,
   conditions,
-  rep = 200,
-  threshs = 0.05,
+  rep = 100,
+  threshs = 0.01,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
   args_mmd = list(),
   args_classifier = list(),
@@ -43,7 +43,7 @@ column of the metadata contains this vector.}
 
 \item{rep}{How many permutations to run. Default to 50.}
 
-\item{threshs}{the threshold(s) for the KS test or classifier test.
+\item{threshs}{the threshold(s) for the KS test or classifier test. Default to .01
 See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
 \item{methods}{The method(s) to use to test. Must be among 'KS_mean',

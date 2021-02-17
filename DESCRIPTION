@@ -46,4 +46,5 @@ Suggests:
     covr,
     viridis,
     ggplot2,
-    RColorBrewer
+    RColorBrewer,
+    randomForest
