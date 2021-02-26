@@ -3,7 +3,7 @@
 # R package: condiments
 
   <!-- badges: start -->
-  [![R-CMD-check](https://github.com/HectorRDB/condiments/workflows/R-CMD-check/badge.svg?branch=main)](https://github.com/HectorRDB/condiments/actions)
+  [![R-CMD-check](https://github.com/HectorRDB/condiments/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/HectorRDB/condiments/actions)
   <!-- badges: end -->
   
 ## Installation
