@@ -9,8 +9,6 @@ on:
     branches:
       - main
       - master
-  schedule:
-    - cron: '0 8 * * 5'
 
 name: check-devel
 
@@ -120,10 +118,4 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-results
           path: check
-
-      - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'macOS-latest' && matrix.config.r == 'release' && matrix.config.bioc == 'devel'
-        run: |
-          R CMD INSTALL .
-          Rscript -e "remotes::install_dev('pkgdown'); pkgdown::deploy_to_branch(new_process = FALSE)"
 
