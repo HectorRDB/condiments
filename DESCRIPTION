@@ -48,4 +48,5 @@ Suggests:
     viridis,
     ggplot2,
     RColorBrewer,
-    randomForest
+    randomForest,
+    tidyr

@@ -44,3 +44,14 @@ test_that("sds is fitted ok", {
   sdss2 <- slingshot_conditions(sce, "cond")
   expect_equal(sdss1, sdss2)
 })
+
+test_that("missing cluster", {
+  cl2 <- cl
+  cl2[condition == "B" & cl == 4] <- 3
+  sds <- slingshot(rd, cl2)
+  sdss <- slingshot_conditions(sds, condition)
+  expect_is(sdss, "list")
+  expect_is(sdss[[1]], "SlingshotDataSet")
+  expect_is(sdss[[2]], "SlingshotDataSet")
+  new_weights <- condiments:::.sling_reassign(sds)
+})

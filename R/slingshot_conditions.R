@@ -19,8 +19,14 @@
   })
   diag(inside) <- FALSE
   while (any(inside)) {
-    lin <- which(rowSums(inside) > 0)[1]
+    lin <- which(colSums(inside) > 0)[1]
     sds_cond@lineages <- sds_cond@lineages[-lin]
+    inside <- sapply(sds_cond@lineages, function(lin1) {
+      sapply(sds_cond@lineages, function(lin2){
+        return(all(lin1 %in% lin2))
+      })
+    }) %>% as.matrix()
+    diag(inside) <- FALSE
   }
   names(sds_cond@lineages) <- paste0("Lineage", seq_along(sds_cond@lineages))
   # Params
@@ -46,9 +52,11 @@
       cluss <- colnames(sds_cond@clusterLabels)[
         colSums(sds_cond@clusterLabels) == 0]
       clus <- cluss[1]
-      message(paste0("Cluster ", clus, " contains no cells condition", cond, ". ",
-                     "This means you should either lower the clustering resolution before ",
-                     "running trajectory inference or fit one trajectory per condition"))
+      message(paste0("Cluster ", clus, " contains no cells condition ", cond,
+                     ". This means you should either lower the clustering ",
+                     "resolution before running trajectory inference or fit",
+                     " one trajectory per condition"))
+      message("Proceeding through")
       sds_cond <- .clean_mst(sds_cond, cluss)
     }
     sdss[[cond]] <- slingshot::getCurves(sds_cond, approx_points = approx_points,
