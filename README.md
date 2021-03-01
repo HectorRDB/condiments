@@ -1,11 +1,11 @@
-<a href='https://hectorrdb.github.io/condiments'><img src='vignettes/sticker.png' align="right" height="138.5"/></a>
-
-# R package: condiments
-
-  <!-- badges: start -->
+<!-- badges: start -->
   [![R-CMD-check](https://github.com/HectorRDB/condiments/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/HectorRDB/condiments/actions)
-  <!-- badges: end -->
-  
+<!-- badges: end -->
+
+<img src='man/figures/logo.png' align="right" height="138.5"/>
+
+# R package: condiments 
+
 ## Installation
 
 To install the development version in `R`, run 
