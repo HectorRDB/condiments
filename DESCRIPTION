@@ -38,7 +38,8 @@ Imports:
     Ecume,
     methods,
     pbapply,
-    matrixStats
+    matrixStats,
+    BiocParallel
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

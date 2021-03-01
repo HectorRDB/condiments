@@ -14,6 +14,8 @@ topologyTest(sds, ...)
   rep = 100,
   threshs = 0.01,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+  parallel = FALSE,
+  BPPARAM = BiocParallel::bpparam(),
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
@@ -26,10 +28,12 @@ topologyTest(sds, ...)
   rep = 100,
   threshs = 0.01,
   methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+  parallel = FALSE,
+  BPPARAM = BiocParallel::bpparam(),
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  nmax = nrow(sds)
+  nmax = ncol(sds)
 )
 }
 \arguments{
@@ -48,6 +52,13 @@ See \code{\link{ks_test}} and \code{\link{classifier_test}}.}
 
 \item{methods}{The method(s) to use to test. Must be among 'KS_mean',
 'Classifier', "KS_all', "mmd' and 'wasserstein_permutation'. See details.}
+
+\item{parallel}{Logical, defaults to FALSE. Set to TRUE if you want to
+parallellize the fitting.}
+
+\item{BPPARAM}{object of class \code{bpparamClass} that specifies the
+back-end to be used for computations. See
+\code{bpparam} in \code{BiocParallel} package for details.}
 
 \item{args_mmd}{arguments passed to the mmd test. See \code{\link{mmd_test}}.}
 

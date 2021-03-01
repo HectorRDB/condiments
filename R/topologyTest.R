@@ -8,6 +8,7 @@
   return(list("psts" = psts, "ws" = ws))
 }
 
+
 .topologyTest_ks_all <- function(permutations, og, threshs) {
   psts <- lapply(permutations, '[[', 1) %>% do.call(what = 'rbind') %>%
     as.vector()
@@ -110,15 +111,25 @@
 }
 
 .topologyTest <- function(sds, conditions, rep = 100, threshs = .01,
-                          methods = "KS_mean", args_mmd = list(),
+                          methods = "KS_mean", parallel = FALSE,
+                          BPPARAM = BiocParallel::bpparam(), args_mmd = list(),
                           args_classifier = list(), args_wass = list(),
                           nmax = nrow(slingshot::slingPseudotime(sds))) {
   message("Generating permuted trajectories")
   og <- .condition_sling(sds, conditions)
-  permutations <- pbapply::pblapply(seq_len(rep), function(i) {
-    condition <- sample(conditions)
-    return(.condition_sling(sds, condition))
+  permutations <- lapply(seq_len(rep), function(i) {
+    return(sample(conditions))
   })
+  if (parallel) {
+    permutations <- BiocParallel::bplapply(
+      X = permutations, FUN = .condition_sling, sds = sds, BPPARAM = BPPARAM
+    )
+  } else {
+    permutations <- pbapply::pblapply(
+      X = permutations, FUN = .condition_sling, sds = sds
+    )
+  }
+
   res <- list()
   if ("KS_all" %in% methods) {
     message("Running KS-all test")
@@ -161,6 +172,11 @@
 #' 'Classifier', "KS_all', "mmd' and 'wasserstein_permutation'. See details.
 #' @param threshs the threshold(s) for the KS test or classifier test. Default to .01
 #' See \code{\link{ks_test}} and \code{\link{classifier_test}}.
+#' @param parallel Logical, defaults to FALSE. Set to TRUE if you want to
+#' parallellize the fitting.
+#' @param BPPARAM object of class \code{bpparamClass} that specifies the
+#'   back-end to be used for computations. See
+#'   \code{bpparam} in \code{BiocParallel} package for details.
 #' @param args_classifier arguments passed to the classifier test. See \code{\link{classifier_test}}.
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
 #' @param args_wass arguments passed to the wasserstein permutation test. See
@@ -196,22 +212,37 @@
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
 #' @importFrom dplyr n_distinct
 #' @importFrom pbapply pblapply
+#' @importFrom BiocParallel bplapply bpparam
 #' @rdname topologyTest
 setMethod(f = "topologyTest",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, rep = 100, threshs = .01,
-    methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-    args_mmd = list(), args_classifier = list(), args_wass = list(),
-    nmax = nrow(slingshot::slingPseudotime(sds))){
+          definition = function(sds,
+                                conditions,
+                                rep = 100,
+                                threshs = .01,
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                parallel = FALSE,
+                                BPPARAM = BiocParallel::bpparam(),
+                                args_mmd = list(),
+                                args_classifier = list(),
+                                args_wass = list(),
+                                nmax = nrow(slingshot::slingPseudotime(sds))){
             if (n_distinct(conditions) > 2 && methods != "Classifier") {
               warning(paste0("Changing to methods `classifier` since more than ",
                              "two conditions are present."))
               methods <- "Classifier"
             }
-            res <- .topologyTest(sds = sds, conditions = conditions, rep = rep,
-                                 threshs = threshs, methods = methods,
-                                 args_mmd = args_mmd, args_wass = args_wass,
-                                 args_classifier = args_classifier, nmax = nmax)
+            res <- .topologyTest(sds = sds,
+                                 conditions = conditions,
+                                 rep = rep,
+                                 threshs = threshs,
+                                 methods = methods,
+                                 parallel = parallel,
+                                 BPPARAM = BPPARAM,
+                                 args_mmd = args_mmd,
+                                 args_wass = args_wass,
+                                 args_classifier = args_classifier,
+                                 nmax = nmax)
             return(res)
           }
 )
@@ -223,10 +254,17 @@ setMethod(f = "topologyTest",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "topologyTest",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions, rep = 100, threshs = .01,
-    methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
-    args_mmd = list(), args_classifier = list(), args_wass = list(),
-    nmax = nrow(sds)){
+          definition = function(sds,
+                                conditions,
+                                rep = 100,
+                                threshs = .01,
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                parallel = FALSE,
+                                BPPARAM = BiocParallel::bpparam(),
+                                args_mmd = list(),
+                                args_classifier = list(),
+                                args_wass = list(),
+                                nmax = ncol(sds)){
             if (is.null(sds@int_metadata$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -238,9 +276,14 @@ setMethod(f = "topologyTest",
               }
             }
             return(topologyTest(slingshot::SlingshotDataSet(sds),
-                                conditions = conditions, rep = rep,
-                                threshs = threshs, methods = methods,
-                                args_mmd = args_mmd, args_wass = args_wass,
+                                conditions = conditions,
+                                rep = rep,
+                                threshs = threshs,
+                                methods = methods,
+                                parallel = parallel,
+                                BPPARAM = BPPARAM,
+                                args_mmd = args_mmd,
+                                args_wass = args_wass,
                                 args_classifier = args_classifier,
                                 nmax = nmax))
           }

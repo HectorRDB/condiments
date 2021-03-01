@@ -1,0 +1,139 @@
+---
+title: "More controls for the tests used in the condiments workflow"
+author: "Hector Roux de Bézieux"
+date: '`r format(Sys.time(), "%d %B , %Y")`'
+bibliography: ref.bib
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Using condiments}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r packages, include=F}
+library(knitr)
+opts_chunk$set(
+  fig.pos = "!h", out.extra = "",
+  fig.align = "center"
+)
+```
+
+This vignette is made for users that are already familiar with the basic *condiments* workflow described in [the first vignette](https://hectorrdb.github.io/condiments/articles/condiments.html). Here, we will show how to modify the default parameters for the first two steps of the workflow
+
+```{r, warning=FALSE, message=F}
+# For analysis
+library(condiments)
+library(slingshot)
+set.seed(21)
+```
+
+# Toy dataset
+
+We rely on the same toy dataset as the first vignette
+
+```{r}
+data("toy_dataset", package = "condiments")
+df <- toy_dataset$sd
+rd <- as.matrix(df[, c("Dim1", "Dim2")])
+sds <- slingshot(rd, df$cl)
+```
+
+# The __topologyTest__ function
+
+By default, the __topologyTest__ function requires only two inputs, the `sds` object and the `condition` labels. To limit run time for the vignette, we also change the default number of permutations used to generate trajectories under the null by setting the `rep` argument to $10$ instead of the default $100$. As such, the test statistics might be more variable.
+
+```{r}
+top_res <- topologyTest(sds = sds, conditions = df$conditions, rep = 10)
+knitr::kable(top_res)
+```
+
+## Changing the method or the threshold
+
+The __topologyTest__ function can be relatively slow on large datasets. Moreover, when changing the method used to test the null hypothesis that a common trajectory should be fitted, the first permutation part of generating `rep` trajectories under the null is identical. Therefore, we allow users to specify more than one method and one value of the threshold. Here, we will use both the Kolmogorov-Smirnov test test[@smirnov1939estimation] and the classifier-test[@Lopez-Paz2016]. 
+
+```{r}
+top_res <- topologyTest(sds = sds, conditions = df$conditions, rep = 10,
+                        methods = c("KS_mean", "Classifier"),
+                        threshs = c(0, .01, .05, .1))
+knitr::kable(top_res)
+```
+
+To see all methods avaible, use `r help(topologyTest)` and look at the `methods` argument.
+
+## Passing arguments to the test method
+
+For all methods but the KS test, additional paramters can be specified, using a custom argument: `args_classifier`, `args_wass` or `args_mmd`. See the help file for given test more information on those parameters. For example, since the default test based on the wasserstein distance and permutation test is quite slow, we can pass a `fast` argument.
+
+```{r}
+top_res <- topologyTest(sds = sds, conditions = df$conditions, rep = 10,
+                        methods = "wasserstein_permutation",
+                        args_wass = list(fast = TRUE, S = 100, iterations  = 10^2))
+knitr::kable(top_res)
+```
+
+## Using parallelisation
+
+For now, the first part of the __topologyTest__ has been designed for parallelisation using the *BiocParallel* package. For example, to run with 4 cores, you can run the following command
+
+```{r, eval = FALSE}
+library(BiocParallel)
+BPPARAM <- bpparam()
+BPPARAM$progressbar <- TRUE
+BPPARAM$workers <- 4
+top_res <- topologyTest(sds = sds, conditions = df$conditions, rep = 100, 
+                        parallel = TRUE, BPPARAM = BPPARAM)
+knitr::kable(top_res)
+```
+
+# Differential progression and differentiation
+
+The tests for the second test are much less compute-intensive, therefore there is no parallelisation. However, the other changes introduce in the previous section are still possible
+
+## Default
+
+```{r}
+prog_res <- progressionTest(sds, conditions = df$conditions)
+knitr::kable(prog_res)
+dif_res <- differentiationTest(sds, conditions = df$conditions)
+knitr::kable(dif_res)
+```
+
+## Changing the method and / or threshold
+
+```{r}
+prog_res <- progressionTest(sds, conditions = df$conditions, method = "Classifier")
+knitr::kable(prog_res)
+dif_res <- differentiationTest(sds, conditions = df$conditions, thresh = .05)
+knitr::kable(dif_res)
+```
+
+## Passing more parameters to the test methods
+
+```{r}
+prog_res <- progressionTest(sds, conditions = df$conditions, method = "Classifier",
+                            args_classifier = list(method = "rf"))
+knitr::kable(prog_res)
+dif_res <- differentiationTest(sds, conditions = df$conditions)
+knitr::kable(dif_res)
+```
+
+
+# Conclusion
+
+For all of the above procedures, it is important to note that we are making multiple comparisons. The p-values we obtain from these tests should be corrected for multiple testing, especially for trajectories with a large number of lineages.
+
+That said, trajectory inference is often one of the last computational methods in a very long analysis pipeline (generally including gene-level quantification, gene filtering / feature selection, and dimensionality reduction). Hence, we strongly discourage the reader from putting too much faith in any p-value that comes out of this analysis. Such values may be useful suggestions, indicating particular features or cells for follow-up study, but should generally not be treated as meaningful statistical quantities.
+
+If some commands and parameters are still unclear after going through this vignette, do not hesitate to open an issue on the *condiments* [Github repository](https://​github.com/​HectorRDB/​condiments/issues).
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+# References
+

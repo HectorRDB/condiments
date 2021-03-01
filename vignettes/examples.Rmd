@@ -1,0 +1,24 @@
+---
+title: "Generating toy datasets"
+author: "Hector Roux de Bézieux"
+date: '`r format(Sys.time(), "%d %B , %Y")`'
+bibliography: ref.bib
+output: 
+  rmarkdown::html_document:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Generating more examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r packages, include=F}
+library(knitr)
+opts_chunk$set(
+  fig.pos = "!h", out.extra = "",
+  fig.align = "center"
+)
+```
+
+To investigate all the parameters of the __create_differential_topology__, you can refer to the [code used to produce the first figure of the paper](https://hectorrdb.github.io/condimentsPaper//articles/Examples.html) associated with *condiments*. 

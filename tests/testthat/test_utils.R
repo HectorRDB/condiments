@@ -43,7 +43,7 @@ test_that("imbalance score works", {
 test_that("example work", {
   test <- create_differential_topology()
   expect_equal(dim(test$sd), c(200, 4))
-  expect_equal(dim(test$mst), c(8, 3))
+  expect_equal(dim(test$mst), c(12, 4))
 })
 
 
