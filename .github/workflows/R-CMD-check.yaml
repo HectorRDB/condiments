@@ -25,8 +25,7 @@ jobs:
         config:
           # - { os: windows-latest, r: 'release', bioc: '3.12'}
           # - { os: macOS-latest, r: 'release', bioc: '3.12'}
-          - { os: ubuntu-20.04, r: 'release', bioc: '3.12', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
-          # - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
+          - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -127,14 +126,8 @@ jobs:
           covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")
         shell: Rscript {0}
 
-      - name: Install deploy dependencies
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'ubuntu-20.04' && matrix.config.r == 'release'
-        run: |
-          apt-get update
-          apt-get -y install rsync
-
       - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'ubuntu-20.04' && matrix.config.r == 'release'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release'
         run: |
           R CMD INSTALL .
           Rscript -e "remotes::install_dev('pkgdown'); pkgdown::deploy_to_branch(new_process = FALSE)"
