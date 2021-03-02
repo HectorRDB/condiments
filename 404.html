@@ -8,6 +8,13 @@
 
 <title>Page not found (404) • condiments</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="http://hectorrdb.github.io//condiments/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://hectorrdb.github.io//condiments/favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="http://hectorrdb.github.io//condiments/apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="http://hectorrdb.github.io//condiments/apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="http://hectorrdb.github.io//condiments/apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="http://hectorrdb.github.io//condiments/apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -40,8 +47,7 @@
 
 
 <meta property="og:title" content="Page not found (404)" />
-
-
+<meta property="og:image" content="http://hectorrdb.github.io//condiments/logo.png" />
 
 
 
@@ -57,19 +63,12 @@
 
 
 
-  
-
-  
-
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    
-
     <div class="container template-title-body">
       <header>
-      <body>
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
@@ -86,28 +85,47 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="http://hectorrdb.github.io//condiments/articles/condiments.html">Get started</a>
+        <li>
+  <a href="index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
 </li>
 <li>
-  <a href="http://hectorrdb.github.io//condiments/reference/index.html">Reference</a>
+  <a href="articles/condiments.html">Get started</a>
+</li>
+<li>
+  <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="articles/controls.html">More controls for the tests used in the condiments workflow</a>
+    </li>
+    <li>
+      <a href="articles/examples.html">Generating toy datasets</a>
+    </li>
+  </ul>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
   <a href="https://github.com/HectorRDB/condiments">
     <span class="fas fa-github"></span>
      
   </a>
 </li>
       </ul>
-</div>
-<!--/.nav-collapse -->
-  </div>
-<!--/.container -->
-</div>
-<!--/.navbar -->
-</body>
+      
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
       
 
       </header>
@@ -134,11 +152,11 @@ Content not found. Please use links in the navbar.
 
       <footer>
       <div class="copyright">
-  <p><p>Developed by Hector Roux de Bezieux, Koen Van den Berge, Kelly Street.</p></p>
+  <p>Developed by Hector Roux de Bezieux, Koen Van den Berge, Kelly Street.</p>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9000.</p></p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
@@ -146,8 +164,6 @@ Content not found. Please use links in the navbar.
 
   
 
-
-  
 
   </body>
 </html>
