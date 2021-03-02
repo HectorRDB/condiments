@@ -25,7 +25,9 @@ jobs:
         config:
           # - { os: windows-latest, r: 'release', bioc: '3.12'}
           # - { os: macOS-latest, r: 'release', bioc: '3.12'}
-          - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
+          # - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
+          - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:devel'}
+
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -127,8 +129,9 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release' && matrix.config.bioc == 'devel'
         run: |
           R CMD INSTALL .
           Rscript -e "remotes::install_dev('pkgdown'); pkgdown::deploy_to_branch(new_process = FALSE)"
+
 
