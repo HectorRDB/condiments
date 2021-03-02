@@ -25,7 +25,7 @@ jobs:
         config:
           # - { os: windows-latest, r: 'release', bioc: '3.12'}
           # - { os: macOS-latest, r: 'release', bioc: '3.12'}
-          - { os: ubuntu-20.04, r: 'devel', bioc: '3.12', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - { os: ubuntu-20.04, r: 'release', bioc: '3.12', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
 
     env:
