@@ -36,7 +36,8 @@ test_that("The topologyTest work on expected tests",{
   # Input SlingshotDataSet
   set.seed(21)
   test <- topologyTest(sds = sds, conditions = condition, rep = 2, methods =
-                         c("KS_all", "Classifier", "mmd"), threshs = c(0, .01))
+                         c("KS_all", "Classifier", "mmd", "wasserstein_permutation"),
+                       threshs = c(0, .01))
   expect_is(test, "data.frame")
   expect_true(all(test$statistic[1:4] >= 0))
   expect_true(all(test$p.value >= 0) & all(test$p.value <= 1))

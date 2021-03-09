@@ -92,7 +92,7 @@
     args$frac <- frac
     glob_test <- do.call(Ecume::mmd_test, args)
   }
-  if (method == "wass") {
+  if (method == "wasserstein_permutation") {
     n <- max(table(conditions))
     S <- min(10^5, n)
     args <- args_wass
@@ -206,9 +206,6 @@ setMethod(f = "progressionTest",
                              "two conditions are present."))
               method <- "Classifier"
             }
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
-              stop("Method must be one of KS, Classifier, mmd or permutation")
-            }
             res <- .progressionTest(pst = pseudotime, ws = cellWeights,
                                     conditions = conditions, global = global,
                                     lineages = lineages, method = method,
@@ -227,16 +224,14 @@ setMethod(f = "progressionTest",
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
     args_classifier = list(), args_wass = list(), rep = 1e4){
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
+                               "wasserstein_permutation")) {
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning(paste0("Changing to method classifier since more than ",
                              "two conditions are present."))
               method <- "Classifier"
-            }
-            if (!method %in% c("KS", "Permutation", "Classifier", "mmd")) {
-              stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             pst <- slingshot::slingPseudotime(pseudotime, na = FALSE)
             ws <- slingshot::slingCurveWeights(pseudotime, as.probs = TRUE)

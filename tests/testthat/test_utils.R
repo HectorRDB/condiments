@@ -38,6 +38,7 @@ test_that("imbalance score works", {
   expect_equal(score1, score2)
   expect_true(all(score$scores == score2$scores$scores))
   expect_true(all(score$scaled_scores == score2$scores$scaled_scores))
+  expect_error(imbalance_score(rd, conditions = rep(1, nrow(rd))))
 })
 
 test_that("example work", {

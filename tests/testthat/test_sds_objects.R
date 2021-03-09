@@ -24,6 +24,22 @@ test_that("Sds does merge correctly",{
                  quantile(slingPseudotime(sds, na = FALSE)[, 2]))
 })
 
+test_that("Sds fail when it should", {
+  expect_error(merge_sds(sds, sds@reducedDim, scale = FALSE,
+                          mapping = matrix(c(1, 1, 2, 2), nrow = 2,
+                                           byrow = TRUE)))
+  expect_error(merge_sds(sds, sds, scale = FALSE, condition_id = 1:2,
+                         mapping = matrix(c(1, 1, 2, 2), nrow = 1,
+                                          byrow = TRUE)))
+  sds2 <- sds
+  sds2@curves$curve2 <- NULL
+  expect_error(merge_sds(sds, sds2, scale = FALSE,
+                         mapping = matrix(c(1, 1, 2, 2), nrow = 1,
+                                          byrow = TRUE)))
+  expect_error(merge_sds(sds, sds, scale = FALSE,
+                         mapping = matrix(c(1, 1, 3, 2), nrow = 2,
+                                          byrow = TRUE)))
+})
 test_that("sds is fitted ok", {
   sdss <- slingshot_conditions(sds, condition)
   expect_is(sdss, "list")
@@ -53,5 +69,4 @@ test_that("missing cluster", {
   expect_is(sdss, "list")
   expect_is(sdss[[1]], "SlingshotDataSet")
   expect_is(sdss[[2]], "SlingshotDataSet")
-  new_weights <- condiments:::.sling_reassign(sds)
 })

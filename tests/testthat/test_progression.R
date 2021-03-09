@@ -61,9 +61,36 @@ test_that("The progressionTest work on all tests", {
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
+  set.seed(23)
   test <- progressionTest(pseudotime = sds, conditions = condition, rep = 2,
                           method = "mmd")
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
+  set.seed(23)
+  condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
+  test <- progressionTest(pseudotime = sds, conditions = condition, rep = 2,
+                          method = "wasserstein_permutation")
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
+})
+
+test_that("The progressionTest error when it should", {
+  # Error when wrong condition and sds
+  expect_error(progressionTest(pseudotime = sds, conditions = condition, rep = 2,
+                               method = "bulls**t"))
+  # Error when wrong condition and matrix
+  pst <- slingPseudotime(sds, na = FALSE)
+  ws <- slingCurveWeights(sds)
+  set.seed(12)
+  expect_error(progressionTest(pseudotime = pst, cellWeights = ws,
+                               conditions = condition, rep = 2,
+                               method = "bulls**t"))
+  # Error when missing sds
+  pd <- DataFrame(cond = condition)
+  rownames(pd) <- colnames(sds)
+  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
+                              colData = pd)
+  expect_error(progressionTest(pseudotime = sce, conditions = "cond", rep = 2))
 })

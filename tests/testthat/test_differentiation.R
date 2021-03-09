@@ -57,4 +57,29 @@ test_that("The differentiationTest work on all tests",{
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
+  test <- differentiationTest(cellWeights = sds, conditions = condition,
+                              method = "wasserstein_permutation")
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
 })
+
+
+test_that("The differentiationTest error when it should", {
+  pd <- DataFrame(cond = condition)
+  rownames(pd) <- colnames(sds)
+  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
+                              colData = pd)
+  expect_error(differentiationTest(cellWeights = sce, conditions = "cond"))
+})
+
+test_that("The function wroks when reassign is false",{
+  sds <- slingshot(rd, cl, reassign = FALSE, reweight = FALSE)
+  set.seed(23)
+  test <- differentiationTest(cellWeights = sds, conditions = condition,
+                              method = "Classifier")
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("pair", "statistic", "p.value"))
+})
+

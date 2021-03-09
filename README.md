@@ -1,5 +1,6 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/HectorRDB/condiments/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/HectorRDB/condiments/actions)
+  [![Codecov test coverage](https://codecov.io/gh/HectorRDB/condiments/branch/master/graph/badge.svg)](https://codecov.io/gh/HectorRDB/condiments?branch=master)
 <!-- badges: end -->
 
 <img src='man/figures/logo.png' align="right" height="138.5"/>
