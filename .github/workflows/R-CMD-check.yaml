@@ -23,8 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-latest, r: 'release', bioc: '3.12'}
-          - { os: macOS-latest, r: 'release', bioc: '3.12'}
           - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
 
 
