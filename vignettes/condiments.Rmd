@@ -128,7 +128,20 @@ top_res <- topologyTest(sds = sds, conditions = df$conditions)
 knitr::kable(top_res)
 ```
 
-The test clearly fails to reject the null that we can fit a common trajectory so we can continue with the `sds` object. This will facilitate downstream analysis. For an example of how to proceed if the __topologyTest__, we invite the user to refer to [one of the case studies used in our paper](https://hectorrdb.github.io/condimentsPaper/articles/KRAS.html).
+The test clearly fails to reject the null that we can fit a common trajectory so we can continue with the `sds` object. This will facilitate downstream analysis. For an example of how to proceed if the __topologyTest__ reject the null, we invite the user to refer to [relevant case study used in our paper](https://hectorrdb.github.io/condimentsPaper/articles/KRAS.html).
+
+We can thus visualize the trajectory
+
+```{r}
+ggplot(df, aes(x = Dim1, y = Dim2, col = cl)) +
+  geom_point() +
+  geom_path(data = slingCurves(sds)[[1]]$s[slingCurves(sds)[[1]]$ord, ] %>%
+              as.data.frame(), col = "black", size = 2) +
+  geom_path(data = slingCurves(sds)[[2]]$s[slingCurves(sds)[[2]]$ord, ] %>%
+              as.data.frame(),
+            col = "black", size = 2) +
+  NULL
+```
 
 # Differential Progression
 
