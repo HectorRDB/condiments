@@ -1,6 +1,7 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/HectorRDB/condiments/workflows/R-CMD-check/badge.svg?branch=master)](https://github.com/HectorRDB/condiments/actions)
   [![Codecov test coverage](https://codecov.io/gh/HectorRDB/condiments/branch/master/graph/badge.svg)](https://codecov.io/gh/HectorRDB/condiments?branch=master)
+  [![Generic badge](https://img.shields.io/static/v1?label=DOI&message=10.1101/2021.03.09.433671&color=brightgreen)](https://doi.org/10.1101/2021.03.09.433671)
 <!-- badges: end -->
 
 <img src='man/figures/logo.png' align="right" height="138.5"/>
