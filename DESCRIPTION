@@ -1,7 +1,7 @@
 Package: condiments
 Type: Package
 Title: Differential Topology, Progression and Differentiation
-Version: 0.99.0
+Version: 0.99.1
 Date: 2020-09-17
 Authors@R: c(person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
                      email = "hector.rouxdebezieux@berkeley.edu",
@@ -13,7 +13,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 URL: https://hectorrdb.github.io/condiments/index.html
-Depends: R (>= 4.0)
+Depends: R (>= 4.1)
 VignetteBuilder: knitr
 biocViews:
     RNASeq,
