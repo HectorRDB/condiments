@@ -11,6 +11,19 @@ methods::setGeneric(
   }
 )
 
+#' @export
+#' @name weights_from_pst
+#' @title weights_from_pst
+#' @import methods
+#' @param pseudotime A matrix or data.frame of \[ncells\] by \[nCurves\].
+methods::setGeneric(
+  name = "weights_from_pst",
+  signature = "pseudotime",
+  def = function(pseudotime, ...) {
+    standardGeneric("weights_from_pst")
+  }
+)
+
 
 #' @export
 #' @name topologyTest

@@ -1,3 +1,44 @@
+.weights_from_pst <- function(pseudotime) {
+  ws <- lapply(pseudotime, is.na) %>%
+    as.data.frame()
+  ws <- !ws
+  ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
+  return(ws)
+}
+
+#' Create weight matrix for methods without partial weights
+#'
+#' @description Most trajectory inference methods do not perform soft assignment
+#' but instead assign cells to all possible lineages before a branching point,
+#' and then to one or another. This function re-creates a weight matrix from those
+#' matrices of pseudotime
+#'
+#' @return A object of the same type and dimensions as the original object, with the
+#' weights for each curve and cell.
+#' @examples
+#' data(list = 'slingshotExample', package = "slingshot")
+#' if (!"cl" %in% ls()) {
+#'   rd <- slingshotExample$rd
+#'   cl <- slingshotExample$cl
+#' }
+#' sds <- slingshot::slingshot(rd, cl)
+#' weights_from_pst(slingPseudotime(sds))
+#' @export
+#' @rdname weights_from_pst
+setMethod(f = "weights_from_pst",
+          signature = c(pseudotime = "matrix"),
+          definition = function(pseudotime){
+            return(as.matrix(.weights_from_pst(as.data.frame(pseudotime))))
+          }
+)
+
+setMethod(f = "weights_from_pst",
+          signature = c(pseudotime = "data.frame"),
+          definition = function(pseudotime){
+            return(.weights_from_pst(pseudotime))
+          }
+)
+
 # Sds merge ----
 
 #' Merge slingshots datasets
