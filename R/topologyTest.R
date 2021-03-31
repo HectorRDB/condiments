@@ -228,8 +228,8 @@ setMethod(f = "topologyTest",
                                 args_wass = list(),
                                 nmax = nrow(slingshot::slingPseudotime(sds))){
             if (n_distinct(conditions) > 2 && methods != "Classifier") {
-              warning(paste0("Changing to methods `classifier` since more than ",
-                             "two conditions are present."))
+              warning("Changing to methods `classifier` since more than ",
+                      "two conditions are present.")
               methods <- "Classifier"
             }
             res <- .topologyTest(sds = sds,

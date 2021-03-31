@@ -202,8 +202,8 @@ setMethod(f = "progressionTest",
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
-              warning(paste0("Changing to method classifier since more than ",
-                             "two conditions are present."))
+              warning("Changing to method classifier since more than ",
+                      "two conditions are present.")
               method <- "Classifier"
             }
             res <- .progressionTest(pst = pseudotime, ws = cellWeights,
@@ -229,8 +229,8 @@ setMethod(f = "progressionTest",
               stop("Method must be one of KS, Classifier, mmd or permutation")
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
-              warning(paste0("Changing to method classifier since more than ",
-                             "two conditions are present."))
+              warning("Changing to method classifier since more than ",
+                      "two conditions are present.")
               method <- "Classifier"
             }
             pst <- slingshot::slingPseudotime(pseudotime, na = FALSE)

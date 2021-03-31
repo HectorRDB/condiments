@@ -10,9 +10,21 @@
 
 ## Installation
 
+You can install the `condiments` from the devel branch of [bioconductor](https://www.bioconductor.org/packages/devel/bioc/html/condiments.html) using
+
+```r
+if(!requireNamespace("BiocManager", quietly = TRUE)) {
+ install.packages("BiocManager") 
+}
+BiocManager::install("tradeSeq")
+```
+
 To install the development version in `R`, run 
 
 ```r
+if(!requireNamespace("devtools", quietly = TRUE)) {
+ install.packages("devtools") 
+}
 devtools::install_github("HectorRDB/condiments")
 ```
 

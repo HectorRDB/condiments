@@ -142,8 +142,8 @@ setMethod(f = "differentiationTest",
             }
             if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
               method <- "Classifier"
-              warning(paste0("If more than two conditions are present, ",
-                             "only the Classifier method is possible."))
+              warning("If more than two conditions are present, ",
+                      "only the Classifier method is possible.")
             }
             res <- .differentiationTest(ws = cellWeights, conditions = conditions,
                                         global = global, pairwise = pairwise,
@@ -171,8 +171,8 @@ setMethod(f = "differentiationTest",
             }
             if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
               method <- "Classifier"
-              warning(paste0("If more than two conditions are present, ",
-                             "only the Classifier method is possible."))
+              warning("If more than two conditions are present, ",
+                      "only the Classifier method is possible.")
             }
             if (slingParams(cellWeights)$reweight | slingParams(cellWeights)$reassign) {
               ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
