@@ -22,7 +22,7 @@
 #'   cl <- slingshotExample$cl
 #' }
 #' sds <- slingshot::slingshot(rd, cl)
-#' weights_from_pst(slingPseudotime::slingPseudotime(sds))
+#' weights_from_pst(slingshot::slingPseudotime(sds))
 #' @export
 #' @rdname weights_from_pst
 setMethod(f = "weights_from_pst",
