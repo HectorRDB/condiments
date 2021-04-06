@@ -10,7 +10,6 @@ if (!"cl" %in% ls()) {
 }
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
-tsc <- TSCANorder(rd, cl)
 mst <- createClusterMST(rd, cl)
 mapping <- mapCellsToEdges(rd, mst, cl)
 ordering <- pathStat(orderCells(mapping, mst, start = 1))
