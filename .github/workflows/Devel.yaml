@@ -25,10 +25,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-latest, r: 'release', bioc: '3.12'}
-          - { os: macOS-latest, r: 'release', bioc: '3.12'}
-          - { os: ubuntu-20.04, r: 'devel', bioc: 'devel', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
-          - { os: ubuntu-latest, r: 'devel', image: 'bioconductor/bioconductor_docker:devel'}
+          - { os: windows-latest, r: 'devel', bioc: '3.13'}
+          - { os: macOS-latest, r: 'devel', bioc: '3.13'}
+          - { os: ubuntu-20.04, r: 'devel', bioc: '3.13', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          # - { os: ubuntu-latest, r: 'devel', image: 'bioconductor/bioconductor_docker:devel'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -90,7 +90,18 @@ jobs:
           local_deps <- remotes::local_package_deps(dependencies = TRUE)
           deps <- remotes::dev_package_deps(dependencies = TRUE, repos = BiocManager::repositories())
           BiocManager::install(local_deps[local_deps %in% deps$package[deps$diff != 0]], Ncpu = 2L)
-          remotes::install_cran('rcmdcheck', Ncpu = 2L)
+        shell: Rscript {0}
+
+      - name: Install remaining dependencies
+        run: |
+          ## Pass #2 at installing dependencies
+          message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
+          remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = FALSE, upgrade = TRUE)
+          ## For running the checks
+          message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
+          remotes::install_cran("rcmdcheck")
+          BiocManager::install("BiocCheck")
+          BiocManager::install("DelayedMatrixStats")
         shell: Rscript {0}
 
       - name: Session info
@@ -106,7 +117,6 @@ jobs:
 
       - name: BiocCheck
         run: |
-          BiocManager::install("BiocCheck")
           BiocCheck::BiocCheck(".")
         shell: Rscript {0}
 

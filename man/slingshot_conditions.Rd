@@ -4,6 +4,7 @@
 \alias{slingshot_conditions}
 \alias{slingshot_conditions,SlingshotDataSet-method}
 \alias{slingshot_conditions,SingleCellExperiment-method}
+\alias{slingshot_conditions,PseudotimeOrdering-method}
 \title{Refitting slingshot per condition}
 \usage{
 slingshot_conditions(sds, ...)
@@ -11,6 +12,8 @@ slingshot_conditions(sds, ...)
 \S4method{slingshot_conditions}{SlingshotDataSet}(sds, conditions, approx_points = 100, ...)
 
 \S4method{slingshot_conditions}{SingleCellExperiment}(sds, conditions, approx_points = 100, ...)
+
+\S4method{slingshot_conditions}{PseudotimeOrdering}(sds, conditions, approx_points = 100, ...)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a

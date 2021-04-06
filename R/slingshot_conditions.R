@@ -1,62 +1,65 @@
+.message_missing_clus <- function(clus, cond) {
+  message(paste0("Cluster ", clus, " contains no cells condition ", cond,
+                 ". This means you should either lower the clustering ",
+                 "resolution before running trajectory inference or fit",
+                 " one trajectory per condition"))
+  message("Proceeding through")
+  return(NULL)
+}
+
 .clean_mst <- function(sds_cond, cluss) {
   # Lineage List
-  sds_cond@lineages <- lapply(sds_cond@lineages, function(lin) {
+  sds_cond@metadata$lineages <- lapply(slingLineages(sds_cond),
+                                       function(lin) {
     return(lin[!lin %in% cluss])
   })
-  # Adjency matrix
-  mat <- sds_cond@adjacency
-  mat <- mat[!rownames(mat) %in% cluss, ]
-  mat <- mat[, !colnames(mat) %in% cluss]
-  sds_cond@adjacency <- mat
+  # mst
+  for (clus in cluss) {
+    sds_cond@metadata$mst <- igraph::delete_vertices(slingMST(sds_cond), clus)
+  }
   # Cluster Labels
-  sds_cond@clusterLabels <- sds_cond@clusterLabels[,
-        !colnames(sds_cond@clusterLabels) %in% cluss]
+  sds_cond@elementMetadata$clusterLabels <- slingClusterLabels(sds_cond)[,
+                          !colnames(slingClusterLabels(sds_cond)) %in% cluss]
   # Clean lineage list
-  inside <- sapply(sds_cond@lineages, function(lin1) {
-    sapply(sds_cond@lineages, function(lin2){
+  inside <- sapply(slingLineages(sds_cond), function(lin1) {
+    sapply(slingLineages(sds_cond), function(lin2){
       return(all(lin1 %in% lin2))
     })
   })
   diag(inside) <- FALSE
   while (any(inside)) {
     lin <- which(colSums(inside) > 0)[1]
-    sds_cond@lineages <- sds_cond@lineages[-lin]
-    inside <- sapply(sds_cond@lineages, function(lin1) {
-      sapply(sds_cond@lineages, function(lin2){
+    sds_cond@metadata$lineages <- slingLineages(sds_cond)[-lin]
+    inside <- sapply(slingLineages(sds_cond), function(lin1) {
+      sapply(slingLineages(sds_cond), function(lin2){
         return(all(lin1 %in% lin2))
       })
-    }) %>% as.matrix()
+    })
+    inside <- as.matrix(inside)
     diag(inside) <- FALSE
   }
-  names(sds_cond@lineages) <- paste0("Lineage", seq_along(sds_cond@lineages))
+  names(sds_cond@metadata$lineages) <-
+    paste0("Lineage", seq_along(slingLineages(sds_cond)))
   # Params
-  sds_cond@slingParams$end.clus <- sapply(sds_cond@lineages, utils::tail, n = 1)
-  dist_mat <- sds_cond@slingParams$dist
-  dist_mat <- dist_mat[!rownames(dist_mat) %in% cluss, ]
-  dist_mat <- dist_mat[, !colnames(dist_mat) %in% cluss]
-  sds_cond@slingParams$dist <- dist_mat
+  sds_cond@metadata$slingParams$end.clus <-
+    sapply(slingLineages(sds_cond), utils::tail, n = 1)
+  sds_cond <- sds_cond[,paste0("Lineage", seq_along(slingLineages(sds_cond)))]
   return(sds_cond)
 }
 
-.slingshot_conditions <- function(sds, conditions, approx_points = 100, ...) {
+.sling_cond <- function(sds, conditions, approx_points = 100, ...) {
   if (n_distinct(conditions) == 1) {
     cond <- conditions[1]
     return(list(cond = sds))
   }
   sdss <- list()
   for (cond in unique(conditions)) {
-    sds_cond <- sds
-    sds_cond@reducedDim <- sds_cond@reducedDim[conditions == cond, ]
-    sds_cond@clusterLabels <- sds_cond@clusterLabels[conditions == cond, ]
-    if (any(colSums(sds_cond@clusterLabels) == 0)) {
-      cluss <- colnames(sds_cond@clusterLabels)[
-        colSums(sds_cond@clusterLabels) == 0]
+    sds_cond <- sds[conditions == cond, ]
+    if (any(colSums(slingClusterLabels(sds_cond)) == 0)) {
+      cluss <- colnames(slingClusterLabels(sds_cond))[
+        colSums(slingClusterLabels(sds_cond)) == 0]
       clus <- cluss[1]
-      message(paste0("Cluster ", clus, " contains no cells condition ", cond,
-                     ". This means you should either lower the clustering ",
-                     "resolution before running trajectory inference or fit",
-                     " one trajectory per condition"))
-      message("Proceeding through")
+      .message_missing_clus(clus, cond)
       sds_cond <- .clean_mst(sds_cond, cluss)
     }
     sdss[[cond]] <- slingshot::getCurves(sds_cond, approx_points = approx_points,
@@ -87,15 +90,16 @@
 #' sds <- slingshot::slingshot(rd, cl)
 #' sdss <- slingshot_conditions(sds, condition)
 #' @export
-#' @importFrom slingshot SlingshotDataSet getCurves
+#' @importFrom slingshot SlingshotDataSet getCurves as.PseudotimeOrdering
 #' @importFrom utils tail
 #' @importFrom dplyr n_distinct
 #' @rdname slingshot_conditions
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, approx_points = 100, ...) {
-            sdss <- .slingshot_conditions(sds = sds, conditions = conditions,
-                                          approx_points = approx_points, ...)
+            sdss <- slingshot_conditions(sds = as.PseudotimeOrdering(sds),
+                                         conditions = conditions,
+                                         approx_points = approx_points, ...)
             return(sdss)
           }
 )
@@ -120,5 +124,20 @@ setMethod(f = "slingshot_conditions",
             return(slingshot_conditions(slingshot::SlingshotDataSet(sds),
                                         conditions = conditions,
                                         approx_points = approx_points, ...))
+          }
+)
+
+
+#' @rdname slingshot_conditions
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
+#' @importFrom slingshot slingLineages slingClusterLabels slingMST
+#' @importFrom igraph delete_vertices
+#' @export
+setMethod(f = "slingshot_conditions",
+          signature = c(sds = "PseudotimeOrdering"),
+          definition = function(sds, conditions, approx_points = 100, ...) {
+            sdss <- .sling_cond(sds = sds, conditions = conditions,
+                                approx_points = approx_points, ...)
+            return(sdss)
           }
 )

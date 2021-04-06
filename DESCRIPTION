@@ -1,7 +1,7 @@
 Package: condiments
 Type: Package
 Title: Differential Topology, Progression and Differentiation
-Version: 0.99.12
+Version: 0.99.13
 Authors@R: c(person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
                      email = "hector.rouxdebezieux@berkeley.edu",
 		     comment = c(ORCID = "0000-0002-1489-8339")),
@@ -23,7 +23,7 @@ biocViews:
     Visualization
 BugReports: https://github.com/HectorRDB/condiments/issues
 Imports: 
-    slingshot,
+    slingshot (>= 1.9),
     mgcv,
     RANN,
     stats,
@@ -37,7 +37,8 @@ Imports:
     pbapply,
     matrixStats,
     BiocParallel,
-    TSCAN
+    TrajectoryUtils,
+    igraph
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,
@@ -48,4 +49,5 @@ Suggests:
     ggplot2,
     RColorBrewer,
     randomForest,
-    tidyr
+    tidyr,
+    TSCAN

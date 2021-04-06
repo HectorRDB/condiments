@@ -4,6 +4,7 @@
 \alias{topologyTest}
 \alias{topologyTest,SlingshotDataSet-method}
 \alias{topologyTest,SingleCellExperiment-method}
+\alias{topologyTest,PseudotimeOrdering-method}
 \title{Differential Topology Test}
 \usage{
 topologyTest(sds, ...)
@@ -34,6 +35,20 @@ topologyTest(sds, ...)
   args_classifier = list(),
   args_wass = list(),
   nmax = ncol(sds)
+)
+
+\S4method{topologyTest}{PseudotimeOrdering}(
+  sds,
+  conditions,
+  rep = 100,
+  threshs = 0.01,
+  methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+  parallel = FALSE,
+  BPPARAM = BiocParallel::bpparam(),
+  args_mmd = list(),
+  args_classifier = list(),
+  args_wass = list(),
+  nmax = nrow(slingshot::slingPseudotime(sds))
 )
 }
 \arguments{

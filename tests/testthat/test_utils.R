@@ -14,9 +14,11 @@ sds <- slingshot(rd, cl)
 
 test_that("nLineages work", {
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   expect_error(nLineages(sce))
   sce@int_metadata$slingshot <- sds
   expect_equal(nLineages(sds), 2)
@@ -29,9 +31,11 @@ test_that("imbalance score works", {
   expect_equal(length(score$scaled_scores), nrow(rd))
   expect_equal(names(score$scaled_scores), rownames(rd))
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   reducedDim(sce, "rd") <- rd
   score1 <- imbalance_score(sce, conditions = "cond")
   score2 <- imbalance_score(sce, conditions = condition)

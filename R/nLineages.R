@@ -37,3 +37,13 @@ setMethod(f = "nLineages",
             return(length(slingshot::slingCurves(sds)))
           }
 )
+
+#' @export
+#' @rdname nLineages
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
+setMethod(f = "nLineages",
+          signature = c(sds = "PseudotimeOrdering"),
+          definition = function(sds){
+            return(length(slingshot::slingCurves(sds)))
+          }
+)

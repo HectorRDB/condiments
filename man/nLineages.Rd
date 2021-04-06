@@ -4,6 +4,7 @@
 \alias{nLineages}
 \alias{nLineages,SingleCellExperiment-method}
 \alias{nLineages,SlingshotDataSet-method}
+\alias{nLineages,PseudotimeOrdering-method}
 \title{Number of lineages}
 \usage{
 nLineages(sds, ...)
@@ -11,6 +12,8 @@ nLineages(sds, ...)
 \S4method{nLineages}{SingleCellExperiment}(sds)
 
 \S4method{nLineages}{SlingshotDataSet}(sds)
+
+\S4method{nLineages}{PseudotimeOrdering}(sds)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a

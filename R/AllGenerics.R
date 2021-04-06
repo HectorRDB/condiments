@@ -16,6 +16,7 @@ methods::setGeneric(
 #' @title weights_from_pst
 #' @import methods
 #' @param pseudotime A matrix or data.frame of \[ncells\] by \[nCurves\].
+#' @param ... Other parameters including:
 methods::setGeneric(
   name = "weights_from_pst",
   signature = "pseudotime",

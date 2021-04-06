@@ -157,6 +157,7 @@ setMethod(f = "differentiationTest",
 
 
 #' @rdname differentiationTest
+#' @importFrom slingshot as.PseudotimeOrdering
 setMethod(f = "differentiationTest",
           signature = c(cellWeights = "SlingshotDataSet"),
           definition = function(cellWeights, conditions, global = TRUE,
@@ -174,18 +175,13 @@ setMethod(f = "differentiationTest",
               warning("If more than two conditions are present, ",
                       "only the Classifier method is possible.")
             }
-            if (slingParams(cellWeights)$reweight | slingParams(cellWeights)$reassign) {
-              ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
-            } else {
-              ws <- .sling_reassign(cellWeights)
-            }
-
-            res <- .differentiationTest(ws = ws, conditions = conditions,
-                                        global = global, pairwise = pairwise,
-                                        method = method, thresh = thresh,
-                                        classifier_method = classifier_method,
-                                        args_mmd = args_mmd, args_wass = args_wass,
-                                        args_classifier = args_classifier)
+            res <- differentiationTest(cellWeights = as.PseudotimeOrdering(cellWeights),
+                                       conditions = conditions,
+                                       global = global, pairwise = pairwise,
+                                       method = method, thresh = thresh,
+                                       classifier_method = classifier_method,
+                                       args_mmd = args_mmd, args_wass = args_wass,
+                                       args_classifier = args_classifier)
             return(res)
           }
 )
@@ -221,5 +217,42 @@ setMethod(f = "differentiationTest",
                                        thresh = thresh, args_mmd = args_mmd,
                                        args_wass = args_wass,
                                        args_classifier = args_classifier))
+          }
+)
+
+
+#' @rdname differentiationTest
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
+#' @export
+setMethod(f = "differentiationTest",
+          signature = c(cellWeights = "PseudotimeOrdering"),
+          definition = function(cellWeights, conditions, global = TRUE,
+                                pairwise = FALSE,
+                                method = c("Classifier", "mmd", "wasserstein_permutation"),
+                                classifier_method = "rf",
+                                thresh = .01, args_classifier = list(),
+                                args_mmd = list(), args_wass = list()){
+            method <- match.arg(method)
+            if (nLineages(cellWeights) == 1) {
+              stop("This only works with more than one lineage.")
+            }
+            if (dplyr::n_distinct(conditions) > 2 && method != "Classifier") {
+              method <- "Classifier"
+              warning("If more than two conditions are present, ",
+                      "only the Classifier method is possible.")
+            }
+            if (slingParams(cellWeights)$reweight | slingParams(cellWeights)$reassign) {
+              ws <- slingshot::slingCurveWeights(cellWeights, as.probs = TRUE)
+            } else {
+              ws <- .sling_reassign(cellWeights)
+            }
+
+            res <- .differentiationTest(ws = ws, conditions = conditions,
+                                        global = global, pairwise = pairwise,
+                                        method = method, thresh = thresh,
+                                        classifier_method = classifier_method,
+                                        args_mmd = args_mmd, args_wass = args_wass,
+                                        args_classifier = args_classifier)
+            return(res)
           }
 )

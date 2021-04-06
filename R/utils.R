@@ -22,7 +22,7 @@
 #'   cl <- slingshotExample$cl
 #' }
 #' sds <- slingshot::slingshot(rd, cl)
-#' weights_from_pst(slingPseudotime(sds))
+#' weights_from_pst(slingPseudotime::slingPseudotime(sds))
 #' @export
 #' @rdname weights_from_pst
 setMethod(f = "weights_from_pst",
@@ -32,6 +32,8 @@ setMethod(f = "weights_from_pst",
           }
 )
 
+#' @export
+#' @rdname weights_from_pst
 setMethod(f = "weights_from_pst",
           signature = c(pseudotime = "data.frame"),
           definition = function(pseudotime){
@@ -55,6 +57,7 @@ setMethod(f = "weights_from_pst",
 #' @return A modified slingshot dataset that can be used for downstream steps.
 #' @import slingshot
 #' @importFrom dplyr bind_rows
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
 #' @details The function assumes that each lineage in a dataset maps to exactly one lineage
 #' in another dataset. Anything else needs to be done manually.
 #' @examples
@@ -71,11 +74,13 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
   sdss <- list(...)
   names(sdss) <- condition_id
   # Checking inputs ----
-  ises <- unlist(lapply(sdss, is))
-  if (!all(ises %in% c("SingleCellExperiment", "SlingshotDataSet"))) {
+  ises <- unlist(lapply(sdss, function(sds){
+    any(c("SingleCellExperiment", "SlingshotDataSet", "PseudotimeOrdering") %in% is(sds))
+  }))
+  if (!all(ises)) {
     stop("The datasets must either be SlingshotDataset or SingleCellExperiment objects")
   }
-  sdss <- lapply(sdss, SlingshotDataSet)
+  sdss <- lapply(sdss, as.PseudotimeOrdering)
   # Add something if one is null
   if (ncol(mapping) != length(sdss)) {
     stop("mapping should have one column per dataset")
@@ -94,11 +99,9 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
   if (!all(mapped)) stop("Some lineages are not mapped")
 
   # Merging per say ----
-  sds <- sdss[[1]]
-  sds@reducedDim <- do.call('rbind', lapply(sdss, reducedDim))
-  sds@clusterLabels <- do.call('rbind', lapply(sdss, slingClusterLabels))
+  sds <- Reduce('rbind', sdss)
   mapping <- as.data.frame(t(mapping))
-  sds@curves <- lapply(mapping, function(map) {
+  sds@metadata$curves <- lapply(mapping, function(map) {
     curves_i <- Map(function(n_lin, n_dataset) {
       slingCurves(sdss[[n_dataset]])[[n_lin]]
     }, n_lin = map, n_dataset = seq_along(map))
@@ -128,7 +131,7 @@ merge_sds <- function(..., mapping, condition_id = seq_len(ncol(mapping)),
 .sling_reassign <- function(sds) {
   # from slingshot package
   W <- slingCurveWeights(sds)
-  D <- vapply(slingCurves(sds), function(p){ p$dist_ind }, rep(0, nrow(reducedDim(sds))))
+  D <- vapply(slingCurves(sds), function(p){ p$dist_ind }, rep(0, nrow(sds)))
   ordD <- order(D)
   W.prob <- W / rowSums(W)
   WrnkD <- cumsum(W.prob[ordD]) / sum(W.prob)

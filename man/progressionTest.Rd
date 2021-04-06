@@ -5,6 +5,7 @@
 \alias{progressionTest,matrix-method}
 \alias{progressionTest,SlingshotDataSet-method}
 \alias{progressionTest,SingleCellExperiment-method}
+\alias{progressionTest,PseudotimeOrdering-method}
 \title{Differential Progression Test}
 \usage{
 progressionTest(pseudotime, ...)
@@ -37,6 +38,19 @@ progressionTest(pseudotime, ...)
 )
 
 \S4method{progressionTest}{SingleCellExperiment}(
+  pseudotime,
+  conditions,
+  global = TRUE,
+  lineages = FALSE,
+  method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+  thresh = ifelse(method == "Classifer", 0.05, 0.01),
+  args_mmd = list(),
+  args_classifier = list(),
+  args_wass = list(),
+  rep = 10000
+)
+
+\S4method{progressionTest}{PseudotimeOrdering}(
   pseudotime,
   conditions,
   global = TRUE,

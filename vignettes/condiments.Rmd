@@ -135,12 +135,8 @@ We can thus visualize the trajectory
 ```{r}
 ggplot(df, aes(x = Dim1, y = Dim2, col = cl)) +
   geom_point() +
-  geom_path(data = slingCurves(sds)[[1]]$s[slingCurves(sds)[[1]]$ord, ] %>%
-              as.data.frame(), col = "black", size = 2) +
-  geom_path(data = slingCurves(sds)[[2]]$s[slingCurves(sds)[[2]]$ord, ] %>%
-              as.data.frame(),
-            col = "black", size = 2) +
-  NULL
+  geom_path(data =  slingCurves(sds, as.df = TRUE) %>% arrange(Order),
+            aes(group = Lineage), col = "black", size = 2)
 ```
 
 # Differential Progression
@@ -152,7 +148,7 @@ psts <- slingPseudotime(sds) %>%
   as.data.frame() %>%
   mutate(cells = rownames(.),
          conditions = df$conditions) %>%
-  pivot_longer(starts_with("curve"), values_to = "pseudotime", names_to = "lineages")
+  pivot_longer(starts_with("Lineage"), values_to = "pseudotime", names_to = "lineages")
 ```
 
 ## Visualization

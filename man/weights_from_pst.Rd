@@ -3,14 +3,19 @@
 \name{weights_from_pst}
 \alias{weights_from_pst}
 \alias{weights_from_pst,matrix-method}
+\alias{weights_from_pst,data.frame-method}
 \title{weights_from_pst}
 \usage{
 weights_from_pst(pseudotime, ...)
 
 \S4method{weights_from_pst}{matrix}(pseudotime)
+
+\S4method{weights_from_pst}{data.frame}(pseudotime)
 }
 \arguments{
 \item{pseudotime}{A matrix or data.frame of \[ncells\] by \[nCurves\].}
+
+\item{...}{Other parameters including:}
 }
 \value{
 A object of the same type and dimensions as the original object, with the
@@ -29,5 +34,5 @@ if (!"cl" \%in\% ls()) {
   cl <- slingshotExample$cl
 }
 sds <- slingshot::slingshot(rd, cl)
-weights_from_pst(slingPseudotime(sds))
+weights_from_pst(slingPseudotime::slingPseudotime(sds))
 }

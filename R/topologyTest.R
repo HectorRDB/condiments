@@ -8,7 +8,6 @@
   return(list("psts" = psts, "ws" = ws))
 }
 
-
 .topologyTest_ks_all <- function(permutations, og, threshs) {
   psts <- lapply(permutations, '[[', 1) %>% do.call(what = 'rbind') %>%
     as.vector()
@@ -27,10 +26,10 @@
   return(res)
 }
 
-.topologyTest_ks_mean <- function(permutations, og, threshs, sds, rep) {
+.topologyTest_ks_mean <- function(permutations, og, threshs, sds, rep, order) {
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[rownames(reducedDim(sds)), ])
+      as.matrix(df[order, ])
     }) %>%
     Reduce(f = '+') %>%
     as.vector()
@@ -38,7 +37,7 @@
   og_psts <- og$psts %>% as.vector()
   ws <- lapply(permutations, '[[', 2) %>%
     lapply(function(df) {
-      as.matrix(df[rownames(reducedDim(sds)), ])
+      as.matrix(df[order, ])
     }) %>%
     Reduce(f = '+') %>%
     as.vector()
@@ -54,10 +53,10 @@
   return(res)
 }
 
-.topologyTest_classifier <- function(permutations, og, threshs, sds, rep, args_classifier){
+.topologyTest_classifier <- function(permutations, og, threshs, sds, rep, args_classifier, order){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[rownames(reducedDim(sds)), ])
+      as.matrix(df[order, ])
     }) %>%
     Reduce(f = '+')
   psts <- psts / rep
@@ -73,10 +72,10 @@
   return(res)
 }
 
-.topologyTest_mmd <- function(permutations, og, sds, rep, args_mmd, n_max = 2000){
+.topologyTest_mmd <- function(permutations, og, sds, rep, args_mmd, order, n_max = 2000){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[rownames(reducedDim(sds)), ])
+      as.matrix(df[order, ])
     }) %>%
     Reduce(f = '+')
   psts <- psts / rep
@@ -92,10 +91,10 @@
          )
 }
 
-.topologyTest_wass <- function(permutations, og, sds, rep, args_wass){
+.topologyTest_wass <- function(permutations, og, sds, rep, args_wass, order){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
-      as.matrix(df[rownames(reducedDim(sds)), ])
+      as.matrix(df[order, ])
     }) %>%
     Reduce(f = '+')
   psts <- psts / rep
@@ -129,7 +128,7 @@
       X = permutations, FUN = .condition_sling, sds = sds
     )
   }
-
+  order <- rownames(sds)
   res <- list()
   if ("KS_all" %in% methods) {
     message("Running KS-all test")
@@ -137,21 +136,24 @@
   }
   if ("KS_mean" %in% methods) {
     message("Running KS-mean test")
-    res[["KS_mean"]] <- .topologyTest_ks_mean(permutations, og, threshs, sds, rep)
+    res[["KS_mean"]] <- .topologyTest_ks_mean(
+      permutations, og, threshs, sds, rep, order
+    )
   }
   if ("Classifier" %in% methods) {
     message("Running Classifier test")
-    res[["Classifier"]] <- .topologyTest_classifier(permutations, og, threshs,
-                                                    sds, rep, args_classifier)
+    res[["Classifier"]] <- .topologyTest_classifier(
+      permutations, og, threshs, sds, rep, args_classifier, order
+    )
   }
   if ("mmd" %in% methods) {
     message("Running mmd test")
-    res[["mmd"]] <- .topologyTest_mmd(permutations, og, sds, rep, args_mmd)
+    res[["mmd"]] <- .topologyTest_mmd(permutations, og, sds, rep, args_mmd, order)
   }
   if ("wasserstein_permutation" %in% methods) {
     message("Running wassertsein permutation test")
     res[["wasserstein_permutation"]] <- .topologyTest_wass(
-      permutations, og, sds, rep, args_wass
+      permutations, og, sds, rep, args_wass, order
     )
   }
   res <- bind_rows(res, .id = "method")
@@ -286,5 +288,41 @@ setMethod(f = "topologyTest",
                                 args_wass = args_wass,
                                 args_classifier = args_classifier,
                                 nmax = nmax))
+          }
+)
+
+#' @rdname topologyTest
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
+#' @export
+setMethod(f = "topologyTest",
+          signature = c(sds = "PseudotimeOrdering"),
+          definition = function(sds,
+                                conditions,
+                                rep = 100,
+                                threshs = .01,
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                parallel = FALSE,
+                                BPPARAM = BiocParallel::bpparam(),
+                                args_mmd = list(),
+                                args_classifier = list(),
+                                args_wass = list(),
+                                nmax = nrow(slingshot::slingPseudotime(sds))){
+            if (n_distinct(conditions) > 2 && methods != "Classifier") {
+              warning("Changing to methods `classifier` since more than ",
+                      "two conditions are present.")
+              methods <- "Classifier"
+            }
+            res <- .topologyTest(sds = sds,
+                                 conditions = conditions,
+                                 rep = rep,
+                                 threshs = threshs,
+                                 methods = methods,
+                                 parallel = parallel,
+                                 BPPARAM = BPPARAM,
+                                 args_mmd = args_mmd,
+                                 args_wass = args_wass,
+                                 args_classifier = args_classifier,
+                                 nmax = nmax)
+            return(res)
           }
 )

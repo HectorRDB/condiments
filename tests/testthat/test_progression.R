@@ -33,9 +33,11 @@ test_that("The progressionTest work on expected inputs",{
   expect_equal(test_lineages[1, 2:3], test_all[2, 2:3])
   # Input SingleCellExperiment
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   sce@int_metadata$slingshot <- sds
   set.seed(12)
   test_sce <- progressionTest(pseudotime = sce, conditions = "cond", rep = 2)
@@ -89,8 +91,10 @@ test_that("The progressionTest error when it should", {
                                method = "bulls**t"))
   # Error when missing sds
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   expect_error(progressionTest(pseudotime = sce, conditions = "cond", rep = 2))
 })

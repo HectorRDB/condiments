@@ -217,6 +217,7 @@ setMethod(f = "progressionTest",
 )
 
 #' @rdname progressionTest
+#' @importFrom slingshot as.PseudotimeOrdering
 setMethod(f = "progressionTest",
           signature = c(pseudotime = "SlingshotDataSet"),
           definition = function(pseudotime, conditions, global = TRUE,
@@ -233,14 +234,13 @@ setMethod(f = "progressionTest",
                       "two conditions are present.")
               method <- "Classifier"
             }
-            pst <- slingshot::slingPseudotime(pseudotime, na = FALSE)
-            ws <- slingshot::slingCurveWeights(pseudotime, as.probs = TRUE)
-            res <- .progressionTest(pst = pst, ws = ws, conditions = conditions,
-                                    global = global, lineages = lineages,
-                                    method = method, thresh = thresh,
-                                    rep = rep, args_mmd = args_mmd,
-                                    args_wass = args_wass,
-                                    args_classifier = args_classifier)
+            res <- progressionTest(pseudotime = as.PseudotimeOrdering(pseudotime),
+                                   conditions = conditions,
+                                   global = global, lineages = lineages,
+                                   method = method, thresh = thresh,
+                                   rep = rep, args_mmd = args_mmd,
+                                   args_wass = args_wass,
+                                   args_classifier = args_classifier)
             return(res)
           }
 )
@@ -276,5 +276,36 @@ setMethod(f = "progressionTest",
                                    thresh = thresh, rep = rep,
                                    args_mmd = args_mmd, args_wass = args_wass,
                                    args_classifier = args_classifier))
+          }
+)
+
+#' @rdname progressionTest
+#' @importClassesFrom TrajectoryUtils PseudotimeOrdering
+#' @export
+setMethod(f = "progressionTest",
+          signature = c(pseudotime = "PseudotimeOrdering"),
+          definition = function(pseudotime, conditions, global = TRUE,
+                                lineages = FALSE,
+                                method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
+                                thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
+                                args_classifier = list(), args_wass = list(), rep = 1e4){
+            if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
+                               "wasserstein_permutation")) {
+              stop("Method must be one of KS, Classifier, mmd or permutation")
+            }
+            if (n_distinct(conditions) > 2 && method != "Classifier") {
+              warning("Changing to method classifier since more than ",
+                      "two conditions are present.")
+              method <- "Classifier"
+            }
+            pst <- slingshot::slingPseudotime(pseudotime, na = FALSE)
+            ws <- slingshot::slingCurveWeights(pseudotime, as.probs = TRUE)
+            res <- .progressionTest(pst = pst, ws = ws, conditions = conditions,
+                                    global = global, lineages = lineages,
+                                    method = method, thresh = thresh,
+                                    rep = rep, args_mmd = args_mmd,
+                                    args_wass = args_wass,
+                                    args_classifier = args_classifier)
+            return(res)
           }
 )

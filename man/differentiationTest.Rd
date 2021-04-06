@@ -5,6 +5,7 @@
 \alias{differentiationTest,matrix-method}
 \alias{differentiationTest,SlingshotDataSet-method}
 \alias{differentiationTest,SingleCellExperiment-method}
+\alias{differentiationTest,PseudotimeOrdering-method}
 \title{Differential Differentiation Test}
 \usage{
 differentiationTest(cellWeights, ...)
@@ -36,6 +37,19 @@ differentiationTest(cellWeights, ...)
 )
 
 \S4method{differentiationTest}{SingleCellExperiment}(
+  cellWeights,
+  conditions,
+  global = TRUE,
+  pairwise = FALSE,
+  method = c("Classifier", "mmd", "wasserstein_permutation"),
+  classifier_method = "rf",
+  thresh = 0.01,
+  args_classifier = list(),
+  args_mmd = list(),
+  args_wass = list()
+)
+
+\S4method{differentiationTest}{PseudotimeOrdering}(
   cellWeights,
   conditions,
   global = TRUE,

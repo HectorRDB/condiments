@@ -31,9 +31,11 @@ test_that("The differentiationTest work on expected inputs",{
   expect_equivalent(test_pairs, test_all)
   # Input SingleCellExperiment
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   sce@int_metadata$slingshot <- sds
   set.seed(23)
   test_sce <- differentiationTest(cellWeights = sce, conditions = "cond")
@@ -67,9 +69,11 @@ test_that("The differentiationTest work on all tests",{
 
 test_that("The differentiationTest error when it should", {
   pd <- DataFrame(cond = condition)
-  rownames(pd) <- colnames(sds)
-  sce <- SingleCellExperiment(assay = list(counts = t(reducedDim(sds))),
-                              colData = pd)
+  rownames(pd) <- rownames(sds)
+  sce <- SingleCellExperiment(
+    assay = list(counts = t(slingReducedDim(sds))),
+    colData = pd
+  )
   expect_error(differentiationTest(cellWeights = sce, conditions = "cond"))
 })
 
