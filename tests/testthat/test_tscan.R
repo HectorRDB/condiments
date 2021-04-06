@@ -12,7 +12,7 @@ condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 mst <- createClusterMST(rd, cl)
 mapping <- mapCellsToEdges(rd, mst, cl)
-ordering <- pathStats(orderCells(mapping, mst, start = 1))
+ordering <- pathStats(orderCells(mapping, mst, start = 1), i = 1)
 
 test_that("Weights can be extracted from the pseudotime",{
   ws <- weights_from_pst(ordering)
