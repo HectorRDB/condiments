@@ -81,7 +81,7 @@ within lineages between conditions" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">condiments</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.14</span>
       </span>
     </div>
 
@@ -177,6 +177,20 @@ within lineages between conditions</p>
 <span class='op'>)</span>
 
 <span class='co'># S4 method for SingleCellExperiment</span>
+<span class='fu'>progressionTest</span><span class='op'>(</span>
+  <span class='va'>pseudotime</span>,
+  <span class='va'>conditions</span>,
+  global <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  lineages <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/n_distinct.html'>n_distinct</a></span><span class='op'>(</span><span class='va'>conditions</span><span class='op'>)</span> <span class='op'>==</span> <span class='fl'>2</span>, <span class='st'>"KS"</span>, <span class='st'>"Classifier"</span><span class='op'>)</span>,
+  thresh <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>method</span> <span class='op'>==</span> <span class='st'>"Classifer"</span>, <span class='fl'>0.05</span>, <span class='fl'>0.01</span><span class='op'>)</span>,
+  args_mmd <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  args_classifier <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  args_wass <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  rep <span class='op'>=</span> <span class='fl'>10000</span>
+<span class='op'>)</span>
+
+<span class='co'># S4 method for PseudotimeOrdering</span>
 <span class='fu'>progressionTest</span><span class='op'>(</span>
   <span class='va'>pseudotime</span>,
   <span class='va'>conditions</span>,
@@ -296,9 +310,9 @@ Princeton University Press, Princeton.</p>
 <span class='va'>condition</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'A'</span>,<span class='st'>'B'</span><span class='op'>)</span>, length.out <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>rd</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>condition</span><span class='op'>[</span><span class='fl'>110</span><span class='op'>:</span><span class='fl'>139</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='st'>'A'</span>
 <span class='va'>sds</span> <span class='op'>&lt;-</span> <span class='fu'>slingshot</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingshot.html'>slingshot</a></span><span class='op'>(</span><span class='va'>rd</span>, <span class='va'>cl</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Using full covariance matrix</span></div><div class='input'><span class='fu'>progressionTest</span><span class='op'>(</span><span class='va'>sds</span>, <span class='va'>condition</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   lineage statistic      p.value
-#&gt; 1     All  3.115524 0.0009180925</div></pre>
+<span class='fu'>progressionTest</span><span class='op'>(</span><span class='va'>sds</span>, <span class='va'>condition</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   lineage statistic     p.value
+#&gt; 1     All  2.873272 0.002031221</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

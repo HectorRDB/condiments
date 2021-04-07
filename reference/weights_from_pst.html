@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Merge slingshots datasets — merge_sds • condiments</title>
+<title>weights_from_pst — weights_from_pst • condiments</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,11 @@
 
 
 
-<meta property="og:title" content="Merge slingshots datasets — merge_sds" />
-<meta property="og:description" content="If trajectory inference needs to be manually done condition per condition,
-this allows to merge them into one. It requires manual mapping of lineages." />
+<meta property="og:title" content="weights_from_pst — weights_from_pst" />
+<meta property="og:description" content="Most trajectory inference methods do not perform soft assignment
+but instead assign cells to all possible lineages before a branching point,
+and then to one or another. This function re-creates a weight matrix from those
+matrices of pseudotime" />
 <meta property="og:image" content="http://hectorrdb.github.io//condiments/logo.png" />
 
 
@@ -135,48 +137,43 @@ this allows to merge them into one. It requires manual mapping of lineages." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Merge slingshots datasets</h1>
-    <small class="dont-index">Source: <a href='https://github.com/HectorRDB/condiments/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
-    <div class="hidden name"><code>merge_sds.Rd</code></div>
+    <h1>weights_from_pst</h1>
+    <small class="dont-index">Source: <a href='https://github.com/HectorRDB/condiments/blob/master/R/AllGenerics.R'><code>R/AllGenerics.R</code></a>, <a href='https://github.com/HectorRDB/condiments/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>weights_from_pst.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>If trajectory inference needs to be manually done condition per condition,
-this allows to merge them into one. It requires manual mapping of lineages.</p>
+    <p>Most trajectory inference methods do not perform soft assignment
+but instead assign cells to all possible lineages before a branching point,
+and then to one or another. This function re-creates a weight matrix from those
+matrices of pseudotime</p>
     </div>
 
-    <pre class="usage"><span class='fu'>merge_sds</span><span class='op'>(</span><span class='va'>...</span>, <span class='va'>mapping</span>, condition_id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_len</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>ncol</a></span><span class='op'>(</span><span class='va'>mapping</span><span class='op'>)</span><span class='op'>)</span>, scale <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>weights_from_pst</span><span class='op'>(</span><span class='va'>pseudotime</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for matrix</span>
+<span class='fu'>weights_from_pst</span><span class='op'>(</span><span class='va'>pseudotime</span><span class='op'>)</span>
+
+<span class='co'># S4 method for data.frame</span>
+<span class='fu'>weights_from_pst</span><span class='op'>(</span><span class='va'>pseudotime</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>pseudotime</th>
+      <td><p>A matrix or data.frame of \[ncells\] by \[nCurves\].</p></td>
+    </tr>
+    <tr>
       <th>...</th>
-      <td><p>Slingshot datasets</p></td>
-    </tr>
-    <tr>
-      <th>mapping</th>
-      <td><p>a matrix, one column per dataset. Each row amounts to lineage mapping.</p></td>
-    </tr>
-    <tr>
-      <th>condition_id</th>
-      <td><p>A vector of condition for each condition. Default to integer values
-in order of appearance</p></td>
-    </tr>
-    <tr>
-      <th>scale</th>
-      <td><p>If TRUE (default), lineages that are mapped are scaled to have the same
-length.</p></td>
+      <td><p>Other parameters including:</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A modified slingshot dataset that can be used for downstream steps.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>The function assumes that each lineage in a dataset maps to exactly one lineage
-in another dataset. Anything else needs to be done manually.</p>
+    <p>A object of the same type and dimensions as the original object, with the
+weights for each curve and cell.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span>list <span class='op'>=</span> <span class='st'>'slingshotExample'</span>, package <span class='op'>=</span> <span class='st'>"slingshot"</span><span class='op'>)</span>
@@ -185,15 +182,148 @@ in another dataset. Anything else needs to be done manually.</p>
   <span class='va'>cl</span> <span class='op'>&lt;-</span> <span class='va'>slingshotExample</span><span class='op'>$</span><span class='va'>cl</span>
 <span class='op'>}</span>
 <span class='va'>sds</span> <span class='op'>&lt;-</span> <span class='fu'>slingshot</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingshot.html'>slingshot</a></span><span class='op'>(</span><span class='va'>rd</span>, <span class='va'>cl</span><span class='op'>)</span>
-<span class='fu'>merge_sds</span><span class='op'>(</span><span class='va'>sds</span>, <span class='va'>sds</span>, mapping <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; class: PseudotimeOrdering 
-#&gt; dim: 280 2 
-#&gt; metadata(4): lineages mst slingParams curves
-#&gt; pathStats(2): pseudotime weights
-#&gt; cellnames(280): cell-1 cell-2 ... cell-139 cell-140
-#&gt; cellData names(2): reducedDim clusterLabels
-#&gt; pathnames(2): Lineage1 Lineage2
-#&gt; pathData names(0):</div></pre>
+<span class='fu'>weights_from_pst</span><span class='op'>(</span><span class='fu'>slingshot</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/slingshot/man/slingPseudotime.html'>slingPseudotime</a></span><span class='op'>(</span><span class='va'>sds</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;        Lineage1 Lineage2
+#&gt;   [1,]      0.5      0.5
+#&gt;   [2,]      0.5      0.5
+#&gt;   [3,]      0.5      0.5
+#&gt;   [4,]      0.5      0.5
+#&gt;   [5,]      0.5      0.5
+#&gt;   [6,]      0.5      0.5
+#&gt;   [7,]      0.5      0.5
+#&gt;   [8,]      0.5      0.5
+#&gt;   [9,]      0.5      0.5
+#&gt;  [10,]      0.5      0.5
+#&gt;  [11,]      0.5      0.5
+#&gt;  [12,]      0.5      0.5
+#&gt;  [13,]      0.5      0.5
+#&gt;  [14,]      0.5      0.5
+#&gt;  [15,]      0.5      0.5
+#&gt;  [16,]      0.5      0.5
+#&gt;  [17,]      0.5      0.5
+#&gt;  [18,]      0.5      0.5
+#&gt;  [19,]      0.5      0.5
+#&gt;  [20,]      0.5      0.5
+#&gt;  [21,]      0.5      0.5
+#&gt;  [22,]      0.5      0.5
+#&gt;  [23,]      0.5      0.5
+#&gt;  [24,]      1.0      0.0
+#&gt;  [25,]      0.5      0.5
+#&gt;  [26,]      0.5      0.5
+#&gt;  [27,]      0.5      0.5
+#&gt;  [28,]      0.5      0.5
+#&gt;  [29,]      0.5      0.5
+#&gt;  [30,]      0.5      0.5
+#&gt;  [31,]      0.5      0.5
+#&gt;  [32,]      0.5      0.5
+#&gt;  [33,]      0.5      0.5
+#&gt;  [34,]      0.5      0.5
+#&gt;  [35,]      0.5      0.5
+#&gt;  [36,]      0.5      0.5
+#&gt;  [37,]      0.5      0.5
+#&gt;  [38,]      0.5      0.5
+#&gt;  [39,]      0.5      0.5
+#&gt;  [40,]      0.5      0.5
+#&gt;  [41,]      0.5      0.5
+#&gt;  [42,]      0.5      0.5
+#&gt;  [43,]      0.5      0.5
+#&gt;  [44,]      0.5      0.5
+#&gt;  [45,]      0.5      0.5
+#&gt;  [46,]      0.5      0.5
+#&gt;  [47,]      0.5      0.5
+#&gt;  [48,]      0.5      0.5
+#&gt;  [49,]      0.5      0.5
+#&gt;  [50,]      0.5      0.5
+#&gt;  [51,]      0.5      0.5
+#&gt;  [52,]      0.5      0.5
+#&gt;  [53,]      0.5      0.5
+#&gt;  [54,]      0.0      1.0
+#&gt;  [55,]      0.5      0.5
+#&gt;  [56,]      1.0      0.0
+#&gt;  [57,]      0.5      0.5
+#&gt;  [58,]      0.5      0.5
+#&gt;  [59,]      0.5      0.5
+#&gt;  [60,]      0.5      0.5
+#&gt;  [61,]      1.0      0.0
+#&gt;  [62,]      1.0      0.0
+#&gt;  [63,]      1.0      0.0
+#&gt;  [64,]      1.0      0.0
+#&gt;  [65,]      1.0      0.0
+#&gt;  [66,]      1.0      0.0
+#&gt;  [67,]      1.0      0.0
+#&gt;  [68,]      1.0      0.0
+#&gt;  [69,]      1.0      0.0
+#&gt;  [70,]      1.0      0.0
+#&gt;  [71,]      1.0      0.0
+#&gt;  [72,]      1.0      0.0
+#&gt;  [73,]      1.0      0.0
+#&gt;  [74,]      1.0      0.0
+#&gt;  [75,]      1.0      0.0
+#&gt;  [76,]      1.0      0.0
+#&gt;  [77,]      1.0      0.0
+#&gt;  [78,]      1.0      0.0
+#&gt;  [79,]      1.0      0.0
+#&gt;  [80,]      1.0      0.0
+#&gt;  [81,]      1.0      0.0
+#&gt;  [82,]      1.0      0.0
+#&gt;  [83,]      1.0      0.0
+#&gt;  [84,]      1.0      0.0
+#&gt;  [85,]      1.0      0.0
+#&gt;  [86,]      1.0      0.0
+#&gt;  [87,]      1.0      0.0
+#&gt;  [88,]      1.0      0.0
+#&gt;  [89,]      1.0      0.0
+#&gt;  [90,]      1.0      0.0
+#&gt;  [91,]      0.5      0.5
+#&gt;  [92,]      0.5      0.5
+#&gt;  [93,]      0.5      0.5
+#&gt;  [94,]      0.5      0.5
+#&gt;  [95,]      0.5      0.5
+#&gt;  [96,]      0.5      0.5
+#&gt;  [97,]      0.5      0.5
+#&gt;  [98,]      0.5      0.5
+#&gt;  [99,]      0.5      0.5
+#&gt; [100,]      0.5      0.5
+#&gt; [101,]      0.5      0.5
+#&gt; [102,]      0.5      0.5
+#&gt; [103,]      0.5      0.5
+#&gt; [104,]      0.0      1.0
+#&gt; [105,]      0.5      0.5
+#&gt; [106,]      0.5      0.5
+#&gt; [107,]      0.5      0.5
+#&gt; [108,]      0.5      0.5
+#&gt; [109,]      0.0      1.0
+#&gt; [110,]      0.0      1.0
+#&gt; [111,]      0.0      1.0
+#&gt; [112,]      0.0      1.0
+#&gt; [113,]      0.0      1.0
+#&gt; [114,]      0.0      1.0
+#&gt; [115,]      0.5      0.5
+#&gt; [116,]      0.0      1.0
+#&gt; [117,]      0.0      1.0
+#&gt; [118,]      0.0      1.0
+#&gt; [119,]      0.0      1.0
+#&gt; [120,]      0.0      1.0
+#&gt; [121,]      0.0      1.0
+#&gt; [122,]      0.0      1.0
+#&gt; [123,]      0.0      1.0
+#&gt; [124,]      0.0      1.0
+#&gt; [125,]      0.0      1.0
+#&gt; [126,]      0.0      1.0
+#&gt; [127,]      0.0      1.0
+#&gt; [128,]      0.0      1.0
+#&gt; [129,]      0.0      1.0
+#&gt; [130,]      0.0      1.0
+#&gt; [131,]      0.0      1.0
+#&gt; [132,]      0.0      1.0
+#&gt; [133,]      0.0      1.0
+#&gt; [134,]      0.0      1.0
+#&gt; [135,]      0.0      1.0
+#&gt; [136,]      0.0      1.0
+#&gt; [137,]      0.0      1.0
+#&gt; [138,]      0.0      1.0
+#&gt; [139,]      0.0      1.0
+#&gt; [140,]      0.0      1.0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

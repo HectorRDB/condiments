@@ -1,11 +1,11 @@
-pandoc: 2.7.3
+pandoc: 2.11.4
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   condiments: condiments.html
   controls: controls.html
   examples: examples.html
-last_built: 2021-03-11T03:47Z
+last_built: 2021-04-07T00:03Z
 urls:
   reference: http://hectorrdb.github.io//condiments/reference
   article: http://hectorrdb.github.io//condiments/articles

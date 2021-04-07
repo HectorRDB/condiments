@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">condiments</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.14</span>
       </span>
     </div>
 
@@ -89,13 +89,13 @@
 
       
 
-      </header><script src="condiments_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="condiments_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Overview of the condiments workflow</h1>
                         <h4 class="author">Hector Roux de Bézieux</h4>
             
-            <h4 class="date">11 March , 2021</h4>
+            <h4 class="date">07 April , 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/HectorRDB/condiments/blob/master/vignettes/condiments.Rmd"><code>vignettes/condiments.Rmd</code></a></small>
       <div class="hidden name"><code>condiments.Rmd</code></div>
@@ -195,14 +195,12 @@
 <p><img src="condiments_files/figure-html/unnamed-chunk-8-1.png" width="700" style="display: block; margin: auto;"> The <strong>topologyTest</strong> assess the quality of the common trajectory inference done by slingshot and test whether we should fit a common or separate trajectory. This test relies on repeated permutations of the conditions followed by trajectory inference so it can take a few seconds.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">rd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Dim1"</span>, <span class="st">"Dim2"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-<span class="va">sds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingshot.html">slingshot</a></span><span class="op">(</span><span class="va">rd</span>, <span class="va">df</span><span class="op">$</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
-<pre><code>## Using full covariance matrix</code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Takes ~1m30s to run</span>
+<span class="va">sds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingshot.html">slingshot</a></span><span class="op">(</span><span class="va">rd</span>, <span class="va">df</span><span class="op">$</span><span class="va">cl</span><span class="op">)</span>
+<span class="co">## Takes ~1m30s to run</span>
 <span class="va">top_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/topologyTest.html">topologyTest</a></span><span class="op">(</span>sds <span class="op">=</span> <span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span></code></pre></div>
 <pre><code>## Generating permuted trajectories</code></pre>
 <pre><code>## Running KS-mean test</code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">top_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -220,15 +218,11 @@
 </table>
 <p>The test clearly fails to reject the null that we can fit a common trajectory so we can continue with the <code>sds</code> object. This will facilitate downstream analysis. For an example of how to proceed if the <strong>topologyTest</strong> reject the null, we invite the user to refer to <a href="https://hectorrdb.github.io/condimentsPaper/articles/KRAS.html">relevant case study used in our paper</a>.</p>
 <p>We can thus visualize the trajectory</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Dim1</span>, y <span class="op">=</span> <span class="va">Dim2</span>, col <span class="op">=</span> <span class="va">cl</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_path</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingCurves.html">slingCurves</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingCurves.html">slingCurves</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">ord</span>, <span class="op">]</span> <span class="op">%&gt;%</span>
-              <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_path</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingCurves.html">slingCurves</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingCurves.html">slingCurves</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">ord</span>, <span class="op">]</span> <span class="op">%&gt;%</span>
-              <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span>,
-            col <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="cn">NULL</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_path</a></span><span class="op">(</span>data <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingCurves.html">slingCurves</a></span><span class="op">(</span><span class="va">sds</span>, as.df <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">Order</span><span class="op">)</span>,
+            <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>group <span class="op">=</span> <span class="va">Lineage</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"black"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="condiments_files/figure-html/unnamed-chunk-10-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -236,16 +230,16 @@
 <h1 class="hasAnchor">
 <a href="#differential-progression" class="anchor"></a>Differential Progression</h1>
 <p>Even though we can fit a common trajectory, it does not mean that the cells will differentiate similarly between the conditions. The first question we can ask is: for a given lineage, are cells equally represented along pseudotime between conditions?</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">psts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingPseudotime.html">slingPseudotime</a></span><span class="op">(</span><span class="va">sds</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>cells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>,
          conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"curve"</span><span class="op">)</span>, values_to <span class="op">=</span> <span class="st">"pseudotime"</span>, names_to <span class="op">=</span> <span class="st">"lineages"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"Lineage"</span><span class="op">)</span>, values_to <span class="op">=</span> <span class="st">"pseudotime"</span>, names_to <span class="op">=</span> <span class="st">"lineages"</span><span class="op">)</span></code></pre></div>
 <div id="visualization" class="section level2">
 <h2 class="hasAnchor">
 <a href="#visualization" class="anchor"></a>Visualization</h2>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">psts</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pseudotime</span>, fill <span class="op">=</span> <span class="va">conditions</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_fill_brewer</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"qual"</span><span class="op">)</span> <span class="op">+</span>
@@ -258,7 +252,7 @@
 <h2 class="hasAnchor">
 <a href="#testing-for-differential-progression" class="anchor"></a>Testing for differential progression</h2>
 <p>To test for differential progression, we use the <strong>progressionTest</strong>. The test can be run with <code>global = TRUE</code> to test when pooling all lineages, or <code>lineages = TRUE</code> to test every lineage independently, or both. Several tests are implemented in the <strong>progressionTest</strong>. function. Here, we will use the default, the custom KS test <span class="citation">(Smirnov 1939)</span>.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prog_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/progressionTest.html">progressionTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, global <span class="op">=</span> <span class="cn">TRUE</span>, lineages <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">prog_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
@@ -270,17 +264,17 @@
 <tbody>
 <tr class="odd">
 <td align="left">All</td>
-<td align="right">5.5068236</td>
+<td align="right">6.6652072</td>
 <td align="right">0.0000000</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
-<td align="right">0.0344087</td>
-<td align="right">0.9940214</td>
+<td align="right">0.0883114</td>
+<td align="right">0.1394018</td>
 </tr>
 <tr class="odd">
 <td align="left">2</td>
-<td align="right">0.4699368</td>
+<td align="right">0.4415167</td>
 <td align="right">0.0000000</td>
 </tr>
 </tbody>
@@ -296,7 +290,7 @@
 <h2 class="hasAnchor">
 <a href="#vizualisation-1" class="anchor"></a>Vizualisation</h2>
 <p>Visualizing differences 2D distributions can be somewhat tricky. However, it is important to note that the sum of all lineage weights should sum to 1. As such, we can only plot the weights for the first lineage.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span><span class="op">$</span><span class="va">weight_1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingPseudotime.html">slingCurveWeights</a></span><span class="op">(</span><span class="va">sds</span>, as.probs <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">weight_1</span>, fill <span class="op">=</span> <span class="va">conditions</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html">geom_density</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">+</span>
@@ -310,13 +304,13 @@
 <h2 class="hasAnchor">
 <a href="#testing-for-differential-differentiation" class="anchor"></a>Testing for differential differentiation</h2>
 <p>To test for differential differentiation, we use the <strong>differentiationTest</strong>. The test can be run with <code>global = TRUE</code> to test when pooling all pairs of lineages, or <code>pairwise = TRUE</code> to test every pair independently, or both. Here, there is only one pair so the options are equivalent. Several tests are implemented in the <strong>differentiationTest</strong>. function. Here, we will use the default, the classifier test<span class="citation">(Lopez-Paz and Oquab 2016)</span>.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span>
 <span class="va">dif_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiationTest.html">differentiationTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, global <span class="op">=</span> <span class="cn">FALSE</span>, pairwise <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">dif_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -326,8 +320,8 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">1vs2</td>
-<td align="right">0.6476577</td>
-<td align="right">5.6e-06</td>
+<td align="right">0.6116216</td>
+<td align="right">0.0004817</td>
 </tr></tbody>
 </table>
 <p>As could be guessed from the plot, we have clear differential differentiation.</p>
@@ -338,7 +332,7 @@
 <a href="#differential-expression" class="anchor"></a>Differential Expression</h1>
 <p>The workflow above focus on global differences, looking at broad patterns of differentiation. While this is a necessary first step, gene-level information is also quite meaningful.</p>
 <p>To do so requires <strong>tradeSeq</strong><span class="citation">(Van den Berge et al. 2020)</span> &gt; 1.3.0. Considering that we have a count matrix <code>counts</code>, the basic workflow is:s</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">tradeSeq</span><span class="op">)</span>
 <span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">fitGAM</span><span class="op">(</span>counts <span class="op">=</span> <span class="va">counts</span>, sds <span class="op">=</span> <span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span>
 <span class="va">cond_genes</span> <span class="op">&lt;-</span> <span class="fu">conditionTest</span><span class="op">(</span><span class="va">sds</span><span class="op">)</span></code></pre></div>
@@ -353,11 +347,11 @@
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session Info</h1>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R version 4.0.3 (2020-10-10)
+<pre><code>## R Under development (unstable) (2021-04-05 r80145)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 20.04.1 LTS
+## Running under: Ubuntu 20.04.2 LTS
 ## 
 ## Matrix products: default
 ## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
@@ -371,82 +365,93 @@
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] caret_6.0-86       lattice_0.20-41    viridis_0.5.1      viridisLite_0.3.0 
-##  [5] RColorBrewer_1.1-2 ggplot2_3.3.3      tidyr_1.1.3        dplyr_1.0.5       
-##  [9] slingshot_1.8.0    princurve_2.1.6    condiments_0.99.0  knitr_1.31        
+##  [1] caret_6.0-86                 lattice_0.20-41             
+##  [3] viridis_0.5.1                viridisLite_0.3.0           
+##  [5] RColorBrewer_1.1-2           ggplot2_3.3.3               
+##  [7] tidyr_1.1.3                  dplyr_1.0.5                 
+##  [9] slingshot_1.99.3             TrajectoryUtils_0.99.2      
+## [11] SingleCellExperiment_1.13.12 SummarizedExperiment_1.21.2 
+## [13] Biobase_2.51.0               GenomicRanges_1.43.4        
+## [15] GenomeInfoDb_1.27.9          IRanges_2.25.6              
+## [17] S4Vectors_0.29.12            BiocGenerics_0.37.1         
+## [19] MatrixGenerics_1.3.1         matrixStats_0.58.0          
+## [21] princurve_2.1.6              condiments_0.99.14          
+## [23] knitr_1.31                  
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] colorspace_2.0-0            deldir_0.2-10              
-##   [3] ellipsis_0.3.1              class_7.3-17               
-##   [5] rprojroot_2.0.2             XVector_0.30.0             
-##   [7] GenomicRanges_1.42.0        fs_1.5.0                   
-##   [9] spatstat.data_2.0-0         farver_2.1.0               
-##  [11] prodlim_2019.11.13          lubridate_1.7.10           
-##  [13] codetools_0.2-18            splines_4.0.3              
-##  [15] polyclip_1.10-0             pROC_1.17.0.1              
-##  [17] kernlab_0.9-29              compiler_4.0.3             
-##  [19] Matrix_1.3-0                htmltools_0.5.0            
-##  [21] tools_4.0.3                 igraph_1.2.6               
-##  [23] gtable_0.3.0                glue_1.4.2                 
-##  [25] GenomeInfoDbData_1.2.4      RANN_2.6.1                 
-##  [27] reshape2_1.4.4              Rcpp_1.0.5                 
-##  [29] spatstat_1.64-1             Biobase_2.50.0             
-##  [31] pkgdown_1.6.1               vctrs_0.3.6                
-##  [33] ape_5.4-1                   nlme_3.1-151               
-##  [35] iterators_1.0.13            timeDate_3043.102          
-##  [37] gower_0.2.2                 xfun_0.19                  
-##  [39] stringr_1.4.0               Ecume_0.9.0                
-##  [41] lifecycle_1.0.0             goftest_1.2-2              
-##  [43] zlibbioc_1.36.0             MASS_7.3-53                
-##  [45] scales_1.1.1                ipred_0.9-10               
-##  [47] ragg_1.1.1                  MatrixGenerics_1.2.1       
-##  [49] spatstat.utils_2.0-0        parallel_4.0.3             
-##  [51] SummarizedExperiment_1.20.0 SingleCellExperiment_1.12.0
-##  [53] yaml_2.2.1                  memoise_1.1.0              
-##  [55] pbapply_1.4-3               gridExtra_2.3              
-##  [57] rpart_4.1-15                stringi_1.5.3              
-##  [59] highr_0.8                   S4Vectors_0.28.1           
-##  [61] desc_1.3.0                  randomForest_4.6-14        
-##  [63] foreach_1.5.1               e1071_1.7-4                
-##  [65] BiocGenerics_0.36.0         BiocParallel_1.24.1        
-##  [67] lava_1.6.8.1                GenomeInfoDb_1.26.2        
-##  [69] rlang_0.4.10                pkgconfig_2.0.3            
-##  [71] systemfonts_1.0.1           matrixStats_0.58.0         
-##  [73] bitops_1.0-6                evaluate_0.14              
-##  [75] purrr_0.3.4                 tensor_1.5                 
-##  [77] recipes_0.1.15              labeling_0.4.2             
-##  [79] transport_0.12-2            tidyselect_1.1.0           
-##  [81] plyr_1.8.6                  magrittr_2.0.1             
-##  [83] R6_2.5.0                    IRanges_2.24.1             
-##  [85] generics_0.1.0              DelayedArray_0.16.2        
-##  [87] pillar_1.4.7                withr_2.3.0                
-##  [89] mgcv_1.8-33                 survival_3.2-7             
-##  [91] abind_1.4-5                 RCurl_1.98-1.2             
-##  [93] nnet_7.3-14                 tibble_3.0.4               
-##  [95] crayon_1.4.1                rmarkdown_2.7              
-##  [97] grid_4.0.3                  data.table_1.14.0          
-##  [99] ModelMetrics_1.2.2.2        digest_0.6.27              
-## [101] textshaping_0.3.1           stats4_4.0.3               
-## [103] munsell_0.5.0</code></pre>
+##   [1] colorspace_2.0-0          deldir_0.2-10            
+##   [3] ellipsis_0.3.1            class_7.3-18             
+##   [5] rprojroot_2.0.2           XVector_0.31.1           
+##   [7] fs_1.5.0                  proxy_0.4-25             
+##   [9] spatstat.data_2.1-0       farver_2.1.0             
+##  [11] prodlim_2019.11.13        fansi_0.4.2              
+##  [13] lubridate_1.7.10          sparseMatrixStats_1.3.7  
+##  [15] codetools_0.2-18          splines_4.1.0            
+##  [17] cachem_1.0.4              polyclip_1.10-0          
+##  [19] jsonlite_1.7.2            pROC_1.17.0.1            
+##  [21] kernlab_0.9-29            spatstat.linnet_2.1-1    
+##  [23] spatstat.sparse_2.0-0     compiler_4.1.0           
+##  [25] Matrix_1.3-2              fastmap_1.1.0            
+##  [27] htmltools_0.5.1.1         tools_4.1.0              
+##  [29] igraph_1.2.6              gtable_0.3.0             
+##  [31] glue_1.4.2                GenomeInfoDbData_1.2.4   
+##  [33] RANN_2.6.1                reshape2_1.4.4           
+##  [35] Rcpp_1.0.6                spatstat_2.1-0           
+##  [37] jquerylib_0.1.3           pkgdown_1.6.1            
+##  [39] vctrs_0.3.7               debugme_1.1.0            
+##  [41] nlme_3.1-152              DelayedMatrixStats_1.13.5
+##  [43] iterators_1.0.13          timeDate_3043.102        
+##  [45] gower_0.2.2               xfun_0.22                
+##  [47] stringr_1.4.0             Ecume_0.9.1              
+##  [49] lifecycle_1.0.0           goftest_1.2-2            
+##  [51] zlibbioc_1.37.0           MASS_7.3-53.1            
+##  [53] scales_1.1.1              ipred_0.9-11             
+##  [55] spatstat.core_2.0-0       ragg_1.1.2               
+##  [57] spatstat.utils_2.1-0      yaml_2.2.1               
+##  [59] gridExtra_2.3             memoise_2.0.0            
+##  [61] pbapply_1.4-3             sass_0.3.1               
+##  [63] rpart_4.1-15              stringi_1.5.3            
+##  [65] highr_0.8                 desc_1.3.0               
+##  [67] randomForest_4.6-14       foreach_1.5.1            
+##  [69] e1071_1.7-6               BiocParallel_1.25.5      
+##  [71] lava_1.6.9                rlang_0.4.10             
+##  [73] pkgconfig_2.0.3           systemfonts_1.0.1        
+##  [75] bitops_1.0-6              evaluate_0.14            
+##  [77] purrr_0.3.4               tensor_1.5               
+##  [79] labeling_0.4.2            recipes_0.1.15           
+##  [81] transport_0.12-2          tidyselect_1.1.0         
+##  [83] plyr_1.8.6                magrittr_2.0.1           
+##  [85] R6_2.5.0                  generics_0.1.0           
+##  [87] DelayedArray_0.17.10      mgcv_1.8-34              
+##  [89] pillar_1.5.1              withr_2.4.1              
+##  [91] survival_3.2-10           abind_1.4-5              
+##  [93] RCurl_1.98-1.3            nnet_7.3-15              
+##  [95] tibble_3.1.0              crayon_1.4.1             
+##  [97] utf8_1.2.1                spatstat.geom_2.0-1      
+##  [99] rmarkdown_2.7             grid_4.1.0               
+## [101] data.table_1.14.0         ModelMetrics_1.2.2.2     
+## [103] digest_0.6.27             textshaping_0.3.3        
+## [105] munsell_0.5.0             bslib_0.2.4</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references">
-<div id="ref-Lopez-Paz2016">
-<p>Lopez-Paz, David, and Maxime Oquab. 2016. “Revisiting Classifier Two-Sample Tests.” <em>Arxiv</em>, October, 1–15. <a href="http://arxiv.org/abs/1610.06545">http://arxiv.org/abs/1610.06545</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Lopez-Paz2016" class="csl-entry">
+Lopez-Paz, David, and Maxime Oquab. 2016. <span>“<span>Revisiting Classifier Two-Sample Tests</span>.”</span> <em>Arxiv</em>, October, 1–15. <a href="http://arxiv.org/abs/1610.06545">http://arxiv.org/abs/1610.06545</a>.
 </div>
-<div id="ref-smirnov1939estimation">
-<p>Smirnov, Nikolai V. 1939. “On the Estimation of the Discrepancy Between Empirical Curves of Distribution for Two Independent Samples.” <em>Bull. Math. Univ. Moscou</em> 2 (2): 3–14.</p>
+<div id="ref-smirnov1939estimation" class="csl-entry">
+Smirnov, Nikolai V. 1939. <span>“On the Estimation of the Discrepancy Between Empirical Curves of Distribution for Two Independent Samples.”</span> <em>Bull. Math. Univ. Moscou</em> 2 (2): 3–14.
 </div>
-<div id="ref-Street2018a">
-<p>Street, Kelly, Davide Risso, Russell B. Fletcher, Diya Das, John Ngai, Nir Yosef, Elizabeth Purdom, and Sandrine Dudoit. 2018. “Slingshot: cell lineage and pseudotime inference for single-cell transcriptomics.” <em>BMC Genomics</em> 19 (1): 477. <a href="https://doi.org/10.1186/s12864-018-4772-0">https://doi.org/10.1186/s12864-018-4772-0</a>.</p>
+<div id="ref-Street2018a" class="csl-entry">
+Street, Kelly, Davide Risso, Russell B. Fletcher, Diya Das, John Ngai, Nir Yosef, Elizabeth Purdom, and Sandrine Dudoit. 2018. <span>“<span class="nocase">Slingshot: cell lineage and pseudotime inference for single-cell transcriptomics</span>.”</span> <em>BMC Genomics</em> 19 (1): 477. <a href="https://doi.org/10.1186/s12864-018-4772-0">https://doi.org/10.1186/s12864-018-4772-0</a>.
 </div>
-<div id="ref-VandenBerge2020">
-<p>Van den Berge, Koen, Hector Roux de Bézieux, Kelly Street, Wouter Saelens, Robrecht Cannoodt, Yvan Saeys, Sandrine Dudoit, and Lieven Clement. 2020. “Trajectory-based differential expression analysis for single-cell sequencing data.” <em>Nature Communications</em> 11 (1): 1201. <a href="https://doi.org/10.1038/s41467-020-14766-3">https://doi.org/10.1038/s41467-020-14766-3</a>.</p>
+<div id="ref-VandenBerge2020" class="csl-entry">
+Van den Berge, Koen, Hector Roux de Bézieux, Kelly Street, Wouter Saelens, Robrecht Cannoodt, Yvan Saeys, Sandrine Dudoit, and Lieven Clement. 2020. <span>“<span class="nocase">Trajectory-based differential expression analysis for single-cell sequencing data</span>.”</span> <em>Nature Communications</em> 11 (1): 1201. <a href="https://doi.org/10.1038/s41467-020-14766-3">https://doi.org/10.1038/s41467-020-14766-3</a>.
 </div>
 </div>
 </div>

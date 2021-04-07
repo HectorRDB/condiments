@@ -4,6 +4,9 @@
     <loc>http://hectorrdb.github.io//condiments/index.html</loc>
   </url>
   <url>
+    <loc>http://hectorrdb.github.io//condiments/reference/condiments-package.html</loc>
+  </url>
+  <url>
     <loc>http://hectorrdb.github.io//condiments/reference/create_differential_topology.html</loc>
   </url>
   <url>
@@ -19,9 +22,6 @@
     <loc>http://hectorrdb.github.io//condiments/reference/nLineages.html</loc>
   </url>
   <url>
-    <loc>http://hectorrdb.github.io//condiments/reference/pipe.html</loc>
-  </url>
-  <url>
     <loc>http://hectorrdb.github.io//condiments/reference/progressionTest.html</loc>
   </url>
   <url>
@@ -32,6 +32,9 @@
   </url>
   <url>
     <loc>http://hectorrdb.github.io//condiments/reference/toy_dataset.html</loc>
+  </url>
+  <url>
+    <loc>http://hectorrdb.github.io//condiments/reference/weights_from_pst.html</loc>
   </url>
   <url>
     <loc>http://hectorrdb.github.io//condiments/articles/condiments.html</loc>

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">condiments</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.14</span>
       </span>
     </div>
 
@@ -89,13 +89,13 @@
 
       
 
-      </header><script src="controls_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="controls_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>More controls for the tests used in the condiments workflow</h1>
                         <h4 class="author">Hector Roux de Bézieux</h4>
             
-            <h4 class="date">11 March , 2021</h4>
+            <h4 class="date">07 April , 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/HectorRDB/condiments/blob/master/vignettes/controls.Rmd"><code>vignettes/controls.Rmd</code></a></small>
       <div class="hidden name"><code>controls.Rmd</code></div>
@@ -119,17 +119,16 @@
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">toy_dataset</span><span class="op">$</span><span class="va">sd</span>
 <span class="va">rd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Dim1"</span>, <span class="st">"Dim2"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="va">sds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slingshot/man/slingshot.html">slingshot</a></span><span class="op">(</span><span class="va">rd</span>, <span class="va">df</span><span class="op">$</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
-<pre><code>## Using full covariance matrix</code></pre>
 </div>
 <div id="the-topologytest-function" class="section level1">
 <h1 class="hasAnchor">
 <a href="#the-topologytest-function" class="anchor"></a>The <strong>topologyTest</strong> function</h1>
 <p>By default, the <strong>topologyTest</strong> function requires only two inputs, the <code>sds</code> object and the <code>condition</code> labels. To limit run time for the vignette, we also change the default number of permutations used to generate trajectories under the null by setting the <code>rep</code> argument to <span class="math inline">\(10\)</span> instead of the default <span class="math inline">\(100\)</span>. As such, the test statistics might be more variable.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">top_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/topologyTest.html">topologyTest</a></span><span class="op">(</span>sds <span class="op">=</span> <span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, rep <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <pre><code>## Generating permuted trajectories</code></pre>
 <pre><code>## Running KS-mean test</code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">top_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -149,7 +148,7 @@
 <h2 class="hasAnchor">
 <a href="#changing-the-method-or-the-threshold" class="anchor"></a>Changing the method or the threshold</h2>
 <p>The <strong>topologyTest</strong> function can be relatively slow on large datasets. Moreover, when changing the method used to test the null hypothesis that a common trajectory should be fitted, the first permutation part of generating <code>rep</code> trajectories under the null is identical. Therefore, we allow users to specify more than one method and one value of the threshold. Here, we will use both the Kolmogorov-Smirnov test test<span class="citation">(Smirnov 1939)</span> and the classifier-test<span class="citation">(Lopez-Paz and Oquab 2016)</span>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">top_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/topologyTest.html">topologyTest</a></span><span class="op">(</span>sds <span class="op">=</span> <span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, rep <span class="op">=</span> <span class="fl">10</span>,
                         methods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"KS_mean"</span>, <span class="st">"Classifier"</span><span class="op">)</span>,
                         threshs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.01</span>, <span class="fl">.05</span>, <span class="fl">.1</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -158,7 +157,7 @@
 <pre><code>## Running Classifier test</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Loading required package: ggplot2</code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">top_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -224,13 +223,13 @@
 <h2 class="hasAnchor">
 <a href="#passing-arguments-to-the-test-method" class="anchor"></a>Passing arguments to the test method</h2>
 <p>For all methods but the KS test, additional paramters can be specified, using a custom argument: <code>args_classifier</code>, <code>args_wass</code> or <code>args_mmd</code>. See the help file for given test more information on those parameters. For example, since the default test based on the wasserstein distance and permutation test is quite slow, we can pass a <code>fast</code> argument.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">top_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/topologyTest.html">topologyTest</a></span><span class="op">(</span>sds <span class="op">=</span> <span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, rep <span class="op">=</span> <span class="fl">10</span>,
                         methods <span class="op">=</span> <span class="st">"wasserstein_permutation"</span>,
                         args_wass <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>fast <span class="op">=</span> <span class="cn">TRUE</span>, S <span class="op">=</span> <span class="fl">100</span>, iterations  <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## Generating permuted trajectories</code></pre>
 <pre><code>## Running wassertsein permutation test</code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">top_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -251,7 +250,7 @@
 <h2 class="hasAnchor">
 <a href="#using-parallelisation" class="anchor"></a>Using parallelisation</h2>
 <p>For now, the first part of the <strong>topologyTest</strong> has been designed for parallelisation using the <em>BiocParallel</em> package. For example, to run with 4 cores, you can run the following command</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Bioconductor/BiocParallel">BiocParallel</a></span><span class="op">)</span>
 <span class="va">BPPARAM</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocParallel/man/register.html">bpparam</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">BPPARAM</span><span class="op">$</span><span class="va">progressbar</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
@@ -268,7 +267,7 @@
 <div id="default" class="section level2">
 <h2 class="hasAnchor">
 <a href="#default" class="anchor"></a>Default</h2>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prog_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/progressionTest.html">progressionTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">prog_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
@@ -279,16 +278,16 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">All</td>
-<td align="right">5.506824</td>
+<td align="right">6.665207</td>
 <td align="right">0</td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dif_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiationTest.html">differentiationTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span></code></pre></div>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .
 ## 
 ## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">dif_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -298,15 +297,15 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">1vs2</td>
-<td align="right">0.7017117</td>
-<td align="right">0</td>
+<td align="right">0.6521622</td>
+<td align="right">2.9e-06</td>
 </tr></tbody>
 </table>
 </div>
 <div id="changing-the-method-and-or-threshold" class="section level2">
 <h2 class="hasAnchor">
 <a href="#changing-the-method-and-or-threshold" class="anchor"></a>Changing the method and / or threshold</h2>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prog_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/progressionTest.html">progressionTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, method <span class="op">=</span> <span class="st">"Classifier"</span><span class="op">)</span>
 <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">prog_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
@@ -317,16 +316,16 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">All</td>
-<td align="right">0.6071171</td>
-<td align="right">0.0007749</td>
+<td align="right">0.5800901</td>
+<td align="right">0.0093097</td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dif_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiationTest.html">differentiationTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, thresh <span class="op">=</span> <span class="fl">.05</span><span class="op">)</span></code></pre></div>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .
 ## 
 ## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">dif_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -336,15 +335,15 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">1vs2</td>
-<td align="right">0.5986486</td>
-<td align="right">0.0019017</td>
+<td align="right">0.6211712</td>
+<td align="right">0.0001764</td>
 </tr></tbody>
 </table>
 </div>
 <div id="passing-more-parameters-to-the-test-methods" class="section level2">
 <h2 class="hasAnchor">
 <a href="#passing-more-parameters-to-the-test-methods" class="anchor"></a>Passing more parameters to the test methods</h2>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prog_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/progressionTest.html">progressionTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span>, method <span class="op">=</span> <span class="st">"Classifier"</span>,
                             args_classifier <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>method <span class="op">=</span> <span class="st">"rf"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
@@ -413,7 +412,7 @@
 ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
 ## reset to within valid range</code></pre>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">prog_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -423,16 +422,16 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">All</td>
-<td align="right">0.6161261</td>
-<td align="right">0.0002942</td>
+<td align="right">0.5845946</td>
+<td align="right">0.0064207</td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">dif_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/differentiationTest.html">differentiationTest</a></span><span class="op">(</span><span class="va">sds</span>, conditions <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">conditions</span><span class="op">)</span></code></pre></div>
 <pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .
 ## 
 ## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .</code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">dif_res</span><span class="op">)</span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
@@ -442,8 +441,8 @@
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">1vs2</td>
-<td align="right">0.6341441</td>
-<td align="right">3.41e-05</td>
+<td align="right">0.6206306</td>
+<td align="right">0.0001764</td>
 </tr></tbody>
 </table>
 </div>
@@ -458,11 +457,11 @@
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session Info</h1>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R version 4.0.3 (2020-10-10)
+<pre><code>## R Under development (unstable) (2021-04-05 r80145)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 20.04.1 LTS
+## Running under: Ubuntu 20.04.2 LTS
 ## 
 ## Matrix products: default
 ## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
@@ -476,74 +475,83 @@
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-## [1] caret_6.0-86      ggplot2_3.3.3     lattice_0.20-41   slingshot_1.8.0  
-## [5] princurve_2.1.6   condiments_0.99.0 knitr_1.31       
+##  [1] caret_6.0-86                 ggplot2_3.3.3               
+##  [3] lattice_0.20-41              slingshot_1.99.3            
+##  [5] TrajectoryUtils_0.99.2       SingleCellExperiment_1.13.12
+##  [7] SummarizedExperiment_1.21.2  Biobase_2.51.0              
+##  [9] GenomicRanges_1.43.4         GenomeInfoDb_1.27.9         
+## [11] IRanges_2.25.6               S4Vectors_0.29.12           
+## [13] BiocGenerics_0.37.1          MatrixGenerics_1.3.1        
+## [15] matrixStats_0.58.0           princurve_2.1.6             
+## [17] condiments_0.99.14           knitr_1.31                  
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] nlme_3.1-151                bitops_1.0-6               
-##   [3] matrixStats_0.58.0          fs_1.5.0                   
-##   [5] lubridate_1.7.10            rprojroot_2.0.2            
-##   [7] GenomeInfoDb_1.26.2         tools_4.0.3                
-##   [9] R6_2.5.0                    rpart_4.1-15               
-##  [11] mgcv_1.8-33                 BiocGenerics_0.36.0        
-##  [13] colorspace_2.0-0            nnet_7.3-14                
-##  [15] withr_2.3.0                 tidyselect_1.1.0           
-##  [17] compiler_4.0.3              textshaping_0.3.1          
-##  [19] Biobase_2.50.0              desc_1.3.0                 
-##  [21] DelayedArray_0.16.2         scales_1.1.1               
-##  [23] spatstat.data_2.0-0         randomForest_4.6-14        
-##  [25] pbapply_1.4-3               pkgdown_1.6.1              
-##  [27] goftest_1.2-2               spatstat_1.64-1            
-##  [29] systemfonts_1.0.1           stringr_1.4.0              
-##  [31] digest_0.6.27               spatstat.utils_2.0-0       
-##  [33] rmarkdown_2.7               XVector_0.30.0             
-##  [35] pkgconfig_2.0.3             htmltools_0.5.0            
-##  [37] MatrixGenerics_1.2.1        highr_0.8                  
-##  [39] rlang_0.4.10                generics_0.1.0             
-##  [41] BiocParallel_1.24.1         dplyr_1.0.5                
-##  [43] ModelMetrics_1.2.2.2        RCurl_1.98-1.2             
-##  [45] magrittr_2.0.1              GenomeInfoDbData_1.2.4     
-##  [47] transport_0.12-2            Matrix_1.3-0               
-##  [49] Rcpp_1.0.5                  munsell_0.5.0              
-##  [51] S4Vectors_0.28.1            abind_1.4-5                
-##  [53] ape_5.4-1                   lifecycle_1.0.0            
-##  [55] stringi_1.5.3               pROC_1.17.0.1              
-##  [57] yaml_2.2.1                  MASS_7.3-53                
-##  [59] SummarizedExperiment_1.20.0 zlibbioc_1.36.0            
-##  [61] plyr_1.8.6                  recipes_0.1.15             
-##  [63] grid_4.0.3                  parallel_4.0.3             
-##  [65] crayon_1.4.1                deldir_0.2-10              
-##  [67] splines_4.0.3               tensor_1.5                 
-##  [69] Ecume_0.9.0                 pillar_1.4.7               
-##  [71] igraph_1.2.6                GenomicRanges_1.42.0       
-##  [73] reshape2_1.4.4              codetools_0.2-18           
-##  [75] stats4_4.0.3                glue_1.4.2                 
-##  [77] evaluate_0.14               data.table_1.14.0          
-##  [79] vctrs_0.3.6                 foreach_1.5.1              
-##  [81] RANN_2.6.1                  polyclip_1.10-0            
-##  [83] gtable_0.3.0                purrr_0.3.4                
-##  [85] kernlab_0.9-29              xfun_0.19                  
-##  [87] gower_0.2.2                 prodlim_2019.11.13         
-##  [89] e1071_1.7-4                 ragg_1.1.1                 
-##  [91] class_7.3-17                survival_3.2-7             
-##  [93] timeDate_3043.102           SingleCellExperiment_1.12.0
-##  [95] tibble_3.0.4                iterators_1.0.13           
-##  [97] memoise_1.1.0               IRanges_2.24.1             
-##  [99] lava_1.6.8.1                ellipsis_0.3.1             
-## [101] ipred_0.9-10</code></pre>
+##   [1] colorspace_2.0-0          deldir_0.2-10            
+##   [3] ellipsis_0.3.1            class_7.3-18             
+##   [5] rprojroot_2.0.2           XVector_0.31.1           
+##   [7] fs_1.5.0                  proxy_0.4-25             
+##   [9] spatstat.data_2.1-0       prodlim_2019.11.13       
+##  [11] fansi_0.4.2               lubridate_1.7.10         
+##  [13] sparseMatrixStats_1.3.7   codetools_0.2-18         
+##  [15] splines_4.1.0             cachem_1.0.4             
+##  [17] polyclip_1.10-0           jsonlite_1.7.2           
+##  [19] pROC_1.17.0.1             kernlab_0.9-29           
+##  [21] spatstat.linnet_2.1-1     spatstat.sparse_2.0-0    
+##  [23] compiler_4.1.0            Matrix_1.3-2             
+##  [25] fastmap_1.1.0             htmltools_0.5.1.1        
+##  [27] tools_4.1.0               igraph_1.2.6             
+##  [29] gtable_0.3.0              glue_1.4.2               
+##  [31] GenomeInfoDbData_1.2.4    RANN_2.6.1               
+##  [33] reshape2_1.4.4            dplyr_1.0.5              
+##  [35] Rcpp_1.0.6                spatstat_2.1-0           
+##  [37] jquerylib_0.1.3           pkgdown_1.6.1            
+##  [39] vctrs_0.3.7               debugme_1.1.0            
+##  [41] nlme_3.1-152              DelayedMatrixStats_1.13.5
+##  [43] iterators_1.0.13          timeDate_3043.102        
+##  [45] gower_0.2.2               xfun_0.22                
+##  [47] stringr_1.4.0             Ecume_0.9.1              
+##  [49] lifecycle_1.0.0           goftest_1.2-2            
+##  [51] zlibbioc_1.37.0           MASS_7.3-53.1            
+##  [53] scales_1.1.1              ipred_0.9-11             
+##  [55] spatstat.core_2.0-0       ragg_1.1.2               
+##  [57] spatstat.utils_2.1-0      yaml_2.2.1               
+##  [59] memoise_2.0.0             pbapply_1.4-3            
+##  [61] sass_0.3.1                rpart_4.1-15             
+##  [63] stringi_1.5.3             highr_0.8                
+##  [65] desc_1.3.0                randomForest_4.6-14      
+##  [67] foreach_1.5.1             e1071_1.7-6              
+##  [69] BiocParallel_1.25.5       lava_1.6.9               
+##  [71] rlang_0.4.10              pkgconfig_2.0.3          
+##  [73] systemfonts_1.0.1         bitops_1.0-6             
+##  [75] evaluate_0.14             purrr_0.3.4              
+##  [77] tensor_1.5                recipes_0.1.15           
+##  [79] transport_0.12-2          tidyselect_1.1.0         
+##  [81] plyr_1.8.6                magrittr_2.0.1           
+##  [83] R6_2.5.0                  generics_0.1.0           
+##  [85] DelayedArray_0.17.10      mgcv_1.8-34              
+##  [87] pillar_1.5.1              withr_2.4.1              
+##  [89] survival_3.2-10           abind_1.4-5              
+##  [91] RCurl_1.98-1.3            nnet_7.3-15              
+##  [93] tibble_3.1.0              crayon_1.4.1             
+##  [95] utf8_1.2.1                spatstat.geom_2.0-1      
+##  [97] rmarkdown_2.7             grid_4.1.0               
+##  [99] data.table_1.14.0         ModelMetrics_1.2.2.2     
+## [101] digest_0.6.27             textshaping_0.3.3        
+## [103] munsell_0.5.0             bslib_0.2.4</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references">
-<div id="ref-Lopez-Paz2016">
-<p>Lopez-Paz, David, and Maxime Oquab. 2016. “Revisiting Classifier Two-Sample Tests.” <em>Arxiv</em>, October, 1–15. <a href="http://arxiv.org/abs/1610.06545">http://arxiv.org/abs/1610.06545</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Lopez-Paz2016" class="csl-entry">
+Lopez-Paz, David, and Maxime Oquab. 2016. <span>“<span>Revisiting Classifier Two-Sample Tests</span>.”</span> <em>Arxiv</em>, October, 1–15. <a href="http://arxiv.org/abs/1610.06545">http://arxiv.org/abs/1610.06545</a>.
 </div>
-<div id="ref-smirnov1939estimation">
-<p>Smirnov, Nikolai V. 1939. “On the Estimation of the Discrepancy Between Empirical Curves of Distribution for Two Independent Samples.” <em>Bull. Math. Univ. Moscou</em> 2 (2): 3–14.</p>
+<div id="ref-smirnov1939estimation" class="csl-entry">
+Smirnov, Nikolai V. 1939. <span>“On the Estimation of the Discrepancy Between Empirical Curves of Distribution for Two Independent Samples.”</span> <em>Bull. Math. Univ. Moscou</em> 2 (2): 3–14.
 </div>
 </div>
 </div>
