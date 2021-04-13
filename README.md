@@ -16,7 +16,7 @@ You can install the `condiments` from the devel branch of [bioconductor](https:/
 if(!requireNamespace("BiocManager", quietly = TRUE)) {
  install.packages("BiocManager") 
 }
-BiocManager::install("tradeSeq")
+BiocManager::install("condiments")
 ```
 
 To install the development version in `R`, run 
