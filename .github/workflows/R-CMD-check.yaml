@@ -23,9 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_12'}
-          - { os: ubuntu-latest, r: 'devel', image: 'bioconductor/bioconductor_docker:devel'}
-
+          - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:RELEASE_3_13'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true

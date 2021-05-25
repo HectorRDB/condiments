@@ -199,7 +199,8 @@ setMethod(f = "differentiationTest",
                                 classifier_method = "rf",
                                 thresh = .01, args_classifier = list(),
                                 args_mmd = list(), args_wass = list()){
-            if (is.null(cellWeights@int_metadata$slingshot)) {
+            if (is.null(cellWeights@int_metadata$slingshot) &
+                is.null(colData(cellWeights)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {

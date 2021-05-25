@@ -129,6 +129,7 @@
     )
   }
   order <- rownames(sds)
+  if (is.null(order)) order <- rownames(reducedDim(sds))
   res <- list()
   if ("KS_all" %in% methods) {
     message("Running KS-all test")
@@ -267,7 +268,8 @@ setMethod(f = "topologyTest",
                                 args_classifier = list(),
                                 args_wass = list(),
                                 nmax = ncol(sds)){
-            if (is.null(sds@int_metadata$slingshot)) {
+            if (is.null(sds@int_metadata$slingshot) &
+                is.null(colData(sds)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {

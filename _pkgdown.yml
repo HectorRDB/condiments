@@ -1,0 +1,41 @@
+-url: http://hectorrdb.github.io//condiments
+
+template:
+  params:
+    bootswatch: flatly
+
+home:
+  title: "condiments"
+  type: inverse
+
+
+navbar:
+  right:
+   - icon: fa-github
+     href: https://github.com/HectorRDB/condiments
+
+reference:
+  - title: "differential Topology"
+    desc: > 
+      Those are the functions used for the first step of the condiments workflow
+    contents:
+      - '`imbalance_score`'
+      - '`topologyTest`'
+  - title: "differential progression and differentiation"
+    desc: >
+      Those are the functions used for the second step of the condiments workflow
+    contents:
+      - '`differentiationTest`'
+      - '`progressionTest`'
+  - title: "Example datasets"
+    desc: >
+      This is all the tools to create toy datasets in order to run the examples or discover the other functions
+    contents:
+      - '`toy_dataset`'
+      - '`create_differential_topology`'
+  - title: 'Slinghsot Helper'
+    desc: "A few helpful functions to run slinghsot when under multiple conditions."
+    contents:
+      - '`merge_sds`'
+      - '`nLineages`'
+      - '`slingshot_conditions`'

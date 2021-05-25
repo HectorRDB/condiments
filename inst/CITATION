@@ -3,7 +3,7 @@ citHeader("To cite Dune in publications use:")
 citEntry(
   entry = "Article",
   title = "Trajectory inference across multiple conditions with condiments: differential topology, progression, differentiation, and expression",
-  author = "Hector Roux de Bezieux and Koen Van den Berge and Kelly Street and Sandrine Dudoit",
+  author = "Hector {Roux de Bezieux} and Koen Van den Berge and Kelly Street and Sandrine Dudoit",
   year = "2021",
 	doi = "10.1101/2021.03.09.433671",
 	publisher = "Cold Spring Harbor Laboratory",

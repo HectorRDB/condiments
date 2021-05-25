@@ -10,7 +10,7 @@
 
 ## Installation
 
-You can install the `condiments` from the devel branch of [bioconductor](https://www.bioconductor.org/packages/devel/bioc/html/condiments.html) using
+You can install the `condiments` from [bioconductor](https://bioconductor.org/packages/release/bioc/html/condiments.html) using
 
 ```r
 if(!requireNamespace("BiocManager", quietly = TRUE)) {
@@ -19,7 +19,7 @@ if(!requireNamespace("BiocManager", quietly = TRUE)) {
 BiocManager::install("condiments")
 ```
 
-To install the development version in `R`, run 
+To install the development version in `R`, run:
 
 ```r
 if(!requireNamespace("devtools", quietly = TRUE)) {

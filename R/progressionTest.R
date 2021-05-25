@@ -257,7 +257,8 @@ setMethod(f = "progressionTest",
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
     args_classifier = list(), args_wass = list(), rep = 1e4){
-            if (is.null(pseudotime@int_metadata$slingshot)) {
+            if (is.null(pseudotime@int_metadata$slingshot) &
+                is.null(colData(pseudotime)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {

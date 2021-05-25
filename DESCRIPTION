@@ -11,7 +11,7 @@ Description: This package encapsulate many functions to conduct a differential t
 License: MIT + file LICENSE
 Encoding: UTF-8
 URL: https://hectorrdb.github.io/condiments/index.html
-Depends: R (>= 4.1)
+Depends: R (>= 4.0)
 VignetteBuilder: knitr
 biocViews:
     RNASeq,
