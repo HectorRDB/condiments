@@ -69,7 +69,7 @@
 }
 
 .recompute_skeleton <- function(sds) {
-  mst <- metadata(sds)$mst
+  mst <- sds@metadata$$mst
   rd <- slingReducedDim(sds)
   clusters <- apply(slingClusterLabels(sds), 1, function(r) {which(r == 1)})
   centers <- base::rowsum(rd, group = clusters)
@@ -80,7 +80,7 @@
     return(cts)
   })
   igraph::V(mst)$coordinates <- centers
-  metadata(sds)$mst <- mst
+  sds@metadata$$mst <- mst
   return(sds)
 }
 
