@@ -1,5 +1,5 @@
 .condition_sling <- function(sds, conditions) {
-  sdss <- slingshot_conditions(sds, conditions)
+  sdss <- slingshot_conditions(sds, conditions, adjust_skeleton = FALSE)
   psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE)
   psts <- do.call('rbind', psts)
   ws <- lapply(sdss, slingshot::slingCurveWeights)

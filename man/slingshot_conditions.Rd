@@ -9,11 +9,29 @@
 \usage{
 slingshot_conditions(sds, ...)
 
-\S4method{slingshot_conditions}{SlingshotDataSet}(sds, conditions, approx_points = 100, ...)
+\S4method{slingshot_conditions}{SlingshotDataSet}(
+  sds,
+  conditions,
+  approx_points = 100,
+  adjust_skeleton = TRUE,
+  ...
+)
 
-\S4method{slingshot_conditions}{SingleCellExperiment}(sds, conditions, approx_points = 100, ...)
+\S4method{slingshot_conditions}{SingleCellExperiment}(
+  sds,
+  conditions,
+  approx_points = 100,
+  adjust_skeleton = TRUE,
+  ...
+)
 
-\S4method{slingshot_conditions}{PseudotimeOrdering}(sds, conditions, approx_points = 100, ...)
+\S4method{slingshot_conditions}{PseudotimeOrdering}(
+  sds,
+  conditions,
+  approx_points = 100,
+  adjust_skeleton = TRUE,
+  ...
+)
 }
 \arguments{
 \item{sds}{A slingshot object already run on the full dataset. Can be either a
@@ -25,13 +43,16 @@ slingshot_conditions(sds, ...)
 column of the metadata contains this vector.}
 
 \item{approx_points}{Passed to \code{\link[slingshot]{getCurves}}}
+
+\item{adjust_skeleton}{Boolean, default to `TRUE`. Whether to recompute the locations
+of the nodes after fitting per conditions.}
 }
 \value{
 A list of \code{\link[slingshot]{SlingshotDataSet}}, one per condition.
 }
 \description{
-Test whether or not slingshot should be fitted independently
-for different conditions or not.
+Based on an original slingshot object, refit one trajectory per
+condition, using the same skeleton.
 }
 \examples{
 data('slingshotExample', package = "slingshot")

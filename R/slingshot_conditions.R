@@ -68,16 +68,34 @@
   return(sdss)
 }
 
-#' Differential Topology Test
+.recompute_skeleton <- function(sds) {
+  mst <- metadata(sds)$mst
+  rd <- slingReducedDim(sds)
+  clusters <- apply(slingClusterLabels(sds), 1, function(r) {which(r == 1)})
+  centers <- base::rowsum(rd, group = clusters)
+  centers <- apply(centers, 2, function(dim) {dim / as.vector(table(clusters))})
+  centers <- as.list(as.data.frame(t(centers)))
+  centers <- lapply(centers, function(cts) {
+    names(cts) <- colnames(rd)
+    return(cts)
+  })
+  igraph::V(mst)$coordinates <- centers
+  metadata(sds)$mst <- mst
+  return(sds)
+}
+
+#' Conditions slingshot
 #'
-#' @description Test whether or not slingshot should be fitted independently
-#' for different conditions or not.
+#' @description Based on an original slingshot object, refit one trajectory per
+#' condition, using the same skeleton.
 #'
 #' @param sds A slingshot object already run on the full dataset. Can be either a
 #' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
 #' column of the metadata contains this vector.
 #' @param approx_points Passed to \code{\link[slingshot]{getCurves}}
+#' @param adjust_skeleton Boolean, default to `TRUE`. Whether to recompute the locations
+#' of the nodes after fitting per conditions.
 #' @param ... Other arguments passed to \code{\link[slingshot]{getCurves}}
 #' @return
 #' A list of \code{\link[slingshot]{SlingshotDataSet}}, one per condition.
@@ -96,10 +114,13 @@
 #' @rdname slingshot_conditions
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SlingshotDataSet"),
-          definition = function(sds, conditions, approx_points = 100, ...) {
+          definition = function(sds, conditions, approx_points = 100,
+                                adjust_skeleton = TRUE, ...) {
             sdss <- slingshot_conditions(sds = as.PseudotimeOrdering(sds),
                                          conditions = conditions,
-                                         approx_points = approx_points, ...)
+                                         approx_points = approx_points,
+                                         adjust_skeleton = adjust_skeleton,
+                                         ...)
             return(sdss)
           }
 )
@@ -110,8 +131,9 @@ setMethod(f = "slingshot_conditions",
 #' @importFrom SummarizedExperiment colData
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SingleCellExperiment"),
-          definition = function(sds, conditions, approx_points = 100, ...) {
-            if (is.null(sds@int_metadata$slingshot)) {
+          definition = function(sds, conditions, approx_points = 100,
+                                adjust_skeleton = TRUE, ...) {
+            if (is.null(sds@int_metadata$slingshot) & is.null(colData(sds)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
             if (length(conditions) == 1) {
@@ -123,7 +145,9 @@ setMethod(f = "slingshot_conditions",
             }
             return(slingshot_conditions(slingshot::SlingshotDataSet(sds),
                                         conditions = conditions,
-                                        approx_points = approx_points, ...))
+                                        approx_points = approx_points,
+                                        adjust_skeleton = adjust_skeleton,
+                                        ...))
           }
 )
 
@@ -135,9 +159,14 @@ setMethod(f = "slingshot_conditions",
 #' @export
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "PseudotimeOrdering"),
-          definition = function(sds, conditions, approx_points = 100, ...) {
+          definition = function(sds, conditions, approx_points = 100,
+                                adjust_skeleton = TRUE, ...) {
             sdss <- .sling_cond(sds = sds, conditions = conditions,
-                                approx_points = approx_points, ...)
+                                approx_points = approx_points,
+                                ...)
+            if (adjust_skeleton) {
+              sdss <- lapply(sdss, .recompute_skeleton)
+            }
             return(sdss)
           }
 )
