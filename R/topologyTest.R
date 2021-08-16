@@ -1,9 +1,14 @@
-.condition_sling <- function(sds, conditions) {
-  sdss <- slingshot_conditions(sds, conditions, adjust_skeleton = FALSE)
-  psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE)
-  psts <- do.call('rbind', psts)
-  ws <- lapply(sdss, slingshot::slingCurveWeights)
-  ws <- do.call('rbind', ws)
+.condition_sling <- function(sds, conditions, verbose = TRUE) {
+  sdss <- slingshot_conditions(sds, conditions, adjust_skeleton = FALSE,
+                               verbose = verbose)
+  psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE) %>%
+    lapply(., as.data.frame) %>%
+    bind_rows(.)
+  psts[is.na(psts)] <- 0
+  ws <- lapply(sdss, slingshot::slingCurveWeights) %>%
+    lapply(., as.data.frame) %>%
+    bind_rows(.)
+  ws[is.na(ws)] <- 0
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   return(list("psts" = psts, "ws" = ws))
 }
@@ -53,7 +58,8 @@
   return(res)
 }
 
-.topologyTest_classifier <- function(permutations, og, threshs, sds, rep, args_classifier, order){
+.topologyTest_classifier <- function(permutations, og, threshs, sds, rep,
+                                     args_classifier, order){
   psts <- lapply(permutations, '[[', 1) %>%
     lapply(function(df) {
       as.matrix(df[order, ])
@@ -115,7 +121,7 @@
                           args_classifier = list(), args_wass = list(),
                           nmax = nrow(slingshot::slingPseudotime(sds))) {
   message("Generating permuted trajectories")
-  og <- .condition_sling(sds, conditions)
+  og <- .condition_sling(sds, conditions, verbose = FALSE)
   permutations <- lapply(seq_len(rep), function(i) {
     return(sample(conditions))
   })
@@ -213,7 +219,7 @@
 #' @export
 #' @importFrom Ecume classifier_test ks_test wasserstein_permut
 #' @importFrom slingshot SlingshotDataSet getCurves slingPseudotime slingCurveWeights
-#' @importFrom dplyr n_distinct
+#' @importFrom dplyr n_distinct bind_rows
 #' @importFrom pbapply pblapply
 #' @importFrom BiocParallel bplapply bpparam
 #' @rdname topologyTest
@@ -223,7 +229,8 @@ setMethod(f = "topologyTest",
                                 conditions,
                                 rep = 100,
                                 threshs = .01,
-                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2,
+                                                 "KS_mean", "Classifier"),
                                 parallel = FALSE,
                                 BPPARAM = BiocParallel::bpparam(),
                                 args_mmd = list(),
@@ -261,7 +268,8 @@ setMethod(f = "topologyTest",
                                 conditions,
                                 rep = 100,
                                 threshs = .01,
-                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2,
+                                                 "KS_mean", "Classifier"),
                                 parallel = FALSE,
                                 BPPARAM = BiocParallel::bpparam(),
                                 args_mmd = list(),
@@ -302,7 +310,8 @@ setMethod(f = "topologyTest",
                                 conditions,
                                 rep = 100,
                                 threshs = .01,
-                                methods = ifelse(dplyr::n_distinct(conditions) == 2, "KS_mean", "Classifier"),
+                                methods = ifelse(dplyr::n_distinct(conditions) == 2,
+                                                 "KS_mean", "Classifier"),
                                 parallel = FALSE,
                                 BPPARAM = BiocParallel::bpparam(),
                                 args_mmd = list(),

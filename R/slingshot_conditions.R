@@ -47,7 +47,8 @@
   return(sds_cond)
 }
 
-.sling_cond <- function(sds, conditions, approx_points = 100, ...) {
+.sling_cond <- function(sds, conditions, approx_points = 100, verbose = TRUE,
+                        ...) {
   if (n_distinct(conditions) == 1) {
     cond <- conditions[1]
     return(list(cond = sds))
@@ -59,7 +60,9 @@
       cluss <- colnames(slingClusterLabels(sds_cond))[
         colSums(slingClusterLabels(sds_cond)) == 0]
       clus <- cluss[1]
-      .message_missing_clus(clus, cond)
+      if (verbose) {
+        .message_missing_clus(clus, cond)
+      }
       sds_cond <- .clean_mst(sds_cond, cluss)
     }
     sdss[[cond]] <- slingshot::getCurves(sds_cond, approx_points = approx_points,
@@ -96,6 +99,7 @@
 #' @param approx_points Passed to \code{\link[slingshot]{getCurves}}
 #' @param adjust_skeleton Boolean, default to `TRUE`. Whether to recompute the locations
 #' of the nodes after fitting per conditions.
+#' @param verbose Boolean, default to `TRUE`. Control whether messages are printed.
 #' @param ... Other arguments passed to \code{\link[slingshot]{getCurves}}
 #' @return
 #' A list of \code{\link[slingshot]{SlingshotDataSet}}, one per condition.
@@ -115,7 +119,7 @@
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, ...) {
+                                adjust_skeleton = TRUE, message = TRUE, ...) {
             sdss <- slingshot_conditions(sds = as.PseudotimeOrdering(sds),
                                          conditions = conditions,
                                          approx_points = approx_points,
@@ -132,7 +136,7 @@ setMethod(f = "slingshot_conditions",
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, ...) {
+                                adjust_skeleton = TRUE, message = TRUE, ...) {
             if (is.null(sds@int_metadata$slingshot) & is.null(colData(sds)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -160,7 +164,7 @@ setMethod(f = "slingshot_conditions",
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "PseudotimeOrdering"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, ...) {
+                                adjust_skeleton = TRUE, message = TRUE, ...) {
             sdss <- .sling_cond(sds = sds, conditions = conditions,
                                 approx_points = approx_points,
                                 ...)

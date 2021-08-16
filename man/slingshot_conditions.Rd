@@ -14,6 +14,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
+  message = TRUE,
   ...
 )
 
@@ -22,6 +23,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
+  message = TRUE,
   ...
 )
 
@@ -30,6 +32,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
+  message = TRUE,
   ...
 )
 }
@@ -46,6 +49,8 @@ column of the metadata contains this vector.}
 
 \item{adjust_skeleton}{Boolean, default to `TRUE`. Whether to recompute the locations
 of the nodes after fitting per conditions.}
+
+\item{verbose}{Boolean, default to `TRUE`. Control whether messages are printed.}
 }
 \value{
 A list of \code{\link[slingshot]{SlingshotDataSet}}, one per condition.
