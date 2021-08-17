@@ -3,12 +3,41 @@
                                verbose = verbose)
   psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE) %>%
     lapply(., as.data.frame) %>%
-    bind_rows(.)
-  psts[is.na(psts)] <- 0
+    bind_rows(., .id = "condition")
   ws <- lapply(sdss, slingshot::slingCurveWeights) %>%
     lapply(., as.data.frame) %>%
-    bind_rows(.)
-  ws[is.na(ws)] <- 0
+    bind_rows(., .id = "condition")
+  # If a lineage is missing for some condition, we use the others to extrapolate
+  uncommon <- lapply(sdss, slingLineages) %>%
+    lapply(., names) %>% unlist() %>% table()
+  uncommon <- names(uncommon)[uncommon != length(sdss)]
+  for (lin in uncommon) {
+    has_lin <- lapply(sdss, function(sds_cond){
+      lin %in% names(slingLineages(sds_cond))
+    }) %>% unlist()
+    sdss_lin <- sdss[has_lin]
+    cond_not_lin <- names(sdss)[!has_lin]
+    for (cond in cond_not_lin) {
+      psts[psts$condition == cond, lin] <- lapply(sdss_lin, function(sds_lin) {
+        new_pst <- slingshot::predict(object = sds_lin, slingReducedDim(sdss[[cond]])) %>%
+          slingPseudotime(., na = FALSE)
+        new_pst <- new_pst[, lin]
+      }) %>%
+        Reduce(f = '+') %>%
+        `/`(., sum(has_lin))
+      ws[ws$condition == cond, lin] <-
+        lapply(sdss_lin, function(sds_lin) {
+          new_ws <- slingshot::predict(object = sds_lin, slingReducedDim(sdss[[cond]])) %>%
+            slingCurveWeights()
+          new_ws <- new_ws[, lin]
+        }) %>%
+        Reduce(f = '+') %>%
+        `/`(., sum(has_lin))
+    }
+
+  }
+  psts <- psts[, -which(colnames(psts) == "condition"), drop = FALSE] %>% as.matrix()
+  ws <- ws[, -which(colnames(ws) == "condition"), drop = FALSE] %>% as.matrix()
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   return(list("psts" = psts, "ws" = ws))
 }

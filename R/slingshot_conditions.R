@@ -1,5 +1,5 @@
 .message_missing_clus <- function(clus, cond) {
-  message(paste0("Cluster ", clus, " contains no cells condition ", cond,
+  message(paste0("Cluster ", clus, " contains no cells of condition ", cond,
                  ". This means you should either lower the clustering ",
                  "resolution before running trajectory inference or fit",
                  " one trajectory per condition"))
@@ -38,12 +38,13 @@
     inside <- as.matrix(inside)
     diag(inside) <- FALSE
   }
-  names(sds_cond@metadata$lineages) <-
-    paste0("Lineage", seq_along(slingLineages(sds_cond)))
+  # names(sds_cond@metadata$lineages) <-
+  #   paste0("Lineage", seq_along(slingLineages(sds_cond)))
   # Params
   sds_cond@metadata$slingParams$end.clus <-
     sapply(slingLineages(sds_cond), utils::tail, n = 1)
-  sds_cond <- sds_cond[,paste0("Lineage", seq_along(slingLineages(sds_cond)))]
+  # sds_cond <- sds_cond[, paste0("Lineage", seq_along(slingLineages(sds_cond)))]
+  sds_cond <- sds_cond[, names(sds_cond@metadata$lineages)]
   return(sds_cond)
 }
 
@@ -119,11 +120,12 @@
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, message = TRUE, ...) {
+                                adjust_skeleton = TRUE, verbose = TRUE, ...) {
             sdss <- slingshot_conditions(sds = as.PseudotimeOrdering(sds),
                                          conditions = conditions,
                                          approx_points = approx_points,
                                          adjust_skeleton = adjust_skeleton,
+                                         verbose = verbose,
                                          ...)
             return(sdss)
           }
@@ -136,7 +138,7 @@ setMethod(f = "slingshot_conditions",
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "SingleCellExperiment"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, message = TRUE, ...) {
+                                adjust_skeleton = TRUE, verbose = TRUE, ...) {
             if (is.null(sds@int_metadata$slingshot) & is.null(colData(sds)$slingshot)) {
               stop("For now this only works downstream of slingshot")
             }
@@ -151,6 +153,7 @@ setMethod(f = "slingshot_conditions",
                                         conditions = conditions,
                                         approx_points = approx_points,
                                         adjust_skeleton = adjust_skeleton,
+                                        verbose = verbose,
                                         ...))
           }
 )
@@ -164,9 +167,10 @@ setMethod(f = "slingshot_conditions",
 setMethod(f = "slingshot_conditions",
           signature = c(sds = "PseudotimeOrdering"),
           definition = function(sds, conditions, approx_points = 100,
-                                adjust_skeleton = TRUE, message = TRUE, ...) {
+                                adjust_skeleton = TRUE, verbose = TRUE, ...) {
             sdss <- .sling_cond(sds = sds, conditions = conditions,
                                 approx_points = approx_points,
+                                verbose = verbose,
                                 ...)
             if (adjust_skeleton) {
               sdss <- lapply(sdss, .recompute_skeleton)

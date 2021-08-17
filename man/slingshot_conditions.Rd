@@ -14,7 +14,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
-  message = TRUE,
+  verbose = TRUE,
   ...
 )
 
@@ -23,7 +23,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
-  message = TRUE,
+  verbose = TRUE,
   ...
 )
 
@@ -32,7 +32,7 @@ slingshot_conditions(sds, ...)
   conditions,
   approx_points = 100,
   adjust_skeleton = TRUE,
-  message = TRUE,
+  verbose = TRUE,
   ...
 )
 }
