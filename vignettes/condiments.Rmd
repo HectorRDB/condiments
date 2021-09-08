@@ -174,7 +174,7 @@ knitr::kable(prog_res)
 
 As expected, there is a global difference over all lineages, which is driven by differences of distribution across lineage 2 (i.e. the bottom one).
 
-# Differential differentiation
+# Differential fate selection
 
 Even though we can fit a common trajectory, it does not mean that the cells will differentiate similarly between the conditions. The first question we can ask is: for a given lineage, are cells equally between the two lineages for the two conditions? 
 
@@ -197,17 +197,17 @@ The distribution has tri modes, which is very often the case for two lineages:
 
 In condition A, we have many more cells with a weight of 0 and, since those are density plots, fewer cells with weights around .5 and 1. Visually, we can guess that cells in condition B differentiate preferentially along lineage 1.
 
-## Testing for differential differentiation
+## Testing for differential fate selection
 
-To test for differential differentiation, we use the __differentiationTest__. The test can be run with `global = TRUE` to test when pooling all pairs of lineages, or `pairwise = TRUE` to test every pair independently, or both. Here, there is only one pair so the options are equivalent. Several tests are implemented in the __differentiationTest__. function. Here, we will use the default, the classifier test[@Lopez-Paz2016].
+To test for differential fate selection, we use the __fateSelectionTest__. The test can be run with `global = TRUE` to test when pooling all pairs of lineages, or `pairwise = TRUE` to test every pair independently, or both. Here, there is only one pair so the options are equivalent. Several tests are implemented in the __fateSelectionTest__. function. Here, we will use the default, the classifier test[@Lopez-Paz2016].
 
 ```{r}
 set.seed(12)
-dif_res <- differentiationTest(sds, conditions = df$conditions, global = FALSE, pairwise = TRUE)
+dif_res <- fateSelectionTest(sds, conditions = df$conditions, global = FALSE, pairwise = TRUE)
 knitr::kable(dif_res)
 ```
 
-As could be guessed from the plot, we have clear differential differentiation.
+As could be guessed from the plot, we have clear differential fate selection.
 
 # Differential Expression
 

@@ -32,6 +32,6 @@ test_that("Differential progression and differentiation work",{
   ws <- weights_from_pst(ordering)
   expect_is(progressionTest(ordering, ws, condition),
             "data.frame")
-  expect_is(differentiationTest(ws, condition),
+  expect_is(fateSelectionTest(ws, condition),
             "data.frame")
 })

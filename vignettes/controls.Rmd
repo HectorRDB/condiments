@@ -88,7 +88,7 @@ top_res <- topologyTest(sds = sds, conditions = df$conditions, rep = 100,
 knitr::kable(top_res)
 ```
 
-# Differential progression and differentiation
+# Differential progression and fate selection
 
 The tests for the second test are much less compute-intensive, therefore there is no parallelisation. However, the other changes introduce in the previous section are still possible
 
@@ -97,7 +97,7 @@ The tests for the second test are much less compute-intensive, therefore there i
 ```{r}
 prog_res <- progressionTest(sds, conditions = df$conditions)
 knitr::kable(prog_res)
-dif_res <- differentiationTest(sds, conditions = df$conditions)
+dif_res <- fateSelectionTest(sds, conditions = df$conditions)
 knitr::kable(dif_res)
 ```
 
@@ -106,7 +106,7 @@ knitr::kable(dif_res)
 ```{r}
 prog_res <- progressionTest(sds, conditions = df$conditions, method = "Classifier")
 knitr::kable(prog_res)
-dif_res <- differentiationTest(sds, conditions = df$conditions, thresh = .05)
+dif_res <- fateSelectionTest(sds, conditions = df$conditions, thresh = .05)
 knitr::kable(dif_res)
 ```
 
@@ -116,7 +116,7 @@ knitr::kable(dif_res)
 prog_res <- progressionTest(sds, conditions = df$conditions, method = "Classifier",
                             args_classifier = list(method = "rf"))
 knitr::kable(prog_res)
-dif_res <- differentiationTest(sds, conditions = df$conditions)
+dif_res <- fateSelectionTest(sds, conditions = df$conditions)
 knitr::kable(dif_res)
 ```
 

@@ -52,17 +52,19 @@ methods::setGeneric(
   }
 )
 
-#' @name differentiationTest
-#' @title Differential Differentiation Test
+#' @name fateSelectionTest
+#' @title Differential fate selection Test
 #' @param ... parameters including:
 #' @import methods
 methods::setGeneric(
-  name = "differentiationTest",
+  name = "fateSelectionTest",
   signature = "cellWeights",
   def = function(cellWeights, ...) {
-    standardGeneric("differentiationTest")
+    standardGeneric("fateSelectionTest")
   }
 )
+
+
 
 #' @name nLineages
 #' @title Number of lineages

@@ -1,2 +1,5 @@
+Changes in version 1.1.04 (2021-03-01)
++ Renaming the differentiationTest to the fateSelectionTest
+
 Changes in version 0.99.0 (2021-03-01)
 + Submitted to Bioconductor

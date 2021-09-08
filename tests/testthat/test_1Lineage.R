@@ -29,7 +29,8 @@ test_that("All tests work with just one lineage", {
   test_full <- progressionTest(sds, conditions = condition, lineages = TRUE)
   expect_equal(test, test_full[1,])
   set.seed(07)
-  expect_error(test <- differentiationTest(sds, conditions = condition))
-  expect_error(differentiationTest(cellWeights = slingCurveWeights(sds),
-                                   conditions = condition))
+  expect_error(test <- fateSelectionTest(sds, conditions = condition))
+  expect_error(fateSelectionTest(cellWeights = slingCurveWeights(sds),
+                                 conditions = condition)
+                )
 })
