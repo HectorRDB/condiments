@@ -235,7 +235,6 @@ setMethod(f = "progressionTest_multipleSamples",
 #'
 #' @description Test whether or not slingshot should be fitted independently
 #' for different conditions or not, per sample, with samples not being confounded by conditions.
-#'
 #' @param sds A slingshot object already run on the full dataset. Can be either a
 #' \code{\link{SlingshotDataSet}} or a \code{\link{SingleCellExperiment}} object.
 #' @param conditions Either the vector of conditions, or a character indicating which
@@ -256,6 +255,7 @@ setMethod(f = "progressionTest_multipleSamples",
 #' topologyTest_multipleSamples(sds = sds, conditions = condition,
 #'                              Samples = samples, rep = 10)
 #' @export
+#' @rdname topologyTest_multipleSamples
 setMethod(f = "topologyTest_multipleSamples",
           signature = c(sds = "SlingshotDataSet"),
           definition = function(sds, conditions, Samples, ...){
