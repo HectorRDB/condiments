@@ -76,6 +76,15 @@ test_that("The progressionTest work on all tests", {
   expect_is(test, "data.frame")
   expect_equal(dim(test), c(1, 3))
   expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
+  set.seed(23)
+  samples <- ifelse(condition == "A",
+                    sample(1:2, length(condition), replace = TRUE),
+                    sample(3:4, length(condition), replace = TRUE))
+  test <- progressionTest(pseudotime = sds, conditions = condition, rep = 2,
+                          method = "distinct", distinct_samples = samples)
+  expect_is(test, "data.frame")
+  expect_equal(dim(test), c(1, 3))
+  expect_equal(colnames(test),  c("lineage", "statistic", "p.value"))
 })
 
 test_that("The progressionTest error when it should", {

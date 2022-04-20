@@ -40,6 +40,22 @@ setMethod(f = "weights_from_pst",
             return(.weights_from_pst(pseudotime))
           }
 )
+# Distinct help ----
+.distinct_inputs <- function(x, distinct_samples, conditions) {
+  colData <- data.frame(Samples = distinct_samples,
+                        Cluster = 1,
+                        "conditions" = conditions)
+  sce <- SummarizedExperiment::SummarizedExperiment(
+    assays = list("Pseudotime" = matrix(c(x, x), nrow = 2, byrow = TRUE)),
+    colData = colData
+  )
+  design <- colData %>%
+    dplyr::select(Samples, conditions) %>%
+    dplyr::distinct() %>%
+    dplyr::arrange(Samples) %>%
+    model.matrix(~conditions, .)
+  return(list(sce = sce, design = design))
+}
 
 # Sds merge ----
 

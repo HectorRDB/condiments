@@ -25,7 +25,6 @@ methods::setGeneric(
   }
 )
 
-
 #' @export
 #' @name topologyTest
 #' @title Differential Topology Test
@@ -87,5 +86,41 @@ methods::setGeneric(
   signature = "sds",
   def = function(sds, ...) {
     standardGeneric("slingshot_conditions")
+  }
+)
+
+#' @name progressionTest_multipleSamples
+#' @title Differential Progression Test with multiple samples
+#' @param ... parameters including:
+#' @import methods
+methods::setGeneric(
+  name = "progressionTest_multipleSamples",
+  signature = "pseudotime",
+  def = function(pseudotime, ...) {
+    standardGeneric("progressionTest_multipleSamples")
+  }
+)
+
+#' @name fateSelectionTest_multipleSamples
+#' @title Differential fate selection Test with multiple samples
+#' @param ... parameters including:
+#' @import methods
+methods::setGeneric(
+  name = "fateSelectionTest_multipleSamples",
+  signature = "cellWeights",
+  def = function(cellWeights, ...) {
+    standardGeneric("fateSelectionTest_multipleSamples")
+  }
+)
+
+#' @name topologyTest_multipleSamples
+#' @title Differential Topology Test with multiple samples
+#' @param ... parameters including:
+#' @import methods
+methods::setGeneric(
+  name = "topologyTest_multipleSamples",
+  signature = "sds",
+  def = function(sds, ...) {
+    standardGeneric("topologyTest_multipleSamples")
   }
 )

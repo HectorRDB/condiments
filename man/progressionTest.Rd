@@ -21,7 +21,8 @@ progressionTest(pseudotime, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  rep = 10000
+  rep = 10000,
+  distinct_samples = NULL
 )
 
 \S4method{progressionTest}{SlingshotDataSet}(
@@ -34,7 +35,8 @@ progressionTest(pseudotime, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  rep = 10000
+  rep = 10000,
+  distinct_samples = NULL
 )
 
 \S4method{progressionTest}{SingleCellExperiment}(
@@ -47,7 +49,8 @@ progressionTest(pseudotime, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  rep = 10000
+  rep = 10000,
+  distinct_samples = NULL
 )
 
 \S4method{progressionTest}{PseudotimeOrdering}(
@@ -60,7 +63,8 @@ progressionTest(pseudotime, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  rep = 10000
+  rep = 10000,
+  distinct_samples = NULL
 )
 }
 \arguments{
@@ -96,8 +100,11 @@ the 'classifier'.}
 \item{args_wass}{arguments passed to the wasserstein permutation test. See
 \code{\link{wasserstein_permut}}.}
 
-\item{rep}{Number of permutations to run. Ignored if \code{method = "KS"}.
-Default to \code{1e4}.}
+\item{rep}{Number of permutations to run. Only for methods "Permutations" and
+"wasserstein_permutation". Default to \code{1e4}.}
+
+\item{distinct_samples}{The samples to which each cell belong to. Only use
+with method \code{distinct}. See \verb{\code{\link{distinct_test}}} for help.}
 }
 \value{
 A data frame with 3 columns:

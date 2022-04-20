@@ -20,7 +20,8 @@ topologyTest(sds, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  nmax = nrow(slingshot::slingPseudotime(sds))
+  nmax = nrow(slingshot::slingPseudotime(sds)),
+  distinct_samples = NULL
 )
 
 \S4method{topologyTest}{SingleCellExperiment}(
@@ -34,7 +35,8 @@ topologyTest(sds, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  nmax = ncol(sds)
+  nmax = ncol(sds),
+  distinct_samples = NULL
 )
 
 \S4method{topologyTest}{PseudotimeOrdering}(
@@ -48,7 +50,8 @@ topologyTest(sds, ...)
   args_mmd = list(),
   args_classifier = list(),
   args_wass = list(),
-  nmax = nrow(slingshot::slingPseudotime(sds))
+  nmax = nrow(slingshot::slingPseudotime(sds)),
+  distinct_samples = NULL
 )
 }
 \arguments{
@@ -83,6 +86,9 @@ back-end to be used for computations. See
 \code{\link{wasserstein_permut}}.}
 
 \item{nmax}{How many samples to use to compute the mmd test. See details.}
+
+\item{distinct_samples}{The samples to which each cell belong to. Only use
+with method `distinct`. See `\code{\link{distinct_test}}` for help.}
 }
 \value{
 A list containing the following components:
@@ -114,5 +120,5 @@ cl <- slingshotExample$cl
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 sds <- slingshot::getLineages(rd, cl)
-topologyTest(sds, condition, rep = 20)
+topologyTest(sds, condition, rep = 10)
 }

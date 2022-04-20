@@ -9,7 +9,8 @@
 .progressionTest <- function(pst, ws, conditions, global = TRUE, lineages = FALSE,
                              method = "KS",  thresh = 0.05, rep = 1e4,
                              args_mmd = list(), args_wass = list(),
-                             args_classifier = list()) {
+                             args_classifier = list(),
+                             distinct_samples = NULL) {
   # Get variables
   ws <- sweep(ws, 1, FUN = "/", STATS = apply(ws, 1, sum))
   colnames(pst) <- colnames(ws) <-
@@ -50,7 +51,7 @@
       test_l <- do.call(Ecume::classifier_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
-    if(method == "mmd") {
+    if (method == "mmd") {
       n <- max(table(conditions))
       frac <- 10^5 / (n * (n - 1))
       args <- args_mmd
@@ -60,7 +61,7 @@
       test_l <- do.call(Ecume::mmd_test, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
-    if(method == "wasserstein_permutation") {
+    if (method == "wasserstein_permutation") {
       n <- max(table(conditions))
       S <- min(10^5, n)
       args <- args_wass
@@ -70,10 +71,22 @@
       test_l <- do.call(Ecume::wasserstein_permut, args)
       return(c("statistic" = test_l$statistic, "p.value" = test_l$p.value))
     }
+    if (method == "distinct") {
+      inputs <- .distinct_inputs(pst_l, distinct_samples[w_l > 0], conditions[w_l > 0])
+      test_l <- distinct_test(x = inputs$sce, name_assays_expression = "Pseudotime",
+                              name_cluster = "Cluster", name_sample = "Samples",
+                              design = inputs$design,
+                              column_to_test = 2, min_non_zero_cells = 0,
+                              n_cores = 1)
+      return(c("statistic" = qnorm(test_l$p_val[1]), "p.value" = test_l$p_val[1]))
+    }
   }) %>%
     dplyr::bind_rows(.id = "lineage") %>%
     dplyr::mutate(lineage = as.character(lineage)) %>%
     dplyr::select(lineage, statistic, p.value)
+
+
+  # Get global p-values
 
   if (method == "Classifier") {
     xs <- lapply(unique(conditions), function(cond) {
@@ -101,7 +114,7 @@
     args$S <- S; args$fast <- TRUE; args$iterations <- rep
     glob_test <- do.call(Ecume::wasserstein_permut, args)
   }
-  if (method %in% c("KS", "Permutation")) {
+  if (method %in% c("KS", "Permutation", "distinct")) {
     glob_test <- Ecume::stouffer_zscore(pvals = lineages_test$p.value,
                                         weights = colSums(ws))
   }
@@ -142,11 +155,14 @@
 #' @param args_mmd arguments passed to the mmd test. See \code{\link{mmd_test}}.
 #' @param args_wass arguments passed to the wasserstein permutation test. See
 #' \code{\link{wasserstein_permut}}.
-#' @param rep Number of permutations to run. Ignored if \code{method = "KS"}.
-#' Default to \code{1e4}.
+#' @param distinct_samples The samples to which each cell belong to. Only use
+#' with method `distinct`. See `\code{\link{distinct_test}}` for help.
+#' @param rep Number of permutations to run. Only for methods "Permutations" and
+#' "wasserstein_permutation". Default to \code{1e4}.
 #' @importFrom slingshot slingshot SlingshotDataSet slingPseudotime slingCurveWeights
 #' @importFrom stats weighted.mean
-#' @importFrom dplyr n_distinct bind_rows mutate select
+#' @importFrom dplyr n_distinct bind_rows mutate select distinct
+#' @importFrom distinct distinct_test
 #' @details
 #' For every lineage, we compare the pseudotimes of the cells from either
 #' conditions, using the lineage weights as observations weights.
@@ -196,10 +212,13 @@ setMethod(f = "progressionTest",
     global = TRUE, lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
-    args_classifier = list(), args_wass = list(), rep = 1e4){
+    args_classifier = list(), args_wass = list(), rep = 1e4,
+    distinct_samples = NULL){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
-                               "wasserstein_permutation")) {
-              stop("Method must be one of KS, Classifier, mmd or permutation")
+                               "wasserstein_permutation", "distinct")) {
+              stop(paste0(
+                "Method must be one of KS, Classifier, mmd, permutation",
+                ", wasserstein_permutation or distinct"))
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning("Changing to method classifier since more than ",
@@ -211,7 +230,8 @@ setMethod(f = "progressionTest",
                                     lineages = lineages, method = method,
                                     thresh = thresh, rep = rep,
                                     args_mmd = args_mmd, args_wass = args_wass,
-                                    args_classifier = args_classifier)
+                                    args_classifier = args_classifier,
+                                    distinct_samples = distinct_samples)
             return(res)
           }
 )
@@ -224,10 +244,13 @@ setMethod(f = "progressionTest",
     lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
-    args_classifier = list(), args_wass = list(), rep = 1e4){
+    args_classifier = list(), args_wass = list(), rep = 1e4,
+    distinct_samples = NULL){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
-                               "wasserstein_permutation")) {
-              stop("Method must be one of KS, Classifier, mmd or permutation")
+                               "wasserstein_permutation", "distinct")) {
+              stop(paste0(
+                "Method must be one of KS, Classifier, mmd, permutation",
+                ", wasserstein_permutation or distinct"))
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning("Changing to method classifier since more than ",
@@ -240,7 +263,8 @@ setMethod(f = "progressionTest",
                                    method = method, thresh = thresh,
                                    rep = rep, args_mmd = args_mmd,
                                    args_wass = args_wass,
-                                   args_classifier = args_classifier)
+                                   args_classifier = args_classifier,
+                                   distinct_samples = distinct_samples)
             return(res)
           }
 )
@@ -256,7 +280,8 @@ setMethod(f = "progressionTest",
     lineages = FALSE,
     method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
     thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
-    args_classifier = list(), args_wass = list(), rep = 1e4){
+    args_classifier = list(), args_wass = list(), rep = 1e4,
+    distinct_samples = NULL){
             if (is.null(pseudotime@int_metadata$slingshot) &
                 is.null(colData(pseudotime)$slingshot)) {
               stop("For now this only works downstream of slingshot")
@@ -276,7 +301,8 @@ setMethod(f = "progressionTest",
                                    lineages = lineages, method = method,
                                    thresh = thresh, rep = rep,
                                    args_mmd = args_mmd, args_wass = args_wass,
-                                   args_classifier = args_classifier))
+                                   args_classifier = args_classifier,
+                                   distinct_samples = distinct_samples))
           }
 )
 
@@ -289,10 +315,13 @@ setMethod(f = "progressionTest",
                                 lineages = FALSE,
                                 method = ifelse(dplyr::n_distinct(conditions) == 2, "KS", "Classifier"),
                                 thresh = ifelse(method == "Classifer", .05, .01), args_mmd = list(),
-                                args_classifier = list(), args_wass = list(), rep = 1e4){
+                                args_classifier = list(), args_wass = list(), rep = 1e4,
+                                distinct_samples = NULL){
             if (!method %in% c("KS", "Permutation", "Classifier", "mmd",
-                               "wasserstein_permutation")) {
-              stop("Method must be one of KS, Classifier, mmd or permutation")
+                               "wasserstein_permutation", "distinct")) {
+              stop(paste0(
+                "Method must be one of KS, Classifier, mmd, permutation",
+                ", wasserstein_permutation or distinct"))
             }
             if (n_distinct(conditions) > 2 && method != "Classifier") {
               warning("Changing to method classifier since more than ",
@@ -306,7 +335,8 @@ setMethod(f = "progressionTest",
                                     method = method, thresh = thresh,
                                     rep = rep, args_mmd = args_mmd,
                                     args_wass = args_wass,
-                                    args_classifier = args_classifier)
+                                    args_classifier = args_classifier,
+                                    distinct_samples = distinct_samples)
             return(res)
           }
 )
