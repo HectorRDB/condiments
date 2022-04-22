@@ -1,7 +1,8 @@
 # Fit one slingshot object per condition ----
 .condition_sling <- function(sds, conditions, verbose = TRUE) {
   sdss <- slingshot_conditions(sds, conditions, adjust_skeleton = FALSE,
-                               verbose = verbose)
+                               verbose = verbose,
+                               approx_points = sds@metadata$slingParams$approx_points)
   psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE) %>%
     lapply(., as.data.frame) %>%
     bind_rows(., .id = "condition")
