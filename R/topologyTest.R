@@ -2,7 +2,7 @@
 .condition_sling <- function(sds, conditions, verbose = TRUE) {
   sdss <- slingshot_conditions(sds, conditions, adjust_skeleton = FALSE,
                                verbose = verbose,
-                               approx_points = sds@metadata$slingParams$approx_points)
+                               approx_points = slingParams(sds)$approx_points)
   psts <- lapply(sdss, slingshot::slingPseudotime, na = FALSE) %>%
     lapply(., as.data.frame) %>%
     bind_rows(., .id = "condition")
@@ -82,6 +82,8 @@
 
 .topologyTest_distinct_mean <- function(permutations, og, sds, rep, distinct_samples,
                                         conditions) {
+  distinct_samples <- rep(distinct_samples, nLineages(sds))
+  conditions <- rep(conditions, nLineages(sds))
   psts <- lapply(permutations, '[[', 1) %>% Reduce(f = '+') %>%
     as.vector()
   psts <- psts / rep
@@ -91,9 +93,11 @@
   og_ws <- og$ws %>% as.vector()
   og_psts <- og_psts[og_ws > 0]
   psts <- psts[ws > 0]
-  inputs <- .distinct_inputs(c(og_psts, psts),
-                             c(distinct_samples[og_ws > 0], distinct_samples[ws > 0]),
-                             c(conditions[og_ws > 0], conditions[ws > 0]))
+  inputs <- .distinct_inputs(x = c(og_psts, psts),
+                             distinct_samples = c(distinct_samples[og_ws > 0],
+                                                  distinct_samples[ws > 0]),
+                             conditions = c(conditions[og_ws > 0],
+                                            conditions[ws > 0]))
   res <- distinct_test(x = inputs$sce, name_assays_expression = "Pseudotime",
                           name_cluster = "Cluster", name_sample = "Samples",
                           design = inputs$design,
