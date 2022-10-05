@@ -1,7 +1,7 @@
 library(testthat)
 library(slingshot)
 library(SingleCellExperiment)
-library(TSCAN)
+# library(TSCAN)
 
 data(list = 'slingshotExample', package = "slingshot")
 if (!"cl" %in% ls()) {
@@ -11,7 +11,7 @@ if (!"cl" %in% ls()) {
 condition <- factor(rep(c('A','B'), length.out = nrow(rd)))
 condition[110:139] <- 'A'
 mst <- createClusterMST(rd, cl)
-mapping <- try(mapCellsToEdges(rd, mst, cl))
+mapping <- try(mapCellsToEdges(rd, mst, cl),silent = T)
 if (class(mapping) != "try-error") {
   ordering <- pathStat(orderCells(mapping, mst, start = 1))
 
