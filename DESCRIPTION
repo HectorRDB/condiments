@@ -1,6 +1,6 @@
 Package: condiments
 Type: Package
-Title: Differential Topology, Progression and Differentiation
+Title: Differential Topology, Progression and Differentiation.
 Version: 1.5.0
 Authors@R: c(person("Hector", "Roux de Bezieux", role = c("aut", "cre"),
                      email = "hector.rouxdebezieux@berkeley.edu",
