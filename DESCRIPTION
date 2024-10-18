@@ -51,4 +51,5 @@ Suggests:
     RColorBrewer,
     randomForest,
     tidyr,
-    TSCAN
+    TSCAN,
+    DelayedMatrixStats
