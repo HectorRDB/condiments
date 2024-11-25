@@ -25,9 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-latest, r: 'release', bioc: '3.13'}
-          - { os: macOS-latest, r: 'release', bioc: '3.13'}
-          - { os: ubuntu-20.04, r: 'release', bioc: '3.13', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - { os: windows-latest, r: 'release', bioc: '3.20'}
+          - { os: macOS-latest, r: 'release', bioc: '3.20'}
+          - { os: ubuntu-20.04, r: 'release', bioc: '3.20', cran: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
           - { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:devel'}
 
     env:
