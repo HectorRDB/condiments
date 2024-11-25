@@ -214,10 +214,10 @@
   order <- rownames(sds)
   if (is.null(order)) order <- rownames(reducedDim(sds))
   permutations <- lapply(permutations, function(perm){
-    lapply(perm, function(dat) dat[order, ]) %>% return()
+    lapply(perm, function(dat) dat[order, , drop = FALSE]) %>% return()
   })
   og <- lapply(og, function(dat){
-    return(dat[order, ])
+    return(dat[order, , drop = FALSE])
   })
 
   return(list("og" = og, "permutations" = permutations))
